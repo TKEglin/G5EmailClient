@@ -35,10 +35,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ClientSize = new System.Drawing.Size(982, 553);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "MainWindow";
-            this.Text = "G5 Email Client";
             this.ResumeLayout(false);
 
         }
