@@ -24,10 +24,31 @@ namespace G5EmailClient.Email
 
         IDatabase.User activeUser = new();
 
+        IMailFolder? activeFolder;
+        List<MimeMessage> activeFolderMessages = new();
+
         public MailKitEmail()
         {
+            // Initalizing class data variables.
             List<IDatabase.User> users = data.GetUsers();
-            
+
+        }
+
+        /// <summary>
+        /// Sets as active and opens the given folder
+        /// </summary>
+        /// <param name="folder"></param>
+        void updateActiveFolder(IMailFolder folder)
+        {
+            activeFolder = folder;
+            folder.Open(FolderAccess.ReadWrite);
+
+            activeFolderMessages.Clear();
+            // Adding the messages from oldest to newest
+            foreach(var message in activeFolder.Reverse())
+            {
+                activeFolderMessages.Add(message);
+            }
         }
 
         /// <summary>
@@ -88,6 +109,8 @@ namespace G5EmailClient.Email
             }
             activeUser.password = password;
             activeUser.username = username;
+            // Preparing main window
+            updateActiveFolder(imapClient.Inbox);
             return null;
         }
         #endregion
@@ -132,6 +155,19 @@ namespace G5EmailClient.Email
         }
         #endregion
 
-
+        //__________________________________________
+        // Functions that supply IMAP info to the GUI
+        #region imap interaction functions
+        List<(string from, string subject)> IEmail.GetFolderEnvelopes()
+        {
+            List<(string, string)> envelopes = new();
+            if(activeFolder != null)
+                foreach(var message in activeFolderMessages)
+                {
+                    envelopes.Add((message.From.ToString(), message.Subject));
+                }
+            return envelopes;
+        }
+        #endregion
     }
 }

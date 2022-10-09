@@ -48,22 +48,22 @@
             this.folders_lisbox = new System.Windows.Forms.ListBox();
             this.account_info_panel = new System.Windows.Forms.Panel();
             this.connected_email_label = new System.Windows.Forms.Label();
-            this.inbox_panel = new System.Windows.Forms.Panel();
             this.inbox_listview = new System.Windows.Forms.ListView();
             this.from_header = new System.Windows.Forms.ColumnHeader();
             this.subject_header = new System.Windows.Forms.ColumnHeader();
-            this.search_folder_textbox = new System.Windows.Forms.TextBox();
             this.main_panel = new System.Windows.Forms.Panel();
             this.main_tab = new System.Windows.Forms.TabControl();
             this.open_message_tab = new System.Windows.Forms.TabPage();
             this.compose_message_tab = new System.Windows.Forms.TabPage();
+            this.search_folder_textbox = new System.Windows.Forms.TextBox();
+            this.inbox_panel = new System.Windows.Forms.Panel();
             this.top_panel.SuspendLayout();
             this.top_toolstrip.SuspendLayout();
             this.folders_panel.SuspendLayout();
             this.account_info_panel.SuspendLayout();
-            this.inbox_panel.SuspendLayout();
             this.main_panel.SuspendLayout();
             this.main_tab.SuspendLayout();
+            this.inbox_panel.SuspendLayout();
             this.SuspendLayout();
             // 
             // top_panel
@@ -224,9 +224,9 @@
             this.folders_lisbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.folders_lisbox.FormattingEnabled = true;
             this.folders_lisbox.ItemHeight = 20;
-            this.folders_lisbox.Location = new System.Drawing.Point(0, 30);
+            this.folders_lisbox.Location = new System.Drawing.Point(0, 23);
             this.folders_lisbox.Name = "folders_lisbox";
-            this.folders_lisbox.Size = new System.Drawing.Size(198, 585);
+            this.folders_lisbox.Size = new System.Drawing.Size(198, 592);
             this.folders_lisbox.TabIndex = 1;
             // 
             // account_info_panel
@@ -235,32 +235,21 @@
             this.account_info_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.account_info_panel.Location = new System.Drawing.Point(0, 0);
             this.account_info_panel.Name = "account_info_panel";
-            this.account_info_panel.Size = new System.Drawing.Size(198, 30);
+            this.account_info_panel.Size = new System.Drawing.Size(198, 23);
             this.account_info_panel.TabIndex = 0;
             // 
             // connected_email_label
             // 
             this.connected_email_label.AutoSize = true;
             this.connected_email_label.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.connected_email_label.Location = new System.Drawing.Point(0, 5);
+            this.connected_email_label.Location = new System.Drawing.Point(0, 1);
             this.connected_email_label.MaximumSize = new System.Drawing.Size(198, 0);
             this.connected_email_label.MinimumSize = new System.Drawing.Size(198, 0);
             this.connected_email_label.Name = "connected_email_label";
             this.connected_email_label.Size = new System.Drawing.Size(198, 20);
             this.connected_email_label.TabIndex = 0;
-            this.connected_email_label.Text = "<connected email>";
+            this.connected_email_label.Text = "<active email>";
             this.connected_email_label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // inbox_panel
-            // 
-            this.inbox_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.inbox_panel.Controls.Add(this.inbox_listview);
-            this.inbox_panel.Controls.Add(this.search_folder_textbox);
-            this.inbox_panel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.inbox_panel.Location = new System.Drawing.Point(200, 30);
-            this.inbox_panel.Name = "inbox_panel";
-            this.inbox_panel.Size = new System.Drawing.Size(302, 617);
-            this.inbox_panel.TabIndex = 2;
             // 
             // inbox_listview
             // 
@@ -270,7 +259,7 @@
             this.inbox_listview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.inbox_listview.Location = new System.Drawing.Point(0, 23);
             this.inbox_listview.Name = "inbox_listview";
-            this.inbox_listview.Size = new System.Drawing.Size(300, 592);
+            this.inbox_listview.Size = new System.Drawing.Size(400, 592);
             this.inbox_listview.TabIndex = 5;
             this.inbox_listview.UseCompatibleStateImageBehavior = false;
             this.inbox_listview.View = System.Windows.Forms.View.Details;
@@ -278,32 +267,21 @@
             // from_header
             // 
             this.from_header.Text = "From";
-            this.from_header.Width = 149;
+            this.from_header.Width = 199;
             // 
             // subject_header
             // 
             this.subject_header.Text = "Subject";
-            this.subject_header.Width = 150;
-            // 
-            // search_folder_textbox
-            // 
-            this.search_folder_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.search_folder_textbox.Dock = System.Windows.Forms.DockStyle.Top;
-            this.search_folder_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.search_folder_textbox.Location = new System.Drawing.Point(0, 0);
-            this.search_folder_textbox.Name = "search_folder_textbox";
-            this.search_folder_textbox.PlaceholderText = "Search..";
-            this.search_folder_textbox.Size = new System.Drawing.Size(300, 23);
-            this.search_folder_textbox.TabIndex = 4;
+            this.subject_header.Width = 199;
             // 
             // main_panel
             // 
             this.main_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.main_panel.Controls.Add(this.main_tab);
             this.main_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.main_panel.Location = new System.Drawing.Point(502, 30);
+            this.main_panel.Location = new System.Drawing.Point(602, 30);
             this.main_panel.Name = "main_panel";
-            this.main_panel.Size = new System.Drawing.Size(616, 617);
+            this.main_panel.Size = new System.Drawing.Size(516, 617);
             this.main_panel.TabIndex = 3;
             // 
             // main_tab
@@ -314,7 +292,7 @@
             this.main_tab.Location = new System.Drawing.Point(0, 0);
             this.main_tab.Name = "main_tab";
             this.main_tab.SelectedIndex = 0;
-            this.main_tab.Size = new System.Drawing.Size(614, 615);
+            this.main_tab.Size = new System.Drawing.Size(514, 615);
             this.main_tab.TabIndex = 0;
             // 
             // open_message_tab
@@ -322,7 +300,7 @@
             this.open_message_tab.Location = new System.Drawing.Point(4, 29);
             this.open_message_tab.Name = "open_message_tab";
             this.open_message_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.open_message_tab.Size = new System.Drawing.Size(606, 582);
+            this.open_message_tab.Size = new System.Drawing.Size(506, 582);
             this.open_message_tab.TabIndex = 0;
             this.open_message_tab.Text = "Message";
             this.open_message_tab.UseVisualStyleBackColor = true;
@@ -332,10 +310,32 @@
             this.compose_message_tab.Location = new System.Drawing.Point(4, 29);
             this.compose_message_tab.Name = "compose_message_tab";
             this.compose_message_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.compose_message_tab.Size = new System.Drawing.Size(606, 582);
+            this.compose_message_tab.Size = new System.Drawing.Size(506, 582);
             this.compose_message_tab.TabIndex = 1;
             this.compose_message_tab.Text = "Compose";
             this.compose_message_tab.UseVisualStyleBackColor = true;
+            // 
+            // search_folder_textbox
+            // 
+            this.search_folder_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.search_folder_textbox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.search_folder_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.search_folder_textbox.Location = new System.Drawing.Point(0, 0);
+            this.search_folder_textbox.Name = "search_folder_textbox";
+            this.search_folder_textbox.PlaceholderText = "Search..";
+            this.search_folder_textbox.Size = new System.Drawing.Size(400, 23);
+            this.search_folder_textbox.TabIndex = 4;
+            // 
+            // inbox_panel
+            // 
+            this.inbox_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.inbox_panel.Controls.Add(this.inbox_listview);
+            this.inbox_panel.Controls.Add(this.search_folder_textbox);
+            this.inbox_panel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.inbox_panel.Location = new System.Drawing.Point(200, 30);
+            this.inbox_panel.Name = "inbox_panel";
+            this.inbox_panel.Size = new System.Drawing.Size(402, 617);
+            this.inbox_panel.TabIndex = 2;
             // 
             // MainWindow
             // 
@@ -358,10 +358,10 @@
             this.folders_panel.ResumeLayout(false);
             this.account_info_panel.ResumeLayout(false);
             this.account_info_panel.PerformLayout();
-            this.inbox_panel.ResumeLayout(false);
-            this.inbox_panel.PerformLayout();
             this.main_panel.ResumeLayout(false);
             this.main_tab.ResumeLayout(false);
+            this.inbox_panel.ResumeLayout(false);
+            this.inbox_panel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -376,11 +376,9 @@
         private ToolStripDropDownButton move_message_dropdown;
         private ToolStripDropDownButton settings_dropdown;
         private Panel folders_panel;
-        private Panel inbox_panel;
         private Panel main_panel;
         private ToolStripButton open_inbox_button;
         private ToolStripButton contacts_button;
-        private TextBox search_folder_textbox;
         private TabControl main_tab;
         private TabPage open_message_tab;
         private TabPage compose_message_tab;
@@ -396,5 +394,7 @@
         private ListBox folders_lisbox;
         private Panel account_info_panel;
         private Label connected_email_label;
+        private TextBox search_folder_textbox;
+        private Panel inbox_panel;
     }
 }

@@ -19,9 +19,24 @@ namespace G5EmailClient.GUI
             EmailClient = ParamEmailClient;
 
             // Opening connection form
-            //this.Visible = false;
-            //Application.Run(new ConnectionForm(EmailClient));
+            this.Visible = false;
+            Application.Run(new ConnectionForm(EmailClient));
             this.Visible = true;
+
+            // Initializing email data.
+            updateInboxView();
+        }
+
+        /// <summary>
+        /// Gets message envelopes for the active inbox and adds them to the inbox_view
+        /// </summary>
+        void updateInboxView()
+        {
+            var envelopes = EmailClient.GetFolderEnvelopes();
+            foreach(var envelope in envelopes)
+            {
+                inbox_listview.Items.Add(new ListViewItem(new[] { envelope.from, envelope.subject }));
+            }
         }
     }
 }
