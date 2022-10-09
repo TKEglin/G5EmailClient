@@ -15,7 +15,7 @@ namespace G5EmailClient.GUI
             EmailClient = ParamEmailClient;
 
             // Opening connection form
-            this.Visible = false;
+            this.Visible = true; // Set to true for testing, should be false
             Application.Run(new ConnectionForm(EmailClient));
             this.Visible = true;
 

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConnectionForm));
             this.server_connect_panel = new System.Windows.Forms.Panel();
             this.SMTP_port_box = new System.Windows.Forms.NumericUpDown();
             this.SMTP_port_label = new System.Windows.Forms.Label();
@@ -383,7 +384,7 @@
             // save_button_tooltip
             // 
             this.save_button_tooltip.AutomaticDelay = 50;
-            this.save_button_tooltip.AutoPopDelay = 50000;
+            this.save_button_tooltip.AutoPopDelay = 5000000;
             this.save_button_tooltip.BackColor = System.Drawing.SystemColors.HighlightText;
             this.save_button_tooltip.InitialDelay = 50;
             this.save_button_tooltip.ReshowDelay = 10;
@@ -407,6 +408,7 @@
             this.Controls.Add(this.server_connect_panel);
             this.Controls.Add(this.connect_button);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ConnectionForm";
             this.Text = "ConnectionForm";
             this.server_connect_panel.ResumeLayout(false);

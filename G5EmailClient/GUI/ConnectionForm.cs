@@ -115,6 +115,9 @@ namespace G5EmailClient.GUI
             }
             else
             {
+                // Hiding tooltip so new messages don't show old tooltips.
+                message_label_tooltip.Active = false;
+                // Hiding label.
                 label.Visible = false;
             }
         }
@@ -180,6 +183,7 @@ namespace G5EmailClient.GUI
                 // Showing message to user
                 showMessage(message_label, "Connection error. Move mouse here for details.", 0, Color.Red);
                 // Updating tooltip
+                message_label_tooltip.Active = true;
                 message_label_tooltip.SetToolTip(message_label, attempt.ToString());
             }
             this.Cursor = Cursors.Default;
@@ -198,6 +202,7 @@ namespace G5EmailClient.GUI
                 // Showing message to user
                 showMessage(message_label, "Authentication error. Move mouse here for details.", 0, Color.Red);
                 // Updating tooltip
+                message_label_tooltip.Active = true;
                 message_label_tooltip.SetToolTip(message_label, attempt.ToString());
             }
             this.Cursor = Cursors.Default;
@@ -227,7 +232,7 @@ namespace G5EmailClient.GUI
 
         private void delete_user_button_Click(object sender, EventArgs e)
         {
-            string? selectedUsername = saved_users_list.SelectedItem.ToString();
+            string? selectedUsername = saved_users_list.SelectedItem?.ToString();
             if(selectedUsername == null)
             {
                 showMessage(message_label, "Please select a user from the list.", 1.5, Color.Black);
@@ -237,7 +242,7 @@ namespace G5EmailClient.GUI
                 if (EmailClient.DeleteUser(selectedUsername) == 1) // If delete successful
                 {
                     // Remove the username from the list
-                    saved_users_list.Items.Remove(saved_users_list.SelectedItem);
+                    saved_users_list.Items.Remove(saved_users_list.SelectedItem!);
 
                     // If the deleted user is the default user, default user must be updated
                     if(selectedUsername == EmailClient.GetDefaultUser().username)
@@ -265,7 +270,7 @@ namespace G5EmailClient.GUI
 
         private void load_user_button_Click(object sender, EventArgs e)
         {
-            string? selectedUsername = saved_users_list.SelectedItem.ToString();
+            string? selectedUsername = saved_users_list.SelectedItem?.ToString();
             if (selectedUsername == null)
             {
                 showMessage(message_label, "Please select a user from the list.", 1.5, Color.Black);
