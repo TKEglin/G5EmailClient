@@ -11,6 +11,17 @@ namespace G5EmailClient.Email
     public interface IEmail
     {
         /// <summary>
+        /// Contains message information.
+        /// </summary>
+        public class Message
+        {
+            public string from    { get; set; } = string.Empty;
+            public string to      { get; set; } = string.Empty;
+            public string subject { get; set; } = string.Empty;
+            public string body    { get; set; } = string.Empty;
+        }
+
+        /// <summary>
         /// Cleanly disconnects from all servers.
         /// </summary>
         public void Disconnect();
@@ -53,6 +64,12 @@ namespace G5EmailClient.Email
         IDatabase.User? GetUser(string username);
 
         /// <summary>
+        /// Gets the active user.
+        /// </summary>
+        /// <returns>The active user.</returns>
+        IDatabase.User GetActiveUser();
+
+        /// <summary>
         /// Gets the user whose username matches the saved default username.
         /// </summary>
         /// <returns> Returns the user if found. 
@@ -83,6 +100,13 @@ namespace G5EmailClient.Email
         /// Gets the from email and subject line of all emails in the active folder.
         /// </summary>
         /// <returns>A list of string tuples. The first string is from, the second is subject.</returns>
-        List<(string from, string subject)> GetFolderEnvelopes();
+        List<(string from, string subject, bool read)> GetFolderEnvelopes();
+
+        /// <summary>
+        /// Retrives and returns a message from the active folder given an index.
+        /// </summary>
+        /// <param name="messageIndex">Returns a message if index is within range. Otherwise, retuns null.</param>
+        /// <returns></returns>
+        Message? GetMessage(int messageIndex);
     }
 }

@@ -25,7 +25,9 @@ namespace G5EmailClient.Email
         IDatabase.User activeUser = new();
 
         IMailFolder? activeFolder;
+        // These two lists will contains a message and its ID at the same index
         List<MimeMessage> activeFolderMessages = new();
+        List<UniqueId> activeFolderUIDS = new();
 
         public MailKitEmail()
         {
@@ -44,11 +46,19 @@ namespace G5EmailClient.Email
             folder.Open(FolderAccess.ReadWrite);
 
             activeFolderMessages.Clear();
+            activeFolderUIDS.Clear();
             // Adding the messages from oldest to newest
             foreach(var message in activeFolder.Reverse())
             {
                 activeFolderMessages.Add(message);
             }
+            foreach (var UID in activeFolder.Fetch(0, -1, 
+                                                   MessageSummaryItems.UniqueId))
+            {
+                activeFolderUIDS.Add(UID.UniqueId);
+            }
+            // To correspond with messages, the list must be reversed.
+            activeFolderUIDS.Reverse();
         }
 
         /// <summary>
@@ -61,6 +71,11 @@ namespace G5EmailClient.Email
             // __To be implemented__
 
             return true;
+        }
+
+        IDatabase.User IEmail.GetActiveUser()
+        {
+            return activeUser;
         }
 
          //__________________________________________
@@ -158,15 +173,42 @@ namespace G5EmailClient.Email
         //__________________________________________
         // Functions that supply IMAP info to the GUI
         #region imap interaction functions
-        List<(string from, string subject)> IEmail.GetFolderEnvelopes()
+        List<(string from, string subject, bool read)> IEmail.GetFolderEnvelopes()
         {
-            List<(string, string)> envelopes = new();
-            if(activeFolder != null)
-                foreach(var message in activeFolderMessages)
+            List<(string, string, bool)> envelopes = new();
+
+            // This list will contain the flags
+            var flags = activeFolder.Fetch(activeFolderUIDS, MessageSummaryItems.Flags);
+            if (activeFolder != null)
+                // This foreach loop merges the messages and UID lists to
+                // add them to the return list in one iteration.
+                foreach (var item in activeFolderMessages.Zip(flags, (a, b) => new { message = a, flag = b }))
                 {
-                    envelopes.Add((message.From.ToString(), message.Subject));
+                    // Gettings seen flag for message
+                    var seenFlag = item.flag.Flags.Value.HasFlag(MessageFlags.Seen);
+                    envelopes.Add((item.message.From.ToString(), item.message.Subject, seenFlag));
                 }
+
             return envelopes;
+        }
+
+        IEmail.Message? IEmail.GetMessage(int messageIndex)
+        {
+            if(messageIndex < activeFolderMessages.Count & messageIndex >= 0)
+            {
+                var ImapMessage = activeFolderMessages[messageIndex];
+                IEmail.Message message = new();
+                    message.from = ImapMessage.From.ToString();
+                    message.to = ImapMessage.To.ToString();
+                    message.subject = ImapMessage.Subject;
+                    message.body = ImapMessage.Body.ToString();
+                return message;
+            }
+            else
+            {
+                return null;
+            }
+            
         }
         #endregion
     }
