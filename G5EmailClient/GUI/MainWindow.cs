@@ -11,17 +11,17 @@ namespace G5EmailClient.GUI
         {
             InitializeComponent();
 
+            // Enabling window dragging for controls
             AddDraggingControl(this);
+            AddDraggingControl(top_toolstrip);
 
             // Saving email client to local variable
             EmailClient = ParamEmailClient;
 
             // Opening connection form
-            this.Visible = true; // Set to true for testing, should be false
-            Application.Run(new ConnectionForm(EmailClient));
+            //this.Visible = false;
+            //Application.Run(new ConnectionForm(EmailClient));
             this.Visible = true;
-
-
         }
     }
 }
