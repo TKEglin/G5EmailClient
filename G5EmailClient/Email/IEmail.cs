@@ -78,5 +78,11 @@ namespace G5EmailClient.Email
         /// </summary>
         /// <returns>Returns 0 if new user added, 1 if user is overwritten.</returns>
         int SaveUser(IDatabase.User saveUser);
+
+        /// <summary>
+        /// Gets the from email and subject line of all emails in the active folder.
+        /// </summary>
+        /// <returns>A list of string tuples. The first string is from, the second is subject.</returns>
+        List<(string from, string subject)> GetFolderEnvelopes();
     }
 }
