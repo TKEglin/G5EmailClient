@@ -111,6 +111,7 @@ namespace G5EmailClient.Database
                 if (username == user!["username"]!.GetValue<string>())
                 {
                     email_data["DefaultUser"] = username;
+                    SaveData();
                     return 1;
                 }
             }

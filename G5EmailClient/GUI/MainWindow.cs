@@ -11,11 +11,15 @@ namespace G5EmailClient.GUI
         {
             InitializeComponent();
 
+            // Saving email client to local variable
             EmailClient = ParamEmailClient;
 
+            // Opening connection form
             this.Visible = false;
             Application.Run(new ConnectionForm(EmailClient));
             this.Visible = true;
+
+
         }
     }
 }

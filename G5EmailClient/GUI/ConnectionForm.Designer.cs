@@ -307,7 +307,7 @@
             this.users_button.Location = new System.Drawing.Point(696, 421);
             this.users_button.Name = "users_button";
             this.users_button.Size = new System.Drawing.Size(94, 29);
-            this.users_button.TabIndex = 9;
+            this.users_button.TabIndex = 0;
             this.users_button.Text = "Users";
             this.users_button.UseVisualStyleBackColor = true;
             this.users_button.Click += new System.EventHandler(this.users_button_Click);

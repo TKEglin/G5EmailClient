@@ -84,7 +84,6 @@ namespace G5EmailClient.Email
             }
             catch(Exception ex)
             {
-                ((IEmail)this).Disconnect();
                 return ex;
             }
             activeUser.password = password;

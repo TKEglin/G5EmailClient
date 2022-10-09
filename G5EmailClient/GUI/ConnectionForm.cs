@@ -250,6 +250,7 @@ namespace G5EmailClient.GUI
 
         private void save_user_button_Click(object sender, EventArgs e)
         {
+            // Calling SaveUser() function:
             if(EmailClient.SaveUser(activeUser) == 1)
             {
                 showMessage(message_label, "User overwritten.", 1.5, Color.Black);
@@ -258,6 +259,7 @@ namespace G5EmailClient.GUI
             {
                 // If user is not overwritten, we can add the username to the list.
                 saved_users_list.Items.Add(activeUser.username);
+                showMessage(message_label, "New user saved.", 1.5, Color.Black);
             }
         }
 
