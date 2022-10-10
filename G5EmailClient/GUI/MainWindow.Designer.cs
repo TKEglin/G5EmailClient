@@ -231,7 +231,7 @@
             this.folders_lisbox.Location = new System.Drawing.Point(0, 23);
             this.folders_lisbox.Name = "folders_lisbox";
             this.folders_lisbox.Size = new System.Drawing.Size(198, 592);
-            this.folders_lisbox.TabIndex = 1;
+            this.folders_lisbox.TabIndex = 2;
             // 
             // account_info_panel
             // 
@@ -329,7 +329,7 @@
             this.search_folder_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.search_folder_textbox.Location = new System.Drawing.Point(0, 0);
             this.search_folder_textbox.Name = "search_folder_textbox";
-            this.search_folder_textbox.PlaceholderText = "Search..";
+            this.search_folder_textbox.PlaceholderText = " Search...";
             this.search_folder_textbox.Size = new System.Drawing.Size(350, 23);
             this.search_folder_textbox.TabIndex = 4;
             // 

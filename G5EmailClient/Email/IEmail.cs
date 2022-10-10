@@ -97,16 +97,16 @@ namespace G5EmailClient.Email
         int SaveUser(IDatabase.User saveUser);
 
         /// <summary>
-        /// Gets the from email and subject line of all emails in the active folder.
+        /// Gets the from string, subject line and read status of all emails in the active folder.
         /// </summary>
-        /// <returns>A list of string tuples. The first string is from, the second is subject.</returns>
+        /// <returns>A list of tuples.</returns>
         List<(string from, string subject, bool read)> GetFolderEnvelopes();
 
         /// <summary>
         /// Retrives and returns a message from the active folder given an index.
         /// </summary>
-        /// <param name="messageIndex">Returns a message if index is within range. Otherwise, retuns null.</param>
-        /// <returns></returns>
+        /// <param name="messageIndex"></param>
+        /// <returns>Returns a message if index is within range. Otherwise, retuns null.</returns>
         Message? GetMessage(int messageIndex);
     }
 }

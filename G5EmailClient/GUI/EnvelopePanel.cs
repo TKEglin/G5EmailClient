@@ -19,8 +19,8 @@ namespace G5EmailClient.GUI
         {
             InitializeComponent();
 
-            env_from_label.MaximumSize = new Size(Width - 15, env_from_label.Height);
-            env_from_label.MaximumSize = new Size(Width - 15, env_from_label.Height);
+            env_from_label.MaximumSize = new Size(this.Width - 15, 0);
+            env_subject_label.MaximumSize = new Size(this.Width - 15, 0);
         }
 
         [Category("Fields"), Description("The text of the from label")]
@@ -70,8 +70,8 @@ namespace G5EmailClient.GUI
 
         private void EnvelopePanel_SizeChanged(object sender, EventArgs e)
         {
-            env_from_label.MaximumSize = new Size(Width - 15, env_from_label.Height);
-            env_from_label.MaximumSize = new Size(Width - 15, env_from_label.Height);
+            env_from_label.MaximumSize = new Size(Width - 15, 0);
+            env_subject_label.MaximumSize = new Size(Width - 15, 0);
         }
 
         private void EnvelopePanel_MouseEnter(object sender, EventArgs e)
