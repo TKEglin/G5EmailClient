@@ -15,10 +15,10 @@ namespace G5EmailClient.Email
         /// </summary>
         public class Message
         {
-            public string from    { get; set; } = string.Empty;
-            public string to      { get; set; } = string.Empty;
+            public string from { get; set; } = string.Empty;
+            public string to { get; set; } = string.Empty;
             public string subject { get; set; } = string.Empty;
-            public string body    { get; set; } = string.Empty;
+            public string body { get; set; } = string.Empty;
         }
 
         /// <summary>
@@ -107,6 +107,21 @@ namespace G5EmailClient.Email
         /// </summary>
         /// <param name="messageIndex"></param>
         /// <returns>Returns a message if index is within range. Otherwise, retuns null.</returns>
-        Message? GetMessage(int messageIndex);
+        Message? OpenMessage(int messageIndex);
+
+        /// <summary>
+        /// Gets a list of all foldernames. The index of the list will match the underlying index
+        /// of the email folder in the IEmail client.
+        /// </summary>
+        /// <returns>A list of strings containing the folder names.</returns>
+        List<string> GetFoldernames();
+
+        /// <summary>
+        /// Toggles between read and unread for the given index. 
+        /// If the index is out of bounds, nothing happens.
+        /// </summary>
+        /// <param name="messageIndex"></param>
+        /// <returns>Returns null if successful, an exception if failed.</returns>
+        void ToggleRead(int messageIndex);
     }
 }

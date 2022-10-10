@@ -140,6 +140,7 @@
             this.toggle_read_button.Name = "toggle_read_button";
             this.toggle_read_button.Size = new System.Drawing.Size(140, 29);
             this.toggle_read_button.Text = "Unread/Read";
+            this.toggle_read_button.Click += new System.EventHandler(this.toggle_read_button_Click);
             // 
             // settings_dropdown
             // 

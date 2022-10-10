@@ -15,12 +15,24 @@ namespace G5EmailClient.GUI
         internal bool Selected = false;
         public int index = -1;
 
+        // Definition of the color of the edge bar for each status
+        static Color ReadColor = Color.LightGray;
+        static Color UnreadColor = Color.Black;
+
         public EnvelopePanel()
         {
             InitializeComponent();
 
             env_from_label.MaximumSize = new Size(this.Width - 15, 0);
             env_subject_label.MaximumSize = new Size(this.Width - 15, 0);
+        }
+
+        public void toggleRead()
+        {
+            if (env_edge_colorbar_panel.BackColor == ReadColor)
+                env_edge_colorbar_panel.BackColor = UnreadColor;
+            else
+                env_edge_colorbar_panel.BackColor = ReadColor;
         }
 
         [Category("Fields"), Description("The text of the from label")]
@@ -66,6 +78,23 @@ namespace G5EmailClient.GUI
             {
                 return Selected;
             }
+            set
+            {
+                if (value == Selected)
+                {
+                    return;
+                }
+                else if (!Selected)
+                {
+                    BackColor = SystemColors.ActiveBorder;
+                    Selected = true;
+                }
+                else
+                {
+                    BackColor = SystemColors.ButtonHighlight;
+                    Selected = false;
+                }
+            }
         }
 
         private void EnvelopePanel_SizeChanged(object sender, EventArgs e)
@@ -95,7 +124,7 @@ namespace G5EmailClient.GUI
             }
             else
             {
-                BackColor = SystemColors.ButtonHighlight;
+                BackColor = SystemColors.ButtonFace; 
                 Selected = false;
             }
         }

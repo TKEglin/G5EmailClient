@@ -1,5 +1,7 @@
 
 using System.Diagnostics;
+using System.Timers;
+using System.Threading;
 
 using G5EmailClient.Email;
 
@@ -28,6 +30,7 @@ namespace G5EmailClient.GUI
             this.Visible = true;
 
             // Setting up GUI
+                // Main Tab Page window:
             main_tab.TabPages.Remove(compose_message_tab);
             main_tab.TabPages.Remove(open_message_tab);
             main_tab.Appearance = TabAppearance.FlatButtons;
@@ -36,8 +39,52 @@ namespace G5EmailClient.GUI
 
             // Initializing email data.
             updateInboxView();
+            updateFoldersView();
             active_email_label.Text = EmailClient.GetActiveUser().username;
         }
+
+        #region utility functions
+        // This timer will be used for the button functions.
+        // It is declared here so it can be reset by new calls of tempDisableButton
+        System.Timers.Timer buttonTimer = new(1000) { Enabled = false };
+        /// <summary>
+        /// Temporarily disables a button for time 'double seconds'.
+        /// </summary>
+        /// <param name="button"></param>
+        void tempDisableButton(ToolStripButton button, double seconds)
+        {
+            if(button.Owner.InvokeRequired)
+            {
+                Action safeDisable = delegate { tempDisableButton(button, seconds); };
+                button.Owner.Invoke(safeDisable);
+            }
+            else
+            {
+                button.Enabled = false;
+
+                buttonTimer.Interval = seconds * 1000;
+                buttonTimer.Enabled = true;
+                buttonTimer.Elapsed += (sender, args) =>
+                {
+                    reenableButton(button);
+                    buttonTimer.Enabled = false;
+                };
+            }
+        }
+        void reenableButton(ToolStripButton button)
+        {
+            if (button.Owner.InvokeRequired)
+            {
+                Action safeEnable = delegate { reenableButton(button); };
+                button.Owner.Invoke(safeEnable);
+            }
+            else
+            {
+                button.Enabled = true;
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets message envelopes for the active inbox and adds them to the inbox_view.
@@ -60,7 +107,7 @@ namespace G5EmailClient.GUI
                     envelopePanel.fromText = envelope.from.ToString();
                     envelopePanel.subjectText = envelope.subject;
                     if (!envelope.read)
-                        envelopePanel.colorBar = Color.Black;
+                        envelopePanel.toggleRead();
                     envelopePanel.Anchor = AnchorStyles.Top;
                     envelopePanel.AutoSize = true;
                     envelopePanel.MinimumSize = new Size(envelopes_flowpanel.Width - 6 - SystemInformation.VerticalScrollBarWidth, 68);
@@ -74,13 +121,45 @@ namespace G5EmailClient.GUI
             }
         }
 
+        /// <summary>
+        /// Updates the folder listbox
+        /// </summary>
+        void updateFoldersView()
+        {
+            folders_lisbox.Items.Clear();
+            foreach (var folderName in EmailClient.GetFoldernames())
+            {
+                folders_lisbox.Items.Add(folderName);
+            }
+        }
+
         private void EnvelopePanel_DoubleClick(object sender, EventArgs e)
         {
             var envelope = (EnvelopePanel)sender;
-            var message = EmailClient.GetMessage(envelope.index);
+            var message = EmailClient.OpenMessage(envelope.index);
             // Test
             Debug.WriteLine("Opening message " + envelope.index.ToString() + ": " 
                           + message.from + message.subject + message.body);
+        }
+
+        private void toggle_read_button_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            ToolStripButton button = (ToolStripButton)sender;
+            tempDisableButton(button, 1);
+
+            foreach(var envelope in envelopePanels)
+            {
+                if(envelope.Selected)
+                {
+                    // Updating the UI representation of the read status
+                    envelope.toggleRead();
+                    // Starting self-terminating thread to switch flag in server
+                    EmailClient.ToggleRead(envelope.index);
+                }
+            }
+
+            this.Cursor = Cursors.Default;
         }
     }
 }
