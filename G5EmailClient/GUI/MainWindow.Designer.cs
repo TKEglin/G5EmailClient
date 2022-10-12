@@ -132,6 +132,7 @@
             this.delete_button.Name = "delete_button";
             this.delete_button.Size = new System.Drawing.Size(88, 29);
             this.delete_button.Text = "Delete";
+            this.delete_button.Click += new System.EventHandler(this.delete_button_Click);
             // 
             // toggle_read_button
             // 
@@ -229,10 +230,11 @@
             this.folders_lisbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.folders_lisbox.FormattingEnabled = true;
             this.folders_lisbox.ItemHeight = 23;
-            this.folders_lisbox.Location = new System.Drawing.Point(0, 23);
+            this.folders_lisbox.Location = new System.Drawing.Point(0, 30);
             this.folders_lisbox.Name = "folders_lisbox";
-            this.folders_lisbox.Size = new System.Drawing.Size(198, 592);
+            this.folders_lisbox.Size = new System.Drawing.Size(198, 585);
             this.folders_lisbox.TabIndex = 2;
+            this.folders_lisbox.TabStop = false;
             // 
             // account_info_panel
             // 
@@ -240,14 +242,15 @@
             this.account_info_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.account_info_panel.Location = new System.Drawing.Point(0, 0);
             this.account_info_panel.Name = "account_info_panel";
-            this.account_info_panel.Size = new System.Drawing.Size(198, 23);
+            this.account_info_panel.Size = new System.Drawing.Size(198, 30);
             this.account_info_panel.TabIndex = 0;
             // 
             // active_email_label
             // 
             this.active_email_label.AutoSize = true;
             this.active_email_label.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.active_email_label.Location = new System.Drawing.Point(0, 1);
+            this.active_email_label.Location = new System.Drawing.Point(0, 3);
+            this.active_email_label.Margin = new System.Windows.Forms.Padding(0);
             this.active_email_label.MaximumSize = new System.Drawing.Size(198, 0);
             this.active_email_label.MinimumSize = new System.Drawing.Size(198, 0);
             this.active_email_label.Name = "active_email_label";
@@ -296,7 +299,6 @@
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.pictureBox1.Image = global::G5EmailClient.Properties.Resources.Group5Logo;
             this.pictureBox1.Location = new System.Drawing.Point(28, 28);
-            this.pictureBox1.MinimumSize = new System.Drawing.Size(500, 200);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(500, 200);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -333,6 +335,7 @@
             this.search_folder_textbox.PlaceholderText = " Search...";
             this.search_folder_textbox.Size = new System.Drawing.Size(350, 23);
             this.search_folder_textbox.TabIndex = 4;
+            this.search_folder_textbox.TabStop = false;
             // 
             // inbox_panel
             // 

@@ -121,7 +121,15 @@ namespace G5EmailClient.Email
         /// If the index is out of bounds, nothing happens.
         /// </summary>
         /// <param name="messageIndex"></param>
-        /// <returns>Returns null if successful, an exception if failed.</returns>
         void ToggleRead(int messageIndex);
+
+        /// <summary>
+        /// Deletes the message in the active folder that corresponds to the index.
+        /// Note: The message will not be locally deleted. The client assumes
+        /// that the GUI will remove the message from the UI, so the message cannot
+        /// be deleted again.
+        /// </summary>
+        /// <param name="messageIndex"></param>
+        void Delete(int messageIndex);
     }
 }

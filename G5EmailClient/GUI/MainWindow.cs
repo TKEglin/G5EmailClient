@@ -116,8 +116,6 @@ namespace G5EmailClient.GUI
                 envelopes_flowpanel.Controls.Add(envelopePanel);
                 // Adding to list for later use
                 envelopePanels.Add(envelopePanel);
-
-                // this.env_from_label.Click += new System.EventHandler(this.EnvelopePanel_Click);
             }
         }
 
@@ -146,7 +144,7 @@ namespace G5EmailClient.GUI
         {
             this.Cursor = Cursors.WaitCursor;
             ToolStripButton button = (ToolStripButton)sender;
-            tempDisableButton(button, 1);
+            tempDisableButton(button, 0.2);
 
             foreach(var envelope in envelopePanels)
             {
@@ -154,11 +152,26 @@ namespace G5EmailClient.GUI
                 {
                     // Updating the UI representation of the read status
                     envelope.toggleRead();
-                    // Starting self-terminating thread to switch flag in server
+                    // Calling client function
                     EmailClient.ToggleRead(envelope.index);
                 }
             }
+            this.Cursor = Cursors.Default;
+        }
 
+        private void delete_button_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            foreach(var envelope in envelopePanels)
+            {
+                if(envelope.Selected)
+                {
+                    // Calling client function
+                    EmailClient.Delete(envelope.index);
+                    // Locally removing the envelope
+                    envelope.Dispose();
+                }
+            }
             this.Cursor = Cursors.Default;
         }
     }
