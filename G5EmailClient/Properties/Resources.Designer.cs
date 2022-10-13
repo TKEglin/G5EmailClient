@@ -83,6 +83,16 @@ namespace G5EmailClient.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AddIcon {
+            get {
+                object obj = ResourceManager.GetObject("AddIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap AddUserIcon {
             get {
                 object obj = ResourceManager.GetObject("AddUserIcon", resourceCulture);
@@ -106,6 +116,16 @@ namespace G5EmailClient.Properties {
         internal static System.Drawing.Bitmap ContactsIcon {
             get {
                 object obj = ResourceManager.GetObject("ContactsIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DeleteAnimatedIcon {
+            get {
+                object obj = ResourceManager.GetObject("DeleteAnimatedIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -236,6 +256,16 @@ namespace G5EmailClient.Properties {
         internal static System.Drawing.Bitmap SelectUserIcon {
             get {
                 object obj = ResourceManager.GetObject("SelectUserIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SendIcon {
+            get {
+                object obj = ResourceManager.GetObject("SendIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

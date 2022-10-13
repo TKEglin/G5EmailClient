@@ -96,18 +96,6 @@ namespace G5EmailClient.Email
         }
         #endregion
 
-        /// <summary>
-        /// Verifies that an input string is an email address
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        bool verifyEmail(string input)
-        {
-            // __To be implemented__
-
-            return true;
-        }
-
          //__________________________________________
         // Functions that deal with server connection
         #region server connection functions

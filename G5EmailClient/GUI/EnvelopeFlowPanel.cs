@@ -89,6 +89,18 @@ namespace G5EmailClient.GUI
         }
 
         /// <summary>
+        /// Deselects all envelope panels.
+        /// </summary>
+        public void ClearSelction()
+        {
+            foreach(var envelope in selectedPanels)
+            {
+                envelope.SetSelected(false);
+            }
+            selectedPanels.Clear();
+        }
+
+        /// <summary>
         /// Returns the selected index. 
         /// If more than one panel is selected, it returns the first index.
         /// If no panel is selected, returns -1.

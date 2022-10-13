@@ -45,6 +45,10 @@ namespace G5EmailClient.GUI
             brief_control_explain_tooltop.SetToolTip(msg_reply_button,    "Reply");
             brief_control_explain_tooltop.SetToolTip(msg_replyall_button, "Reply All");
             brief_control_explain_tooltop.SetToolTip(msg_forward_button,  "Forward");
+                // Compose message tab
+            brief_control_explain_tooltop.SetToolTip(cmp_send_button, "Send");
+            cmp_send_button.FlatAppearance.BorderSize = 0;
+            cmp_add_button. FlatAppearance.BorderSize = 0;
 
             // Initializing email data.
             updateInboxView();
@@ -177,7 +181,8 @@ namespace G5EmailClient.GUI
             msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
         }
 
-        // This event triggers when the window state changes
+        // This event triggers when the window is maximized,
+        // minimized or returned to normal windowed mode.
         FormWindowState LastWindowState = FormWindowState.Minimized;
         private void Window_Resize(object sender, EventArgs e)
         {
@@ -190,10 +195,51 @@ namespace G5EmailClient.GUI
                 msg_from_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
                 msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
                 msg_senderinfo_panel.Size = new Size(msg_senderinfo_panel.Width,
-                                                       msg_from_label.Height
-                                                     + msg_subject_label.Height
-                                                     + msg_senderinfo_padding_panel.Height);
+                                                     msg_from_label.Height
+                                                   + msg_subject_label.Height
+                                                   + msg_senderinfo_padding_panel.Height);
             }
+        }
+
+        private void new_message_button_Click(object sender, EventArgs e)
+        {
+            message_flow_panel.ClearSelction();
+            main_tab.SelectedTab = compose_message_tab;
+        }
+
+        private void cmp_add_button_Click(object sender, EventArgs e)
+        {
+            cmp_add_contextstrip.Show(cmp_add_button, new Point(cmp_add_button.Location.X,
+                                                                cmp_add_button.Location.Y
+                                                              - cmp_add_button.Height     ));
+        }
+
+        private void add_bcc_menuitem_Click(object sender, EventArgs e)
+        {
+            cmp_bcc_panel.Visible = !cmp_bcc_panel.Visible;
+            if (!cmp_bcc_panel.Visible)
+                add_bcc_menuitem.Text = "Add Bcc";
+            else
+                add_bcc_menuitem.Text = "Remove Bcc";
+        }
+
+        private void add_cc_menuitem_Click(object sender, EventArgs e)
+        {
+            cmp_cc_panel.Visible = !cmp_cc_panel.Visible;
+            if (!cmp_cc_panel.Visible)
+                add_cc_menuitem.Text = "Add cc";
+            else
+                add_cc_menuitem.Text = "Remove cc";
+        }
+
+        private void delete_button_MouseEnter(object sender, EventArgs e)
+        {
+            delete_button.Image = Properties.Resources.DeleteAnimatedIcon;
+        }
+
+        private void delete_button_MouseLeave(object sender, EventArgs e)
+        {
+            delete_button.Image = Properties.Resources.DeleteIcon;
         }
     }
 }
