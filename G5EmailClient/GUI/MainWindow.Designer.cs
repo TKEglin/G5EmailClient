@@ -57,7 +57,6 @@
             this.compose_message_tab = new System.Windows.Forms.TabPage();
             this.search_folder_textbox = new System.Windows.Forms.TextBox();
             this.inbox_panel = new System.Windows.Forms.Panel();
-            this.envelopes_flowpanel = new System.Windows.Forms.FlowLayoutPanel();
             this.top_panel.SuspendLayout();
             this.top_toolstrip.SuspendLayout();
             this.folders_panel.SuspendLayout();
@@ -285,7 +284,6 @@
             // intro_tab
             // 
             this.intro_tab.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.intro_tab.Controls.Add(this.test_flow_control);
             this.intro_tab.Controls.Add(this.pictureBox1);
             this.intro_tab.Location = new System.Drawing.Point(4, 29);
             this.intro_tab.Name = "intro_tab";
@@ -296,9 +294,10 @@
             // test_flow_control
             // 
             this.test_flow_control.AutoScroll = true;
-            this.test_flow_control.Location = new System.Drawing.Point(28, 28);
+            this.test_flow_control.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.test_flow_control.Location = new System.Drawing.Point(0, 23);
             this.test_flow_control.Name = "test_flow_control";
-            this.test_flow_control.Size = new System.Drawing.Size(371, 547);
+            this.test_flow_control.Size = new System.Drawing.Size(350, 592);
             this.test_flow_control.TabIndex = 2;
             // 
             // pictureBox1
@@ -351,25 +350,13 @@
             // 
             this.inbox_panel.AutoScroll = true;
             this.inbox_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.inbox_panel.Controls.Add(this.envelopes_flowpanel);
+            this.inbox_panel.Controls.Add(this.test_flow_control);
             this.inbox_panel.Controls.Add(this.search_folder_textbox);
             this.inbox_panel.Dock = System.Windows.Forms.DockStyle.Left;
             this.inbox_panel.Location = new System.Drawing.Point(200, 30);
             this.inbox_panel.Name = "inbox_panel";
             this.inbox_panel.Size = new System.Drawing.Size(352, 617);
             this.inbox_panel.TabIndex = 2;
-            // 
-            // envelopes_flowpanel
-            // 
-            this.envelopes_flowpanel.AutoScroll = true;
-            this.envelopes_flowpanel.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.envelopes_flowpanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.envelopes_flowpanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.envelopes_flowpanel.Location = new System.Drawing.Point(0, 23);
-            this.envelopes_flowpanel.Name = "envelopes_flowpanel";
-            this.envelopes_flowpanel.Size = new System.Drawing.Size(350, 592);
-            this.envelopes_flowpanel.TabIndex = 5;
-            this.envelopes_flowpanel.WrapContents = false;
             // 
             // MainWindow
             // 
@@ -429,7 +416,6 @@
         private Label active_email_label;
         private TextBox search_folder_textbox;
         private Panel inbox_panel;
-        private FlowLayoutPanel envelopes_flowpanel;
         private TabPage intro_tab;
         private PictureBox pictureBox1;
         private EnvelopeFlowPanel test_flow_control;

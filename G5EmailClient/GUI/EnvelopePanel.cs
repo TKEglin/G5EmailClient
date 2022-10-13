@@ -101,6 +101,22 @@ namespace G5EmailClient.GUI
             }
         }
 
+        public void SetSelected(bool value)
+        {
+            if (value == false)
+            {
+                Debug.WriteLine("Setting selected false flag and changing color");
+                BackColor = SystemColors.ButtonHighlight;
+                Selected = false;
+            }
+            else
+            {
+                Debug.WriteLine("Setting selected true flag and changing color");
+                BackColor = SystemColors.ActiveBorder;
+                Selected = true;
+            }
+        }
+
         private void EnvelopePanel_SizeChanged(object sender, EventArgs e)
         {
             env_from_label.MaximumSize = new Size(Width - 15, 0);
@@ -110,30 +126,22 @@ namespace G5EmailClient.GUI
         private void EnvelopePanel_MouseEnter(object sender, EventArgs e)
         {
             if(!Selected)
-                Debug.WriteLine("Mouse entering, changing color");
-            BackColor = SystemColors.ButtonFace;
+            {
+                BackColor = SystemColors.ButtonFace;
+            }
         }
 
         private void EnvelopePanel_MouseLeave(object sender, EventArgs e)
         {
-            if (!Selected)
-                Debug.WriteLine("Mouse leaving, changing color");
+            if (!Selected) 
+            {
                 BackColor = SystemColors.ButtonHighlight;
+            }
         }
 
         private void EnvelopePanel_Click(object sender, EventArgs e)
         {
             this.PanelClicked(this, e);
-            //if(!Selected)
-            //{
-            //    BackColor = SystemColors.ActiveBorder;
-            //    Selected = true;
-            //}
-            //else
-            //{
-            //    BackColor = SystemColors.ButtonFace; 
-            //    Selected = false;
-            //}
         }
         public event EventHandler PanelClicked;
     }

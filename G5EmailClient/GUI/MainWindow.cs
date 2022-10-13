@@ -102,22 +102,10 @@ namespace G5EmailClient.GUI
             foreach (var envelope in envelopes)
             {
                 index++;
-                var envelopePanel = new EnvelopePanel();
-                    envelopePanel.index = index;
-                    envelopePanel.fromText = envelope.from.ToString();
-                    envelopePanel.subjectText = envelope.subject;
-                    if (!envelope.read)
-                        envelopePanel.toggleRead();
-                    envelopePanel.Anchor = AnchorStyles.Top;
-                    envelopePanel.AutoSize = true;
-                    envelopePanel.MinimumSize = new Size(envelopes_flowpanel.Width - 6 - SystemInformation.VerticalScrollBarWidth, 68);
-                    envelopePanel.DoubleClick += new EventHandler(EnvelopePanel_DoubleClick);
-                // Adding the control to the window
-                envelopes_flowpanel.Controls.Add(envelopePanel);
-                // Adding to list for later use
-                envelopePanels.Add(envelopePanel);
-
-                test_flow_control.Add(index, envelope.from.ToString(), envelope.subject, envelope.read);
+                test_flow_control.Add(index, envelope.from.ToString(), 
+                                             envelope.subject, 
+                                             envelope.read);
+                envelopePanels.Add(envelope);
             }
         }
 

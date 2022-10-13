@@ -121,16 +121,20 @@ namespace G5EmailClient.GUI
             EnvelopePanel panel = (EnvelopePanel)sender;
             if(!ModifierKeys.HasFlag(Keys.Control))
             {
-                // When control is not held, click opens the message
+                // When the control button is not held, click opens the message
                 foreach (var envelope in selectedPanels)
-                    envelope.Selected = false;
+                    envelope.SetSelected(false);
                 selectedPanels.Clear();
+                panel.SetSelected(true);
 
                 Debug.WriteLine("Opening message");
                 panel.setRead();
                 //this.EnvelopePanelOpened(panel, e);
             }
-            panel.Selected = true;
+            else
+            {
+                panel.SetSelected(!panel.Selected);
+            }
             selectedPanels.Add(panel);
         }
 
