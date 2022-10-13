@@ -54,9 +54,9 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.open_message_tab = new System.Windows.Forms.TabPage();
             this.compose_message_tab = new System.Windows.Forms.TabPage();
+            this.message_flow_panel = new G5EmailClient.GUI.EnvelopeFlowPanel();
             this.search_folder_textbox = new System.Windows.Forms.TextBox();
             this.inbox_panel = new System.Windows.Forms.Panel();
-            this.envelopes_flowpanel = new System.Windows.Forms.FlowLayoutPanel();
             this.top_panel.SuspendLayout();
             this.top_toolstrip.SuspendLayout();
             this.folders_panel.SuspendLayout();
@@ -325,6 +325,15 @@
             this.compose_message_tab.Text = "Compose";
             this.compose_message_tab.UseVisualStyleBackColor = true;
             // 
+            // message_flow_panel
+            // 
+            this.message_flow_panel.AutoScroll = true;
+            this.message_flow_panel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.message_flow_panel.Location = new System.Drawing.Point(0, 23);
+            this.message_flow_panel.Name = "message_flow_panel";
+            this.message_flow_panel.Size = new System.Drawing.Size(350, 592);
+            this.message_flow_panel.TabIndex = 2;
+            // 
             // search_folder_textbox
             // 
             this.search_folder_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -341,25 +350,13 @@
             // 
             this.inbox_panel.AutoScroll = true;
             this.inbox_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.inbox_panel.Controls.Add(this.envelopes_flowpanel);
+            this.inbox_panel.Controls.Add(this.message_flow_panel);
             this.inbox_panel.Controls.Add(this.search_folder_textbox);
             this.inbox_panel.Dock = System.Windows.Forms.DockStyle.Left;
             this.inbox_panel.Location = new System.Drawing.Point(200, 30);
             this.inbox_panel.Name = "inbox_panel";
             this.inbox_panel.Size = new System.Drawing.Size(352, 617);
             this.inbox_panel.TabIndex = 2;
-            // 
-            // envelopes_flowpanel
-            // 
-            this.envelopes_flowpanel.AutoScroll = true;
-            this.envelopes_flowpanel.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.envelopes_flowpanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.envelopes_flowpanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.envelopes_flowpanel.Location = new System.Drawing.Point(0, 23);
-            this.envelopes_flowpanel.Name = "envelopes_flowpanel";
-            this.envelopes_flowpanel.Size = new System.Drawing.Size(350, 592);
-            this.envelopes_flowpanel.TabIndex = 5;
-            this.envelopes_flowpanel.WrapContents = false;
             // 
             // MainWindow
             // 
@@ -419,8 +416,8 @@
         private Label active_email_label;
         private TextBox search_folder_textbox;
         private Panel inbox_panel;
-        private FlowLayoutPanel envelopes_flowpanel;
         private TabPage intro_tab;
         private PictureBox pictureBox1;
+        private EnvelopeFlowPanel message_flow_panel;
     }
 }
