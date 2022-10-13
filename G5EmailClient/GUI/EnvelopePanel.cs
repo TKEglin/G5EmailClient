@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace G5EmailClient.GUI
 {
@@ -33,6 +34,11 @@ namespace G5EmailClient.GUI
                 env_edge_colorbar_panel.BackColor = UnreadColor;
             else
                 env_edge_colorbar_panel.BackColor = ReadColor;
+        }
+
+        public void setRead()
+        {
+            env_edge_colorbar_panel.BackColor = ReadColor;
         }
 
         [Category("Fields"), Description("The text of the from label")]
@@ -80,19 +86,17 @@ namespace G5EmailClient.GUI
             }
             set
             {
-                if (value == Selected)
+                if (value == false)
                 {
-                    return;
-                }
-                else if (!Selected)
-                {
-                    BackColor = SystemColors.ActiveBorder;
-                    Selected = true;
+                    Debug.WriteLine("Setting selected false flag and changing color");
+                    BackColor = SystemColors.ButtonHighlight;
+                    Selected = false;
                 }
                 else
                 {
-                    BackColor = SystemColors.ButtonHighlight;
-                    Selected = false;
+                    Debug.WriteLine("Setting selected true flag and changing color");
+                    BackColor = SystemColors.ActiveBorder;
+                    Selected = true;
                 }
             }
         }
@@ -106,27 +110,31 @@ namespace G5EmailClient.GUI
         private void EnvelopePanel_MouseEnter(object sender, EventArgs e)
         {
             if(!Selected)
-                BackColor = SystemColors.ButtonFace;
+                Debug.WriteLine("Mouse entering, changing color");
+            BackColor = SystemColors.ButtonFace;
         }
 
         private void EnvelopePanel_MouseLeave(object sender, EventArgs e)
         {
-            if(!Selected)
+            if (!Selected)
+                Debug.WriteLine("Mouse leaving, changing color");
                 BackColor = SystemColors.ButtonHighlight;
         }
 
         private void EnvelopePanel_Click(object sender, EventArgs e)
         {
-            if(!Selected)
-            {
-                BackColor = SystemColors.ActiveBorder;
-                Selected = true;
-            }
-            else
-            {
-                BackColor = SystemColors.ButtonFace; 
-                Selected = false;
-            }
+            this.PanelClicked(this, e);
+            //if(!Selected)
+            //{
+            //    BackColor = SystemColors.ActiveBorder;
+            //    Selected = true;
+            //}
+            //else
+            //{
+            //    BackColor = SystemColors.ButtonFace; 
+            //    Selected = false;
+            //}
         }
+        public event EventHandler PanelClicked;
     }
 }

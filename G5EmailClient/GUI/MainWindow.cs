@@ -116,6 +116,8 @@ namespace G5EmailClient.GUI
                 envelopes_flowpanel.Controls.Add(envelopePanel);
                 // Adding to list for later use
                 envelopePanels.Add(envelopePanel);
+
+                test_flow_control.Add(index, envelope.from.ToString(), envelope.subject, envelope.read);
             }
         }
 

@@ -51,6 +51,7 @@
             this.main_panel = new System.Windows.Forms.Panel();
             this.main_tab = new System.Windows.Forms.TabControl();
             this.intro_tab = new System.Windows.Forms.TabPage();
+            this.test_flow_control = new G5EmailClient.GUI.EnvelopeFlowPanel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.open_message_tab = new System.Windows.Forms.TabPage();
             this.compose_message_tab = new System.Windows.Forms.TabPage();
@@ -284,12 +285,21 @@
             // intro_tab
             // 
             this.intro_tab.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.intro_tab.Controls.Add(this.test_flow_control);
             this.intro_tab.Controls.Add(this.pictureBox1);
             this.intro_tab.Location = new System.Drawing.Point(4, 29);
             this.intro_tab.Name = "intro_tab";
             this.intro_tab.Size = new System.Drawing.Size(556, 582);
             this.intro_tab.TabIndex = 2;
             this.intro_tab.Text = "Welcome";
+            // 
+            // test_flow_control
+            // 
+            this.test_flow_control.AutoScroll = true;
+            this.test_flow_control.Location = new System.Drawing.Point(28, 28);
+            this.test_flow_control.Name = "test_flow_control";
+            this.test_flow_control.Size = new System.Drawing.Size(371, 547);
+            this.test_flow_control.TabIndex = 2;
             // 
             // pictureBox1
             // 
@@ -422,5 +432,6 @@
         private FlowLayoutPanel envelopes_flowpanel;
         private TabPage intro_tab;
         private PictureBox pictureBox1;
+        private EnvelopeFlowPanel test_flow_control;
     }
 }
