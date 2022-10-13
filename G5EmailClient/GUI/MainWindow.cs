@@ -28,12 +28,23 @@ namespace G5EmailClient.GUI
             this.Visible = true;
 
             // Setting up GUI
-                // Main Tab Page window:
-            main_tab.TabPages.Remove(compose_message_tab);
-            main_tab.TabPages.Remove(open_message_tab);
+                // General
+            this.Resize += Window_Resize;
+                // Main Tab Page window
             main_tab.Appearance = TabAppearance.FlatButtons;
             main_tab.ItemSize = new Size(0, 1);
             main_tab.SizeMode = TabSizeMode.Fixed;
+                // Message flow panel
+            message_flow_panel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
+                // Message open tab
+            msg_from_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
+            msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
+            msg_reply_button.   FlatAppearance.BorderSize = 0;
+            msg_replyall_button.FlatAppearance.BorderSize = 0;
+            msg_forward_button. FlatAppearance.BorderSize = 0;
+            brief_control_explain_tooltop.SetToolTip(msg_reply_button,    "Reply");
+            brief_control_explain_tooltop.SetToolTip(msg_replyall_button, "Reply All");
+            brief_control_explain_tooltop.SetToolTip(msg_forward_button,  "Forward");
 
             // Initializing email data.
             updateInboxView();
@@ -117,13 +128,19 @@ namespace G5EmailClient.GUI
             }
         }
 
-        private void EnvelopePanel_DoubleClick(object sender, EventArgs e)
+        private void EnvelopePanel_MessageOpen(object sender, EventArgs e)
         {
             var envelope = (EnvelopePanel)sender;
+
             var message = EmailClient.OpenMessage(envelope.index);
-            // Test
+            msg_from_label.Text    = message.from;
+            msg_subject_label.Text = message.subject;
+            msg_body_rtextbox.Text = message.body;
+
             Debug.WriteLine("Opening message " + envelope.index.ToString() + ": " 
                           + message.from + message.subject + message.body);
+
+            main_tab.SelectedTab = open_message_tab;
         }
 
         private void toggle_read_button_Click(object sender, EventArgs e)
@@ -152,6 +169,31 @@ namespace G5EmailClient.GUI
             }
             
             this.Cursor = Cursors.Default;
+        }
+
+        private void msg_senderinfo_panel_Resize(object sender, EventArgs e)
+        {
+            msg_from_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
+            msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
+        }
+
+        // This event triggers when the window state changes
+        FormWindowState LastWindowState = FormWindowState.Minimized;
+        private void Window_Resize(object sender, EventArgs e)
+        {
+            // When window state changes
+            if (WindowState != LastWindowState)
+            {
+                LastWindowState = WindowState;
+
+                // Resizing message labels
+                msg_from_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
+                msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
+                msg_senderinfo_panel.Size = new Size(msg_senderinfo_panel.Width,
+                                                       msg_from_label.Height
+                                                     + msg_subject_label.Height
+                                                     + msg_senderinfo_padding_panel.Height);
+            }
         }
     }
 }

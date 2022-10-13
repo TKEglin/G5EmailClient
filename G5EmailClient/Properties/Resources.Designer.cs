@@ -123,6 +123,16 @@ namespace G5EmailClient.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ForwardIcon {
+            get {
+                object obj = ResourceManager.GetObject("ForwardIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap G5Logo {
             get {
                 object obj = ResourceManager.GetObject("G5Logo", resourceCulture);
@@ -186,6 +196,36 @@ namespace G5EmailClient.Properties {
         internal static System.Drawing.Bitmap RefreshIcon {
             get {
                 object obj = ResourceManager.GetObject("RefreshIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ReplyAllIcon {
+            get {
+                object obj = ResourceManager.GetObject("ReplyAllIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ReplyIcon {
+            get {
+                object obj = ResourceManager.GetObject("ReplyIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ReplyIcon1 {
+            get {
+                object obj = ResourceManager.GetObject("ReplyIcon1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

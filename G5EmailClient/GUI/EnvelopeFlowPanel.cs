@@ -127,9 +127,9 @@ namespace G5EmailClient.GUI
                 selectedPanels.Clear();
                 panel.SetSelected(true);
 
-                Debug.WriteLine("Opening message");
+                Debug.WriteLine("Flow panel opening message");
                 panel.setRead();
-                //this.EnvelopePanelOpened(panel, e);
+                this.EnvelopePanelOpened(panel, e);
             }
             else
             {

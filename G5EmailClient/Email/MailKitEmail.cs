@@ -230,7 +230,12 @@ namespace G5EmailClient.Email
             if(messageIndex < activeFolderMessages.Count & messageIndex >= 0)
             {
                 // Adding read flag
-                activeFolder.AddFlags(messageIndex, MessageFlags.Seen, true);
+                if (!activeFolderMessagesSeen[messageIndex]) {
+                    ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(
+                                                          activeFolder!,
+                                                          activeFolderUIDs[messageIndex],
+                                                          false)); }
+
                 // Getting message
                 var ImapMessage = activeFolderMessages[messageIndex];
                 IEmail.Message message = new();
