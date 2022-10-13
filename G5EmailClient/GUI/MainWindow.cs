@@ -11,8 +11,6 @@ namespace G5EmailClient.GUI
     {
         IEmail EmailClient;
 
-        List<EnvelopePanel> envelopePanels = new();
-
         public MainWindow(IEmail ParamEmailClient)
         {
             InitializeComponent();
@@ -93,8 +91,7 @@ namespace G5EmailClient.GUI
         void updateInboxView()
         {
             // Clearing inbox
-            foreach (var envelope in envelopePanels) envelope.Dispose();
-            envelopePanels.Clear();
+            message_flow_panel.Clear();
 
             // The internal index value of the envelope will match the index in the envelopePanels list
             int index = -1;
@@ -102,10 +99,9 @@ namespace G5EmailClient.GUI
             foreach (var envelope in envelopes)
             {
                 index++;
-                test_flow_control.Add(index, envelope.from.ToString(), 
+                message_flow_panel.Add(index, envelope.from.ToString(), 
                                              envelope.subject, 
                                              envelope.read);
-                envelopePanels.Add(envelope);
             }
         }
 
@@ -136,15 +132,11 @@ namespace G5EmailClient.GUI
             ToolStripButton button = (ToolStripButton)sender;
             tempDisableButton(button, 0.2);
 
-            foreach(var envelope in envelopePanels)
+            var indices = message_flow_panel.ToggleReadSelected();
+
+            foreach(var index in indices)
             {
-                if(envelope.Selected)
-                {
-                    // Updating the UI representation of the read status
-                    envelope.toggleRead();
-                    // Calling client function
-                    EmailClient.ToggleRead(envelope.index);
-                }
+                EmailClient.ToggleRead(index);
             }
             this.Cursor = Cursors.Default;
         }
@@ -152,16 +144,13 @@ namespace G5EmailClient.GUI
         private void delete_button_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            foreach(var envelope in envelopePanels)
+
+            var deleted_indices = message_flow_panel.DeleteSelected();
+            foreach(var index in deleted_indices)
             {
-                if(envelope.Selected)
-                {
-                    // Calling client function
-                    EmailClient.Delete(envelope.index);
-                    // Locally removing the envelope
-                    envelope.Dispose();
-                }
+                EmailClient.Delete(index);
             }
+            
             this.Cursor = Cursors.Default;
         }
     }

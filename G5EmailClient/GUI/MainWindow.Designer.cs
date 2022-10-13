@@ -51,10 +51,10 @@
             this.main_panel = new System.Windows.Forms.Panel();
             this.main_tab = new System.Windows.Forms.TabControl();
             this.intro_tab = new System.Windows.Forms.TabPage();
-            this.test_flow_control = new G5EmailClient.GUI.EnvelopeFlowPanel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.open_message_tab = new System.Windows.Forms.TabPage();
             this.compose_message_tab = new System.Windows.Forms.TabPage();
+            this.message_flow_panel = new G5EmailClient.GUI.EnvelopeFlowPanel();
             this.search_folder_textbox = new System.Windows.Forms.TextBox();
             this.inbox_panel = new System.Windows.Forms.Panel();
             this.top_panel.SuspendLayout();
@@ -291,15 +291,6 @@
             this.intro_tab.TabIndex = 2;
             this.intro_tab.Text = "Welcome";
             // 
-            // test_flow_control
-            // 
-            this.test_flow_control.AutoScroll = true;
-            this.test_flow_control.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.test_flow_control.Location = new System.Drawing.Point(0, 23);
-            this.test_flow_control.Name = "test_flow_control";
-            this.test_flow_control.Size = new System.Drawing.Size(350, 592);
-            this.test_flow_control.TabIndex = 2;
-            // 
             // pictureBox1
             // 
             this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -334,6 +325,15 @@
             this.compose_message_tab.Text = "Compose";
             this.compose_message_tab.UseVisualStyleBackColor = true;
             // 
+            // message_flow_panel
+            // 
+            this.message_flow_panel.AutoScroll = true;
+            this.message_flow_panel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.message_flow_panel.Location = new System.Drawing.Point(0, 23);
+            this.message_flow_panel.Name = "message_flow_panel";
+            this.message_flow_panel.Size = new System.Drawing.Size(350, 592);
+            this.message_flow_panel.TabIndex = 2;
+            // 
             // search_folder_textbox
             // 
             this.search_folder_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -350,7 +350,7 @@
             // 
             this.inbox_panel.AutoScroll = true;
             this.inbox_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.inbox_panel.Controls.Add(this.test_flow_control);
+            this.inbox_panel.Controls.Add(this.message_flow_panel);
             this.inbox_panel.Controls.Add(this.search_folder_textbox);
             this.inbox_panel.Dock = System.Windows.Forms.DockStyle.Left;
             this.inbox_panel.Location = new System.Drawing.Point(200, 30);
@@ -418,6 +418,6 @@
         private Panel inbox_panel;
         private TabPage intro_tab;
         private PictureBox pictureBox1;
-        private EnvelopeFlowPanel test_flow_control;
+        private EnvelopeFlowPanel message_flow_panel;
     }
 }
