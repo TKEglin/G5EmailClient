@@ -15,10 +15,12 @@ namespace G5EmailClient.Email
         /// </summary>
         public class Message
         {
-            public string from { get; set; } = string.Empty;
-            public string to { get; set; } = string.Empty;
+            public string from    { get; set; } = string.Empty;
+            public string to      { get; set; } = string.Empty;
+            public string cc      { get; set; } = string.Empty;
+            public string bcc     { get; set; } = string.Empty;
             public string subject { get; set; } = string.Empty;
-            public string body { get; set; } = string.Empty;
+            public string body    { get; set; } = string.Empty;
         }
 
         /// <summary>
@@ -131,5 +133,21 @@ namespace G5EmailClient.Email
         /// </summary>
         /// <param name="messageIndex"></param>
         void Delete(int messageIndex);
+
+        /// <summary>
+        /// Sends the given message to the given email. Empty strings will be ignored.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        void SendMessage(Message message);
+
+
+        /// <summary>
+        /// This event is triggered when the SendMessage function fails.
+        /// It will pass a tuple of (Exception, IEmail.Message).
+        /// </summary>
+        event SentMessageHandler SentMessage;
+        public delegate void SentMessageHandler(Exception? ex, IEmail.Message message);
+
     }
 }

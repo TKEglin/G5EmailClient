@@ -37,7 +37,7 @@ namespace G5EmailClient.GUI
                 // Message flow panel
             message_flow_panel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
                 // Message open tab
-            msg_from_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
+            msg_from_label.MaximumSize    = new Size(msg_senderinfo_panel.Width - 10, 0);
             msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
             msg_reply_button.   FlatAppearance.BorderSize = 0;
             msg_replyall_button.FlatAppearance.BorderSize = 0;
@@ -51,9 +51,13 @@ namespace G5EmailClient.GUI
             cmp_add_button. FlatAppearance.BorderSize = 0;
 
             // Initializing email data.
+                // Data
             updateInboxView();
             updateFoldersView();
             active_email_label.Text = EmailClient.GetActiveUser().username;
+                // Events
+            EmailClient.SentMessage += SentMessageHandler;
+
         }
 
         #region utility functions
@@ -99,6 +103,20 @@ namespace G5EmailClient.GUI
 
         #endregion
 
+        
+        NotificationPanel prepareNotification(string title, Image image, string body)
+        {
+            var notification = new NotificationPanel();
+                notification.Anchor = AnchorStyles.Top;
+                notification.AutoSize = true;
+                notification.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+                notification.MinimumSize = new Size(notifications_flowpanel.Width - 12, 0);
+                notification.titleText = title;
+                notification.Image = image;
+                notification.bodyText = body;
+            return notification;
+        }
+
         /// <summary>
         /// Gets message envelopes for the active inbox and adds them to the inbox_view.
         /// Ideally this will be done asynchronously.
@@ -115,8 +133,8 @@ namespace G5EmailClient.GUI
             {
                 index++;
                 message_flow_panel.Add(index, envelope.from.ToString(), 
-                                             envelope.subject, 
-                                             envelope.read);
+                                              envelope.subject, 
+                                              envelope.read);
             }
         }
 
@@ -211,7 +229,7 @@ namespace G5EmailClient.GUI
         {
             cmp_add_contextstrip.Show(cmp_add_button, new Point(cmp_add_button.Location.X,
                                                                 cmp_add_button.Location.Y
-                                                              - cmp_add_button.Height     ));
+                                                              - cmp_add_button.Height - 10));
         }
 
         private void add_bcc_menuitem_Click(object sender, EventArgs e)
@@ -240,6 +258,78 @@ namespace G5EmailClient.GUI
         private void delete_button_MouseLeave(object sender, EventArgs e)
         {
             delete_button.Image = Properties.Resources.DeleteIcon;
+        }
+
+        private void cmp_send_button_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            IEmail.Message message = new();
+                message.to      = cmp_to_textbox.Text;
+                message.cc      = cmp_cc_textbox.Text;
+                message.bcc     = cmp_bcc_textbox.Text;
+                message.subject = cmp_subject_textbox.Text;
+                message.body    = cmp_mailbody_rtextbox.Text;
+
+            EmailClient.SendMessage(message);
+
+            cmp_to_textbox.Text        = "";
+            cmp_cc_textbox.Text        = "";
+            cmp_bcc_textbox.Text       = "";
+            cmp_subject_textbox.Text   = "";
+            cmp_mailbody_rtextbox.Text = "";
+            this.Cursor = Cursors.Default;
+        }
+        private void SentMessageHandler(Exception ex, IEmail.Message message)
+        {
+            if(ex != null)
+            {
+                if (notifications_flowpanel.InvokeRequired)
+                {
+                    Action safeFailHandler = delegate { SentMessageHandler(ex, message); };
+                    notifications_flowpanel.Invoke(safeFailHandler);
+                }
+                else
+                {
+                    var notification = prepareNotification("Send Failed!",
+                                                           Properties.Resources.ErrorAnimated_Icon,
+                                                           "Click to retry. Error:\n" + ex.Message);
+                    notification.RespondsToClick = true;
+                    notification.Object = message;
+                    notification.NotificationBodyClicked += LoadMessageEventDriver;
+                    notifications_flowpanel.Controls.Add(notification);
+                }
+            }
+        }
+
+        /// <summary>
+        /// This function loads a message into the message compose panel
+        /// </summary>
+        /// <param name="message"></param>
+        private void LoadMessage(IEmail.Message message)
+        {
+            cmp_to_textbox.Text        = message.to;
+            cmp_cc_textbox.Text        = message.cc;
+            cmp_bcc_textbox.Text       = message.bcc;
+            cmp_subject_textbox.Text   = message.subject;
+            cmp_mailbody_rtextbox.Text = message.body;
+        }
+        private void LoadMessageEventDriver(object sender, EventArgs e)
+        {
+            Debug.WriteLine("Running LoadMessage driver");
+            var message = (IEmail.Message)sender;
+            LoadMessage(message);
+        }
+
+        private void msg_reply_button_Click(object sender, EventArgs e)
+        {
+            cmp_to_textbox.Text        = msg_from_label.Text;
+            cmp_subject_textbox.Text   = "RE:" + msg_subject_label.Text;
+            cmp_mailbody_rtextbox.Text = "\n\n________________\n"
+                                           + "Previous Message:"
+                                           + "\nFrom: " + msg_from_label.Text
+                                           + "\nSubject " + msg_subject_label.Text
+                                           + "\n" + msg_body_rtextbox.Text;
+            main_tab.SelectedTab = compose_message_tab;
         }
     }
 }

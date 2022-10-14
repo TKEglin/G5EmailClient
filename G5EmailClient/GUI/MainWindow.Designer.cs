@@ -46,7 +46,11 @@
             this.refresh_button = new System.Windows.Forms.ToolStripButton();
             this.markspam_panel = new System.Windows.Forms.ToolStripButton();
             this.folders_panel = new System.Windows.Forms.Panel();
+            this.notifications_separator_panel = new System.Windows.Forms.Panel();
             this.folders_lisbox = new System.Windows.Forms.ListBox();
+            this.notification_panel = new System.Windows.Forms.Panel();
+            this.notifications_flowpanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.notifications_label = new System.Windows.Forms.Label();
             this.account_info_panel = new System.Windows.Forms.Panel();
             this.active_email_label = new System.Windows.Forms.Label();
             this.main_panel = new System.Windows.Forms.Panel();
@@ -108,6 +112,7 @@
             this.top_panel.SuspendLayout();
             this.top_toolstrip.SuspendLayout();
             this.folders_panel.SuspendLayout();
+            this.notification_panel.SuspendLayout();
             this.account_info_panel.SuspendLayout();
             this.main_panel.SuspendLayout();
             this.main_tab.SuspendLayout();
@@ -139,7 +144,7 @@
             this.top_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.top_panel.Location = new System.Drawing.Point(0, 0);
             this.top_panel.Name = "top_panel";
-            this.top_panel.Size = new System.Drawing.Size(1118, 30);
+            this.top_panel.Size = new System.Drawing.Size(1086, 30);
             this.top_panel.TabIndex = 0;
             // 
             // top_toolstrip
@@ -162,7 +167,7 @@
             this.top_toolstrip.Name = "top_toolstrip";
             this.top_toolstrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.top_toolstrip.ShowItemToolTips = false;
-            this.top_toolstrip.Size = new System.Drawing.Size(1118, 32);
+            this.top_toolstrip.Size = new System.Drawing.Size(1086, 32);
             this.top_toolstrip.TabIndex = 0;
             this.top_toolstrip.Text = "toolStrip1";
             // 
@@ -283,13 +288,24 @@
             // folders_panel
             // 
             this.folders_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.folders_panel.Controls.Add(this.notifications_separator_panel);
             this.folders_panel.Controls.Add(this.folders_lisbox);
+            this.folders_panel.Controls.Add(this.notification_panel);
             this.folders_panel.Controls.Add(this.account_info_panel);
             this.folders_panel.Dock = System.Windows.Forms.DockStyle.Left;
             this.folders_panel.Location = new System.Drawing.Point(0, 30);
             this.folders_panel.Name = "folders_panel";
-            this.folders_panel.Size = new System.Drawing.Size(200, 617);
+            this.folders_panel.Size = new System.Drawing.Size(230, 632);
             this.folders_panel.TabIndex = 1;
+            // 
+            // notifications_separator_panel
+            // 
+            this.notifications_separator_panel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.notifications_separator_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.notifications_separator_panel.Location = new System.Drawing.Point(0, 600);
+            this.notifications_separator_panel.Name = "notifications_separator_panel";
+            this.notifications_separator_panel.Size = new System.Drawing.Size(228, 1);
+            this.notifications_separator_panel.TabIndex = 4;
             // 
             // folders_lisbox
             // 
@@ -300,9 +316,47 @@
             this.folders_lisbox.ItemHeight = 23;
             this.folders_lisbox.Location = new System.Drawing.Point(0, 30);
             this.folders_lisbox.Name = "folders_lisbox";
-            this.folders_lisbox.Size = new System.Drawing.Size(198, 585);
+            this.folders_lisbox.Size = new System.Drawing.Size(228, 571);
             this.folders_lisbox.TabIndex = 2;
             this.folders_lisbox.TabStop = false;
+            // 
+            // notification_panel
+            // 
+            this.notification_panel.AutoScroll = true;
+            this.notification_panel.AutoSize = true;
+            this.notification_panel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.notification_panel.Controls.Add(this.notifications_flowpanel);
+            this.notification_panel.Controls.Add(this.notifications_label);
+            this.notification_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.notification_panel.Location = new System.Drawing.Point(0, 601);
+            this.notification_panel.MaximumSize = new System.Drawing.Size(0, 400);
+            this.notification_panel.Name = "notification_panel";
+            this.notification_panel.Size = new System.Drawing.Size(228, 29);
+            this.notification_panel.TabIndex = 3;
+            // 
+            // notifications_flowpanel
+            // 
+            this.notifications_flowpanel.AutoSize = true;
+            this.notifications_flowpanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.notifications_flowpanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.notifications_flowpanel.Location = new System.Drawing.Point(0, 23);
+            this.notifications_flowpanel.Name = "notifications_flowpanel";
+            this.notifications_flowpanel.Padding = new System.Windows.Forms.Padding(3);
+            this.notifications_flowpanel.Size = new System.Drawing.Size(228, 6);
+            this.notifications_flowpanel.TabIndex = 1;
+            // 
+            // notifications_label
+            // 
+            this.notifications_label.AutoSize = true;
+            this.notifications_label.Dock = System.Windows.Forms.DockStyle.Top;
+            this.notifications_label.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.notifications_label.Location = new System.Drawing.Point(0, 0);
+            this.notifications_label.MinimumSize = new System.Drawing.Size(228, 23);
+            this.notifications_label.Name = "notifications_label";
+            this.notifications_label.Size = new System.Drawing.Size(228, 23);
+            this.notifications_label.TabIndex = 0;
+            this.notifications_label.Text = "Notifications";
+            this.notifications_label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // account_info_panel
             // 
@@ -310,19 +364,19 @@
             this.account_info_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.account_info_panel.Location = new System.Drawing.Point(0, 0);
             this.account_info_panel.Name = "account_info_panel";
-            this.account_info_panel.Size = new System.Drawing.Size(198, 30);
+            this.account_info_panel.Size = new System.Drawing.Size(228, 30);
             this.account_info_panel.TabIndex = 0;
             // 
             // active_email_label
             // 
             this.active_email_label.AutoSize = true;
             this.active_email_label.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.active_email_label.Location = new System.Drawing.Point(0, 3);
+            this.active_email_label.Location = new System.Drawing.Point(0, 5);
             this.active_email_label.Margin = new System.Windows.Forms.Padding(0);
-            this.active_email_label.MaximumSize = new System.Drawing.Size(198, 0);
-            this.active_email_label.MinimumSize = new System.Drawing.Size(198, 0);
+            this.active_email_label.MaximumSize = new System.Drawing.Size(228, 0);
+            this.active_email_label.MinimumSize = new System.Drawing.Size(228, 0);
             this.active_email_label.Name = "active_email_label";
-            this.active_email_label.Size = new System.Drawing.Size(198, 20);
+            this.active_email_label.Size = new System.Drawing.Size(228, 20);
             this.active_email_label.TabIndex = 0;
             this.active_email_label.Text = "<active email>";
             this.active_email_label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -332,9 +386,9 @@
             this.main_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.main_panel.Controls.Add(this.main_tab);
             this.main_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.main_panel.Location = new System.Drawing.Point(552, 30);
+            this.main_panel.Location = new System.Drawing.Point(582, 30);
             this.main_panel.Name = "main_panel";
-            this.main_panel.Size = new System.Drawing.Size(566, 617);
+            this.main_panel.Size = new System.Drawing.Size(504, 632);
             this.main_panel.TabIndex = 3;
             // 
             // main_tab
@@ -346,7 +400,7 @@
             this.main_tab.Location = new System.Drawing.Point(0, 0);
             this.main_tab.Name = "main_tab";
             this.main_tab.SelectedIndex = 0;
-            this.main_tab.Size = new System.Drawing.Size(564, 615);
+            this.main_tab.Size = new System.Drawing.Size(502, 630);
             this.main_tab.TabIndex = 0;
             // 
             // intro_tab
@@ -355,7 +409,7 @@
             this.intro_tab.Controls.Add(this.welcome_picture_box);
             this.intro_tab.Location = new System.Drawing.Point(4, 29);
             this.intro_tab.Name = "intro_tab";
-            this.intro_tab.Size = new System.Drawing.Size(556, 582);
+            this.intro_tab.Size = new System.Drawing.Size(494, 597);
             this.intro_tab.TabIndex = 2;
             this.intro_tab.Text = "Welcome";
             // 
@@ -368,7 +422,7 @@
             this.welcome_picture_box.Image = global::G5EmailClient.Properties.Resources.Group5Logo;
             this.welcome_picture_box.Location = new System.Drawing.Point(28, 28);
             this.welcome_picture_box.Name = "welcome_picture_box";
-            this.welcome_picture_box.Size = new System.Drawing.Size(500, 200);
+            this.welcome_picture_box.Size = new System.Drawing.Size(438, 143);
             this.welcome_picture_box.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.welcome_picture_box.TabIndex = 0;
             this.welcome_picture_box.TabStop = false;
@@ -384,7 +438,7 @@
             this.open_message_tab.Location = new System.Drawing.Point(4, 29);
             this.open_message_tab.Name = "open_message_tab";
             this.open_message_tab.Padding = new System.Windows.Forms.Padding(10);
-            this.open_message_tab.Size = new System.Drawing.Size(556, 582);
+            this.open_message_tab.Size = new System.Drawing.Size(494, 597);
             this.open_message_tab.TabIndex = 0;
             this.open_message_tab.Text = "Message";
             // 
@@ -396,7 +450,7 @@
             this.msg_mailbody_panel.Location = new System.Drawing.Point(10, 76);
             this.msg_mailbody_panel.Name = "msg_mailbody_panel";
             this.msg_mailbody_panel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.msg_mailbody_panel.Size = new System.Drawing.Size(536, 438);
+            this.msg_mailbody_panel.Size = new System.Drawing.Size(474, 453);
             this.msg_mailbody_panel.TabIndex = 4;
             this.msg_mailbody_panel.Tag = "";
             // 
@@ -407,16 +461,16 @@
             this.msg_body_rtextbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.msg_body_rtextbox.Location = new System.Drawing.Point(3, 0);
             this.msg_body_rtextbox.Name = "msg_body_rtextbox";
-            this.msg_body_rtextbox.Size = new System.Drawing.Size(528, 436);
+            this.msg_body_rtextbox.Size = new System.Drawing.Size(466, 451);
             this.msg_body_rtextbox.TabIndex = 0;
             this.msg_body_rtextbox.Text = "<Message body goes here>";
             // 
             // msg_padding_panel2
             // 
             this.msg_padding_panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.msg_padding_panel2.Location = new System.Drawing.Point(10, 514);
+            this.msg_padding_panel2.Location = new System.Drawing.Point(10, 529);
             this.msg_padding_panel2.Name = "msg_padding_panel2";
-            this.msg_padding_panel2.Size = new System.Drawing.Size(536, 10);
+            this.msg_padding_panel2.Size = new System.Drawing.Size(474, 10);
             this.msg_padding_panel2.TabIndex = 3;
             // 
             // msg_padding_panel1
@@ -424,7 +478,7 @@
             this.msg_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.msg_padding_panel1.Location = new System.Drawing.Point(10, 66);
             this.msg_padding_panel1.Name = "msg_padding_panel1";
-            this.msg_padding_panel1.Size = new System.Drawing.Size(536, 10);
+            this.msg_padding_panel1.Size = new System.Drawing.Size(474, 10);
             this.msg_padding_panel1.TabIndex = 2;
             // 
             // msg_buttons_panel
@@ -433,9 +487,9 @@
             this.msg_buttons_panel.Controls.Add(this.msg_replyall_button);
             this.msg_buttons_panel.Controls.Add(this.msg_reply_button);
             this.msg_buttons_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.msg_buttons_panel.Location = new System.Drawing.Point(10, 524);
+            this.msg_buttons_panel.Location = new System.Drawing.Point(10, 539);
             this.msg_buttons_panel.Name = "msg_buttons_panel";
-            this.msg_buttons_panel.Size = new System.Drawing.Size(536, 48);
+            this.msg_buttons_panel.Size = new System.Drawing.Size(474, 48);
             this.msg_buttons_panel.TabIndex = 1;
             // 
             // msg_forward_button
@@ -444,7 +498,7 @@
             this.msg_forward_button.BackgroundImage = global::G5EmailClient.Properties.Resources.ForwardIcon;
             this.msg_forward_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.msg_forward_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.msg_forward_button.Location = new System.Drawing.Point(488, 0);
+            this.msg_forward_button.Location = new System.Drawing.Point(426, 0);
             this.msg_forward_button.Margin = new System.Windows.Forms.Padding(0);
             this.msg_forward_button.Name = "msg_forward_button";
             this.msg_forward_button.Size = new System.Drawing.Size(48, 48);
@@ -472,6 +526,7 @@
             this.msg_reply_button.Size = new System.Drawing.Size(48, 48);
             this.msg_reply_button.TabIndex = 0;
             this.msg_reply_button.UseVisualStyleBackColor = true;
+            this.msg_reply_button.Click += new System.EventHandler(this.msg_reply_button_Click);
             // 
             // msg_senderinfo_panel
             // 
@@ -484,7 +539,7 @@
             this.msg_senderinfo_panel.Location = new System.Drawing.Point(10, 10);
             this.msg_senderinfo_panel.Margin = new System.Windows.Forms.Padding(10);
             this.msg_senderinfo_panel.Name = "msg_senderinfo_panel";
-            this.msg_senderinfo_panel.Size = new System.Drawing.Size(536, 56);
+            this.msg_senderinfo_panel.Size = new System.Drawing.Size(474, 56);
             this.msg_senderinfo_panel.TabIndex = 0;
             this.msg_senderinfo_panel.Resize += new System.EventHandler(this.msg_senderinfo_panel_Resize);
             // 
@@ -505,7 +560,7 @@
             this.msg_senderinfo_padding_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.msg_senderinfo_padding_panel.Location = new System.Drawing.Point(0, 28);
             this.msg_senderinfo_padding_panel.Name = "msg_senderinfo_padding_panel";
-            this.msg_senderinfo_padding_panel.Size = new System.Drawing.Size(536, 5);
+            this.msg_senderinfo_padding_panel.Size = new System.Drawing.Size(474, 5);
             this.msg_senderinfo_padding_panel.TabIndex = 2;
             // 
             // msg_from_label
@@ -531,7 +586,7 @@
             this.compose_message_tab.Location = new System.Drawing.Point(4, 29);
             this.compose_message_tab.Name = "compose_message_tab";
             this.compose_message_tab.Padding = new System.Windows.Forms.Padding(10);
-            this.compose_message_tab.Size = new System.Drawing.Size(556, 582);
+            this.compose_message_tab.Size = new System.Drawing.Size(494, 597);
             this.compose_message_tab.TabIndex = 3;
             this.compose_message_tab.Text = "Compose";
             // 
@@ -540,10 +595,10 @@
             this.cmp_body_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.cmp_body_panel.Controls.Add(this.cmp_mailbody_rtextbox);
             this.cmp_body_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cmp_body_panel.Location = new System.Drawing.Point(10, 164);
+            this.cmp_body_panel.Location = new System.Drawing.Point(10, 159);
             this.cmp_body_panel.Name = "cmp_body_panel";
             this.cmp_body_panel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.cmp_body_panel.Size = new System.Drawing.Size(536, 350);
+            this.cmp_body_panel.Size = new System.Drawing.Size(474, 370);
             this.cmp_body_panel.TabIndex = 4;
             this.cmp_body_panel.Tag = "";
             // 
@@ -554,24 +609,24 @@
             this.cmp_mailbody_rtextbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.cmp_mailbody_rtextbox.Location = new System.Drawing.Point(3, 0);
             this.cmp_mailbody_rtextbox.Name = "cmp_mailbody_rtextbox";
-            this.cmp_mailbody_rtextbox.Size = new System.Drawing.Size(528, 348);
-            this.cmp_mailbody_rtextbox.TabIndex = 0;
+            this.cmp_mailbody_rtextbox.Size = new System.Drawing.Size(466, 368);
+            this.cmp_mailbody_rtextbox.TabIndex = 4;
             this.cmp_mailbody_rtextbox.Text = "";
             // 
             // cmp_padding_panel2
             // 
             this.cmp_padding_panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.cmp_padding_panel2.Location = new System.Drawing.Point(10, 514);
+            this.cmp_padding_panel2.Location = new System.Drawing.Point(10, 529);
             this.cmp_padding_panel2.Name = "cmp_padding_panel2";
-            this.cmp_padding_panel2.Size = new System.Drawing.Size(536, 10);
+            this.cmp_padding_panel2.Size = new System.Drawing.Size(474, 10);
             this.cmp_padding_panel2.TabIndex = 3;
             // 
             // cmp_padding_panel1
             // 
             this.cmp_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.cmp_padding_panel1.Location = new System.Drawing.Point(10, 154);
+            this.cmp_padding_panel1.Location = new System.Drawing.Point(10, 149);
             this.cmp_padding_panel1.Name = "cmp_padding_panel1";
-            this.cmp_padding_panel1.Size = new System.Drawing.Size(536, 10);
+            this.cmp_padding_panel1.Size = new System.Drawing.Size(474, 10);
             this.cmp_padding_panel1.TabIndex = 2;
             // 
             // cmp_bottom_panel
@@ -579,9 +634,9 @@
             this.cmp_bottom_panel.Controls.Add(this.cmp_add_button);
             this.cmp_bottom_panel.Controls.Add(this.cmp_send_button);
             this.cmp_bottom_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.cmp_bottom_panel.Location = new System.Drawing.Point(10, 524);
+            this.cmp_bottom_panel.Location = new System.Drawing.Point(10, 539);
             this.cmp_bottom_panel.Name = "cmp_bottom_panel";
-            this.cmp_bottom_panel.Size = new System.Drawing.Size(536, 48);
+            this.cmp_bottom_panel.Size = new System.Drawing.Size(474, 48);
             this.cmp_bottom_panel.TabIndex = 1;
             // 
             // cmp_add_button
@@ -602,11 +657,12 @@
             this.cmp_send_button.BackgroundImage = global::G5EmailClient.Properties.Resources.SendIcon;
             this.cmp_send_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.cmp_send_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cmp_send_button.Location = new System.Drawing.Point(488, 0);
+            this.cmp_send_button.Location = new System.Drawing.Point(426, 0);
             this.cmp_send_button.Name = "cmp_send_button";
             this.cmp_send_button.Size = new System.Drawing.Size(48, 48);
-            this.cmp_send_button.TabIndex = 0;
+            this.cmp_send_button.TabIndex = 5;
             this.cmp_send_button.UseVisualStyleBackColor = true;
+            this.cmp_send_button.Click += new System.EventHandler(this.cmp_send_button_Click);
             // 
             // cmp_info_panel
             // 
@@ -623,7 +679,7 @@
             this.cmp_info_panel.Location = new System.Drawing.Point(10, 10);
             this.cmp_info_panel.Margin = new System.Windows.Forms.Padding(10);
             this.cmp_info_panel.Name = "cmp_info_panel";
-            this.cmp_info_panel.Size = new System.Drawing.Size(536, 144);
+            this.cmp_info_panel.Size = new System.Drawing.Size(474, 139);
             this.cmp_info_panel.TabIndex = 0;
             // 
             // cmp_subject_panel
@@ -633,9 +689,9 @@
             this.cmp_subject_panel.Controls.Add(this.cmp_subject_textbox);
             this.cmp_subject_panel.Controls.Add(this.cmp_subject_left_panel);
             this.cmp_subject_panel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.cmp_subject_panel.Location = new System.Drawing.Point(0, 113);
+            this.cmp_subject_panel.Location = new System.Drawing.Point(0, 108);
             this.cmp_subject_panel.Name = "cmp_subject_panel";
-            this.cmp_subject_panel.Size = new System.Drawing.Size(536, 31);
+            this.cmp_subject_panel.Size = new System.Drawing.Size(474, 31);
             this.cmp_subject_panel.TabIndex = 7;
             // 
             // cmp_subject_underscore_panel
@@ -644,7 +700,7 @@
             this.cmp_subject_underscore_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_subject_underscore_panel.Location = new System.Drawing.Point(75, 30);
             this.cmp_subject_underscore_panel.Name = "cmp_subject_underscore_panel";
-            this.cmp_subject_underscore_panel.Size = new System.Drawing.Size(461, 1);
+            this.cmp_subject_underscore_panel.Size = new System.Drawing.Size(399, 1);
             this.cmp_subject_underscore_panel.TabIndex = 3;
             // 
             // cmp_subject_textbox
@@ -656,8 +712,8 @@
             this.cmp_subject_textbox.MinimumSize = new System.Drawing.Size(0, 20);
             this.cmp_subject_textbox.Multiline = true;
             this.cmp_subject_textbox.Name = "cmp_subject_textbox";
-            this.cmp_subject_textbox.Size = new System.Drawing.Size(461, 30);
-            this.cmp_subject_textbox.TabIndex = 4;
+            this.cmp_subject_textbox.Size = new System.Drawing.Size(399, 30);
+            this.cmp_subject_textbox.TabIndex = 3;
             // 
             // cmp_subject_left_panel
             // 
@@ -687,7 +743,7 @@
             this.cmp_info_padding_panel3.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_info_padding_panel3.Location = new System.Drawing.Point(0, 103);
             this.cmp_info_padding_panel3.Name = "cmp_info_padding_panel3";
-            this.cmp_info_padding_panel3.Size = new System.Drawing.Size(536, 10);
+            this.cmp_info_padding_panel3.Size = new System.Drawing.Size(474, 5);
             this.cmp_info_padding_panel3.TabIndex = 6;
             // 
             // cmp_bcc_panel
@@ -699,7 +755,7 @@
             this.cmp_bcc_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_bcc_panel.Location = new System.Drawing.Point(0, 72);
             this.cmp_bcc_panel.Name = "cmp_bcc_panel";
-            this.cmp_bcc_panel.Size = new System.Drawing.Size(536, 31);
+            this.cmp_bcc_panel.Size = new System.Drawing.Size(474, 31);
             this.cmp_bcc_panel.TabIndex = 5;
             this.cmp_bcc_panel.Visible = false;
             // 
@@ -709,7 +765,7 @@
             this.cmp_bcc_underscore_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_bcc_underscore_panel.Location = new System.Drawing.Point(45, 30);
             this.cmp_bcc_underscore_panel.Name = "cmp_bcc_underscore_panel";
-            this.cmp_bcc_underscore_panel.Size = new System.Drawing.Size(491, 1);
+            this.cmp_bcc_underscore_panel.Size = new System.Drawing.Size(429, 1);
             this.cmp_bcc_underscore_panel.TabIndex = 3;
             // 
             // cmp_bcc_textbox
@@ -720,8 +776,8 @@
             this.cmp_bcc_textbox.Location = new System.Drawing.Point(45, 0);
             this.cmp_bcc_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_bcc_textbox.Name = "cmp_bcc_textbox";
-            this.cmp_bcc_textbox.Size = new System.Drawing.Size(491, 30);
-            this.cmp_bcc_textbox.TabIndex = 4;
+            this.cmp_bcc_textbox.Size = new System.Drawing.Size(429, 30);
+            this.cmp_bcc_textbox.TabIndex = 2;
             // 
             // cmp_bcc_left_panel
             // 
@@ -751,7 +807,7 @@
             this.cmp_info_padding_panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_info_padding_panel2.Location = new System.Drawing.Point(0, 67);
             this.cmp_info_padding_panel2.Name = "cmp_info_padding_panel2";
-            this.cmp_info_padding_panel2.Size = new System.Drawing.Size(536, 5);
+            this.cmp_info_padding_panel2.Size = new System.Drawing.Size(474, 5);
             this.cmp_info_padding_panel2.TabIndex = 4;
             // 
             // cmp_cc_panel
@@ -763,7 +819,7 @@
             this.cmp_cc_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_cc_panel.Location = new System.Drawing.Point(0, 36);
             this.cmp_cc_panel.Name = "cmp_cc_panel";
-            this.cmp_cc_panel.Size = new System.Drawing.Size(536, 31);
+            this.cmp_cc_panel.Size = new System.Drawing.Size(474, 31);
             this.cmp_cc_panel.TabIndex = 2;
             this.cmp_cc_panel.Visible = false;
             // 
@@ -773,7 +829,7 @@
             this.cmp_cc_underscore_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_cc_underscore_panel.Location = new System.Drawing.Point(45, 30);
             this.cmp_cc_underscore_panel.Name = "cmp_cc_underscore_panel";
-            this.cmp_cc_underscore_panel.Size = new System.Drawing.Size(491, 1);
+            this.cmp_cc_underscore_panel.Size = new System.Drawing.Size(429, 1);
             this.cmp_cc_underscore_panel.TabIndex = 3;
             // 
             // cmp_cc_textbox
@@ -784,8 +840,8 @@
             this.cmp_cc_textbox.Location = new System.Drawing.Point(45, 0);
             this.cmp_cc_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_cc_textbox.Name = "cmp_cc_textbox";
-            this.cmp_cc_textbox.Size = new System.Drawing.Size(491, 30);
-            this.cmp_cc_textbox.TabIndex = 4;
+            this.cmp_cc_textbox.Size = new System.Drawing.Size(429, 30);
+            this.cmp_cc_textbox.TabIndex = 1;
             // 
             // cmp_cc_left_panel
             // 
@@ -816,7 +872,7 @@
             this.cmp_info_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_info_padding_panel1.Location = new System.Drawing.Point(0, 31);
             this.cmp_info_padding_panel1.Name = "cmp_info_padding_panel1";
-            this.cmp_info_padding_panel1.Size = new System.Drawing.Size(536, 5);
+            this.cmp_info_padding_panel1.Size = new System.Drawing.Size(474, 5);
             this.cmp_info_padding_panel1.TabIndex = 3;
             // 
             // cmp_to_panel
@@ -828,7 +884,7 @@
             this.cmp_to_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_to_panel.Location = new System.Drawing.Point(0, 0);
             this.cmp_to_panel.Name = "cmp_to_panel";
-            this.cmp_to_panel.Size = new System.Drawing.Size(536, 31);
+            this.cmp_to_panel.Size = new System.Drawing.Size(474, 31);
             this.cmp_to_panel.TabIndex = 1;
             // 
             // cmp_to_underline_panel
@@ -837,7 +893,7 @@
             this.cmp_to_underline_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_to_underline_panel.Location = new System.Drawing.Point(45, 30);
             this.cmp_to_underline_panel.Name = "cmp_to_underline_panel";
-            this.cmp_to_underline_panel.Size = new System.Drawing.Size(491, 1);
+            this.cmp_to_underline_panel.Size = new System.Drawing.Size(429, 1);
             this.cmp_to_underline_panel.TabIndex = 3;
             // 
             // cmp_to_textbox
@@ -848,8 +904,8 @@
             this.cmp_to_textbox.Location = new System.Drawing.Point(45, 0);
             this.cmp_to_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_to_textbox.Name = "cmp_to_textbox";
-            this.cmp_to_textbox.Size = new System.Drawing.Size(491, 30);
-            this.cmp_to_textbox.TabIndex = 4;
+            this.cmp_to_textbox.Size = new System.Drawing.Size(429, 30);
+            this.cmp_to_textbox.TabIndex = 0;
             // 
             // cmp_to_left_panel
             // 
@@ -881,7 +937,7 @@
             this.message_flow_panel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.message_flow_panel.Location = new System.Drawing.Point(0, 23);
             this.message_flow_panel.Name = "message_flow_panel";
-            this.message_flow_panel.Size = new System.Drawing.Size(350, 592);
+            this.message_flow_panel.Size = new System.Drawing.Size(350, 607);
             this.message_flow_panel.TabIndex = 2;
             // 
             // search_folder_textbox
@@ -903,9 +959,9 @@
             this.inbox_panel.Controls.Add(this.message_flow_panel);
             this.inbox_panel.Controls.Add(this.search_folder_textbox);
             this.inbox_panel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.inbox_panel.Location = new System.Drawing.Point(200, 30);
+            this.inbox_panel.Location = new System.Drawing.Point(230, 30);
             this.inbox_panel.Name = "inbox_panel";
-            this.inbox_panel.Size = new System.Drawing.Size(352, 617);
+            this.inbox_panel.Size = new System.Drawing.Size(352, 632);
             this.inbox_panel.TabIndex = 2;
             // 
             // brief_control_explain_tooltop
@@ -948,7 +1004,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.ClientSize = new System.Drawing.Size(1118, 647);
+            this.ClientSize = new System.Drawing.Size(1086, 662);
             this.Controls.Add(this.main_panel);
             this.Controls.Add(this.inbox_panel);
             this.Controls.Add(this.folders_panel);
@@ -962,6 +1018,9 @@
             this.top_toolstrip.ResumeLayout(false);
             this.top_toolstrip.PerformLayout();
             this.folders_panel.ResumeLayout(false);
+            this.folders_panel.PerformLayout();
+            this.notification_panel.ResumeLayout(false);
+            this.notification_panel.PerformLayout();
             this.account_info_panel.ResumeLayout(false);
             this.account_info_panel.PerformLayout();
             this.main_panel.ResumeLayout(false);
@@ -1080,5 +1139,9 @@
         private ContextMenuStrip cmp_add_contextstrip;
         private ToolStripMenuItem add_cc_menuitem;
         private ToolStripMenuItem add_bcc_menuitem;
+        private Panel notifications_separator_panel;
+        private Panel notification_panel;
+        private Label notifications_label;
+        private FlowLayoutPanel notifications_flowpanel;
     }
 }

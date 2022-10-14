@@ -134,9 +134,7 @@ namespace G5EmailClient.GUI
             if(!ModifierKeys.HasFlag(Keys.Control))
             {
                 // When the control button is not held, click opens the message
-                foreach (var envelope in selectedPanels)
-                    envelope.SetSelected(false);
-                selectedPanels.Clear();
+                ClearSelction();
                 panel.SetSelected(true);
 
                 Debug.WriteLine("Flow panel opening message");

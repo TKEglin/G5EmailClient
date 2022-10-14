@@ -103,6 +103,16 @@ namespace G5EmailClient.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CloseIcon {
+            get {
+                object obj = ResourceManager.GetObject("CloseIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ComposeIcon {
             get {
                 object obj = ResourceManager.GetObject("ComposeIcon", resourceCulture);
@@ -136,6 +146,26 @@ namespace G5EmailClient.Properties {
         internal static System.Drawing.Bitmap DeleteIcon {
             get {
                 object obj = ResourceManager.GetObject("DeleteIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ErrorAnimated_Icon {
+            get {
+                object obj = ResourceManager.GetObject("ErrorAnimated.Icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ErrorIcon {
+            get {
+                object obj = ResourceManager.GetObject("ErrorIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -286,6 +316,16 @@ namespace G5EmailClient.Properties {
         internal static System.Drawing.Bitmap SpamIcon {
             get {
                 object obj = ResourceManager.GetObject("SpamIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap UpArrowIcon {
+            get {
+                object obj = ResourceManager.GetObject("UpArrowIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

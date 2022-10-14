@@ -25,7 +25,8 @@ namespace G5EmailClient.Email
             // Task queue
         
             // Mutexes 
-        Mutex ImapMutex = new(); // Lock this when working with the imap server
+        Mutex ImapMutex = new();
+        Mutex SmtpMutex = new();
 
 
         SmtpClient smtpClient = new();
@@ -286,7 +287,7 @@ namespace G5EmailClient.Email
                 folder.RemoveFlags(ID, MessageFlags.Seen, true);
                 Debug.WriteLine("Server request to remove flag");
             }
-            ImapMutex.ReleaseMutex();   
+            ImapMutex.ReleaseMutex();
         }
 
         void IEmail.Delete(int messageIndex)
@@ -309,6 +310,41 @@ namespace G5EmailClient.Email
 
             ImapMutex.ReleaseMutex();
         }
+
+        #endregion
+
+        //____________________________________________
+        // Functions that interact with the SMTP server 
+        #region SMTP functions
+
+        void IEmail.SendMessage(IEmail.Message message)
+        {
+
+            var MimeMsg = new MimeMessage();
+                MimeMsg.From.Add(new MailboxAddress("", activeUser.username));
+                MimeMsg.To.  Add(new MailboxAddress("", message.to));
+                //MimeMsg.Cc.  Add(new MailboxAddress("", message.cc));
+                //MimeMsg.Bcc. Add(new MailboxAddress("", message.bcc));
+                MimeMsg.Subject = message.subject;
+                MimeMsg.Body = new TextPart("plain") { Text = message.body };
+
+            ThreadPool.QueueUserWorkItem(state => AsyncSendMessage(MimeMsg, message));
+        }
+        private void AsyncSendMessage(MimeMessage MimeMsg, IEmail.Message message)
+        {
+            SmtpMutex.WaitOne();
+            try
+            {
+                smtpClient.Send(MimeMsg);
+            }
+            catch (Exception? ex)
+            {
+                this.SentMessage(ex, message);
+            }
+            SmtpMutex.ReleaseMutex();
+            this.SentMessage(null, message);
+        }
+        public event IEmail.SentMessageHandler SentMessage;
 
         #endregion
     }
