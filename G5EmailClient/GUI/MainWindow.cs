@@ -50,14 +50,16 @@ namespace G5EmailClient.GUI
             cmp_send_button.FlatAppearance.BorderSize = 0;
             cmp_add_button. FlatAppearance.BorderSize = 0;
 
-            // Initializing email data.
+            if (EmailClient.isConnected())
+            {
+             // Initializing email data.
                 // Data
-            updateInboxView();
-            updateFoldersView();
-            active_email_label.Text = EmailClient.GetActiveUser().username;
+                updateInboxView();
+                updateFoldersView();
+                active_email_label.Text = EmailClient.GetActiveUser().username;
                 // Events
-            EmailClient.SentMessage += SentMessageHandler;
-
+                EmailClient.SentMessage += SentMessageHandler;
+            }
         }
 
         #region utility functions
@@ -327,7 +329,7 @@ namespace G5EmailClient.GUI
             cmp_mailbody_rtextbox.Text = "\n\n________________\n"
                                            + "Previous Message:"
                                            + "\nFrom: " + msg_from_label.Text
-                                           + "\nSubject " + msg_subject_label.Text
+                                           + "\nSubject: " + msg_subject_label.Text
                                            + "\n" + msg_body_rtextbox.Text;
             main_tab.SelectedTab = compose_message_tab;
         }

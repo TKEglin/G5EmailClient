@@ -449,7 +449,7 @@
             this.msg_mailbody_panel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.msg_mailbody_panel.Location = new System.Drawing.Point(10, 76);
             this.msg_mailbody_panel.Name = "msg_mailbody_panel";
-            this.msg_mailbody_panel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.msg_mailbody_panel.Padding = new System.Windows.Forms.Padding(3);
             this.msg_mailbody_panel.Size = new System.Drawing.Size(474, 453);
             this.msg_mailbody_panel.TabIndex = 4;
             this.msg_mailbody_panel.Tag = "";
@@ -459,9 +459,9 @@
             this.msg_body_rtextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.msg_body_rtextbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.msg_body_rtextbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.msg_body_rtextbox.Location = new System.Drawing.Point(3, 0);
+            this.msg_body_rtextbox.Location = new System.Drawing.Point(3, 3);
             this.msg_body_rtextbox.Name = "msg_body_rtextbox";
-            this.msg_body_rtextbox.Size = new System.Drawing.Size(466, 451);
+            this.msg_body_rtextbox.Size = new System.Drawing.Size(466, 445);
             this.msg_body_rtextbox.TabIndex = 0;
             this.msg_body_rtextbox.Text = "<Message body goes here>";
             // 
