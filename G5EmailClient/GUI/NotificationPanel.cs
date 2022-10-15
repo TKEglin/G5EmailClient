@@ -14,7 +14,6 @@ namespace G5EmailClient.GUI
     public partial class NotificationPanel : UserControl
     {
         object? StoredObject;
-        bool clickResponse = false;
         bool selected = false;
 
         public NotificationPanel()
@@ -23,6 +22,10 @@ namespace G5EmailClient.GUI
 
             not_left_button.FlatAppearance.BorderSize = 0;
             collapse_button.FlatAppearance.BorderSize = 0;
+
+            this.Anchor = AnchorStyles.Top;
+            this.AutoSize = true;
+            this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         }
 
         [Category("Fields"), Description("The object attached to the notification")]
@@ -73,23 +76,13 @@ namespace G5EmailClient.GUI
                 not_text_label.Text = value;
             }
         }
-        [Category("Fields"), Description("The text of the body text label")]
-        public bool RespondsToClick
-        {
-            get
-            {
-                return clickResponse;
-            }
-            set
-            {
-                clickResponse = value;
-            }
-        }
 
         private void not_left_button_Click(object sender, EventArgs e)
         {
+            this.NotificationClosed(null, e);
             this.Dispose();
         }
+        public EventHandler NotificationClosed;
 
         private void title_panel_Click(object sender, EventArgs e)
         {
@@ -123,12 +116,9 @@ namespace G5EmailClient.GUI
 
         private void not_text_panel_Click(object sender, EventArgs e)
         {
-            if(clickResponse)
-            {
-                Debug.WriteLine("Notification clicked. Launching event.");
-                this.NotificationBodyClicked(StoredObject, e);
-                this.Dispose();
-            }
+            this.NotificationClosed(null, e);
+            this.NotificationBodyClicked(StoredObject, e);
+            this.Dispose();
         }
         public event EventHandler NotificationBodyClicked;
 
