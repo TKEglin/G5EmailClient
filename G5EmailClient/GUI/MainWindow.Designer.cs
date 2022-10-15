@@ -45,7 +45,6 @@
             this.contacts_button = new System.Windows.Forms.ToolStripButton();
             this.refresh_button = new System.Windows.Forms.ToolStripButton();
             this.markspam_panel = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.folders_panel = new System.Windows.Forms.Panel();
             this.notifications_separator_panel = new System.Windows.Forms.Panel();
             this.folders_lisbox = new System.Windows.Forms.ListBox();
@@ -163,8 +162,7 @@
             this.settings_dropdown,
             this.contacts_button,
             this.refresh_button,
-            this.markspam_panel,
-            this.toolStripSeparator1});
+            this.markspam_panel});
             this.top_toolstrip.Location = new System.Drawing.Point(0, 0);
             this.top_toolstrip.Name = "top_toolstrip";
             this.top_toolstrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
@@ -178,8 +176,8 @@
             this.new_message_button.Image = global::G5EmailClient.Properties.Resources.ComposeIcon;
             this.new_message_button.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.new_message_button.Name = "new_message_button";
-            this.new_message_button.Size = new System.Drawing.Size(144, 29);
-            this.new_message_button.Text = "New Message";
+            this.new_message_button.Size = new System.Drawing.Size(111, 29);
+            this.new_message_button.Text = "Compose";
             this.new_message_button.Click += new System.EventHandler(this.new_message_button_Click);
             // 
             // open_inbox_button
@@ -236,28 +234,28 @@
             // 
             this.user_settings_button.Image = global::G5EmailClient.Properties.Resources.AccountSettingsIcon;
             this.user_settings_button.Name = "user_settings_button";
-            this.user_settings_button.Size = new System.Drawing.Size(199, 32);
+            this.user_settings_button.Size = new System.Drawing.Size(229, 32);
             this.user_settings_button.Text = "User Settings";
             // 
             // add_user_button
             // 
             this.add_user_button.Image = global::G5EmailClient.Properties.Resources.AddUserIcon;
             this.add_user_button.Name = "add_user_button";
-            this.add_user_button.Size = new System.Drawing.Size(199, 32);
+            this.add_user_button.Size = new System.Drawing.Size(229, 32);
             this.add_user_button.Text = "Add User";
             // 
             // select_user_button
             // 
             this.select_user_button.Image = global::G5EmailClient.Properties.Resources.SelectUserIcon;
             this.select_user_button.Name = "select_user_button";
-            this.select_user_button.Size = new System.Drawing.Size(199, 32);
+            this.select_user_button.Size = new System.Drawing.Size(229, 32);
             this.select_user_button.Text = "Select User";
             // 
             // logout_button
             // 
             this.logout_button.Image = global::G5EmailClient.Properties.Resources.LogoutIcon;
             this.logout_button.Name = "logout_button";
-            this.logout_button.Size = new System.Drawing.Size(199, 32);
+            this.logout_button.Size = new System.Drawing.Size(229, 32);
             this.logout_button.Text = "Log Out";
             // 
             // contacts_button
@@ -287,11 +285,6 @@
             this.markspam_panel.Name = "markspam_panel";
             this.markspam_panel.Size = new System.Drawing.Size(125, 29);
             this.markspam_panel.Text = "Mark Spam";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 32);
             // 
             // folders_panel
             // 
@@ -1150,6 +1143,5 @@
         private Panel notification_panel;
         private Label notifications_label;
         private FlowLayoutPanel notifications_flowpanel;
-        private ToolStripSeparator toolStripSeparator1;
     }
 }

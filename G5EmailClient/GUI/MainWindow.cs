@@ -382,21 +382,20 @@ namespace G5EmailClient.GUI
         }
         private void InboxUpdateFinishedHandler(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.WaitCursor;
-            var button = (ToolStripButton)sender;
-            if (button.Owner.InvokeRequired)
+            if (refresh_button.Owner.InvokeRequired)
             {
                 Action safeInboxHandler = delegate { InboxUpdateFinishedHandler(sender, e); };
-                button.Owner.Invoke(safeInboxHandler);
+                refresh_button.Owner.Invoke(safeInboxHandler);
             }
             else
             {
-                reenableButton(button);
-                button.Text = "Refresh";
-                button.Image = Properties.Resources.RefreshIcon;
+                this.Cursor = Cursors.WaitCursor;
+                reenableButton(refresh_button);
+                refresh_button.Text = "Refresh";
+                refresh_button.Image = Properties.Resources.RefreshIcon;
                 updateInboxView();
+                this.Cursor = Cursors.Default;
             }
-            this.Cursor = Cursors.Default;
         }
     }
 }

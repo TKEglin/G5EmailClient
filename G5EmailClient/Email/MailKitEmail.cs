@@ -81,7 +81,7 @@ namespace G5EmailClient.Email
 
             activeFolder = folder;
             // This will be used to remove duplicates once the new messages have been opened.
-            int oldMaxIndex = folder.Count - 1;
+            int count = folder.Count;
             // This is necessary to let the user access old messages while inbox is updating.
 
             activeFolder.Open(FolderAccess.ReadWrite);
@@ -98,16 +98,15 @@ namespace G5EmailClient.Email
                 activeFolderUIDs.Add(items.UniqueId);
                 activeFolderMessagesSeen.Add(items.Flags.Value.HasFlag(MessageFlags.Seen));
             }
-            activeFolder.Close();
 
             ImapMutex.ReleaseMutex();
 
             //Deleting duplicates
-            if(oldMaxIndex >= 0)
+            if(count >= 0)
             {
-                activeFolderMessages.    RemoveRange(0, oldMaxIndex);
-                activeFolderUIDs.        RemoveRange(0, oldMaxIndex);
-                activeFolderMessagesSeen.RemoveRange(0, oldMaxIndex);
+                activeFolderMessages.    RemoveRange(0, count);
+                activeFolderUIDs.        RemoveRange(0, count);
+                activeFolderMessagesSeen.RemoveRange(0, count);
             }
             if(InboxUpdateFinished != null)
                 this.InboxUpdateFinished(null, null);
