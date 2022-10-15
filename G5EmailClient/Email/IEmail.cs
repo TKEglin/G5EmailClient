@@ -107,7 +107,9 @@ namespace G5EmailClient.Email
         /// <summary>
         /// Updates the active folder.
         /// </summary>
-        void UpdateActiveFolder();
+        void UpdateInbox();
+        void UpdateInboxAsync();
+        event EventHandler InboxUpdateFinished;
 
         /// <summary>
         /// Gets the from string, subject line and read status of all emails in the active folder.

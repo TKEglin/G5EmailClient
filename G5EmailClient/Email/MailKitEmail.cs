@@ -77,43 +77,40 @@ namespace G5EmailClient.Email
         /// 
         void updateActiveFolder(IMailFolder folder)
         {
-            activeFolder = folder;
-            folder.Open(FolderAccess.ReadWrite);
+            ImapMutex.WaitOne();
 
-            activeFolderMessages.Clear();
-            activeFolderUIDs.Clear();
+            activeFolder = folder;
+            // This will be used to remove duplicates once the new messages have been opened.
+            int oldMaxIndex = folder.Count - 1;
+            // This is necessary to let the user access old messages while inbox is updating.
+
+            activeFolder.Open(FolderAccess.ReadWrite);
+
             // Adding the messages from oldest to newest
             foreach(var message in activeFolder.Reverse())
             {
                 activeFolderMessages.Add(message);
             }
             foreach (var items in activeFolder.Fetch(0, -1, 
-                                                   MessageSummaryItems.UniqueId |
-                                                   MessageSummaryItems.Flags).Reverse())
+                                                       MessageSummaryItems.UniqueId |
+                                                       MessageSummaryItems.Flags).Reverse())
             {
                 activeFolderUIDs.Add(items.UniqueId);
                 activeFolderMessagesSeen.Add(items.Flags.Value.HasFlag(MessageFlags.Seen));
             }
-        }
-        void updateActiveFolder()
-        {
-            var folder = activeFolder;
-            folder.Open(FolderAccess.ReadWrite);
+            activeFolder.Close();
 
-            activeFolderMessages.Clear();
-            activeFolderUIDs.Clear();
-            // Adding the messages from oldest to newest
-            foreach (var message in activeFolder.Reverse())
+            ImapMutex.ReleaseMutex();
+
+            //Deleting duplicates
+            if(oldMaxIndex >= 0)
             {
-                activeFolderMessages.Add(message);
+                activeFolderMessages.    RemoveRange(0, oldMaxIndex);
+                activeFolderUIDs.        RemoveRange(0, oldMaxIndex);
+                activeFolderMessagesSeen.RemoveRange(0, oldMaxIndex);
             }
-            foreach (var items in activeFolder.Fetch(0, -1,
-                                                   MessageSummaryItems.UniqueId |
-                                                   MessageSummaryItems.Flags).Reverse())
-            {
-                activeFolderUIDs.Add(items.UniqueId);
-                activeFolderMessagesSeen.Add(items.Flags.Value.HasFlag(MessageFlags.Seen));
-            }
+            if(InboxUpdateFinished != null)
+                this.InboxUpdateFinished(null, null);
         }
         #endregion
 
@@ -228,10 +225,15 @@ namespace G5EmailClient.Email
             updateActiveFolder(folder);
         }
 
-        void IEmail.UpdateActiveFolder()
+        void IEmail.UpdateInbox()
         {
-            updateActiveFolder();
+            updateActiveFolder(imapClient.Inbox);
         }
+        void IEmail.UpdateInboxAsync()
+        {
+            ThreadPool.QueueUserWorkItem(state => updateActiveFolder(imapClient.Inbox));
+        }
+        public event EventHandler InboxUpdateFinished;
 
         List<(string from, string subject, bool read)> IEmail.GetFolderEnvelopes()
         {
@@ -361,8 +363,10 @@ namespace G5EmailClient.Email
             {
             MimeMsg.From.Add(new MailboxAddress("", activeUser.username));
             MimeMsg.To.  Add(new MailboxAddress("", message.to));
-            MimeMsg.Cc.  Add(new MailboxAddress("", message.cc));
-            MimeMsg.Bcc. Add(new MailboxAddress("", message.bcc));
+            if(message.cc.Length > 0)
+                MimeMsg.Cc.  Add(new MailboxAddress("", message.cc));
+            if(message.bcc.Length > 0)
+                MimeMsg.Bcc. Add(new MailboxAddress("", message.bcc));
             MimeMsg.Subject = message.subject;
             MimeMsg.Body = new TextPart("plain") { Text = message.body };
             }

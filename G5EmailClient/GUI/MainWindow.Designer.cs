@@ -45,6 +45,7 @@
             this.contacts_button = new System.Windows.Forms.ToolStripButton();
             this.refresh_button = new System.Windows.Forms.ToolStripButton();
             this.markspam_panel = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.folders_panel = new System.Windows.Forms.Panel();
             this.notifications_separator_panel = new System.Windows.Forms.Panel();
             this.folders_lisbox = new System.Windows.Forms.ListBox();
@@ -162,7 +163,8 @@
             this.settings_dropdown,
             this.contacts_button,
             this.refresh_button,
-            this.markspam_panel});
+            this.markspam_panel,
+            this.toolStripSeparator1});
             this.top_toolstrip.Location = new System.Drawing.Point(0, 0);
             this.top_toolstrip.Name = "top_toolstrip";
             this.top_toolstrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
@@ -193,8 +195,8 @@
             this.move_message_dropdown.Image = global::G5EmailClient.Properties.Resources.MoveMessageIcon;
             this.move_message_dropdown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.move_message_dropdown.Name = "move_message_dropdown";
-            this.move_message_dropdown.Size = new System.Drawing.Size(162, 29);
-            this.move_message_dropdown.Text = "Move Message";
+            this.move_message_dropdown.Size = new System.Drawing.Size(91, 29);
+            this.move_message_dropdown.Text = "Move";
             // 
             // delete_button
             // 
@@ -285,6 +287,11 @@
             this.markspam_panel.Name = "markspam_panel";
             this.markspam_panel.Size = new System.Drawing.Size(125, 29);
             this.markspam_panel.Text = "Mark Spam";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 32);
             // 
             // folders_panel
             // 
@@ -1143,5 +1150,6 @@
         private Panel notification_panel;
         private Label notifications_label;
         private FlowLayoutPanel notifications_flowpanel;
+        private ToolStripSeparator toolStripSeparator1;
     }
 }

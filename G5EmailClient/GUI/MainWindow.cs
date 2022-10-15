@@ -11,6 +11,8 @@ namespace G5EmailClient.GUI
     {
         IEmail EmailClient;
 
+        int NotificationsCount = 0;
+
         public MainWindow(IEmail ParamEmailClient)
         {
             InitializeComponent();
@@ -59,6 +61,7 @@ namespace G5EmailClient.GUI
                 active_email_label.Text = EmailClient.GetActiveUser().username;
                 // Events
                 EmailClient.SentMessage += SentMessageHandler;
+                EmailClient.InboxUpdateFinished += InboxUpdateFinishedHandler;
             }
         }
 
@@ -68,6 +71,8 @@ namespace G5EmailClient.GUI
         System.Timers.Timer buttonTimer = new(1000) { Enabled = false };
         /// <summary>
         /// Temporarily disables a button for time 'double seconds'.
+        /// If seconds <= 0, the button will be disabled until reenabled
+        /// using reenableButton();
         /// </summary>
         /// <param name="button"></param>
         void tempDisableButton(ToolStripButton button, double seconds)
@@ -81,13 +86,16 @@ namespace G5EmailClient.GUI
             {
                 button.Enabled = false;
 
-                buttonTimer.Interval = seconds * 1000;
-                buttonTimer.Enabled = true;
-                buttonTimer.Elapsed += (sender, args) =>
+                if(seconds > 0)
                 {
-                    reenableButton(button);
-                    buttonTimer.Enabled = false;
-                };
+                    buttonTimer.Interval = seconds * 1000;
+                    buttonTimer.Enabled = true;
+                    buttonTimer.Elapsed += (sender, args) =>
+                    {
+                        reenableButton(button);
+                        buttonTimer.Enabled = false;
+                    };
+                }
             }
         }
         void reenableButton(ToolStripButton button)
@@ -105,18 +113,32 @@ namespace G5EmailClient.GUI
 
         #endregion
 
-        
+        /// <summary>
+        /// Prepares and returns a notification panel.
+        /// </summary>
         NotificationPanel prepareNotification(string title, Image image, string body)
         {
             var notification = new NotificationPanel();
-                notification.Anchor = AnchorStyles.Top;
-                notification.AutoSize = true;
-                notification.AutoSizeMode = AutoSizeMode.GrowAndShrink;
                 notification.MinimumSize = new Size(notifications_flowpanel.Width - 12, 0);
                 notification.titleText = title;
                 notification.Image = image;
                 notification.bodyText = body;
+                notification.NotificationClosed += NotificationClosed;
             return notification;
+        }
+        private void NotificationClosed(object sender, EventArgs e)
+        {
+            NotificationsCount--;
+            if (NotificationsCount > 0)
+                notifications_label.Text = "Notifications (" + NotificationsCount.ToString() + ")";
+            else
+                notifications_label.Text = "Notifications";
+        }
+        void AddNotification(NotificationPanel notification)
+        {
+            NotificationsCount++;
+            notifications_label.Text = "Notifications (" + NotificationsCount.ToString() + ")";
+            notifications_flowpanel.Controls.Add(notification);
         }
 
         /// <summary>
@@ -223,6 +245,11 @@ namespace G5EmailClient.GUI
 
         private void new_message_button_Click(object sender, EventArgs e)
         {
+            cmp_to_textbox.Text        = "";
+            cmp_cc_textbox.Text        = "";
+            cmp_bcc_textbox.Text       = "";
+            cmp_subject_textbox.Text   = "";
+            cmp_mailbody_rtextbox.Text = "";
             message_flow_panel.ClearSelction();
             main_tab.SelectedTab = compose_message_tab;
         }
@@ -280,7 +307,7 @@ namespace G5EmailClient.GUI
             cmp_subject_textbox.Text   = "";
             cmp_mailbody_rtextbox.Text = "";
             this.Cursor = Cursors.Default;
-        }
+        }    
         private void SentMessageHandler(Exception ex, IEmail.Message message)
         {
             if(ex != null)
@@ -293,14 +320,13 @@ namespace G5EmailClient.GUI
                 else
                 {
                     var notification = prepareNotification("Send Failed!",
-                                                           Properties.Resources.ErrorAnimated_Icon,
+                                                           Properties.Resources.ErrorAnimatedIcon,
                                                            "Message sent to <" + message.to + "> with " 
                                                          + " subject \"" + message.subject + "\" failed\n"
                                                          + "\nClick to retry. Error:\n" + ex.Message);
-                    notification.RespondsToClick = true;
                     notification.Object = message;
-                    notification.NotificationBodyClicked += LoadMessageEventDriver;
-                    notifications_flowpanel.Controls.Add(notification);
+                    notification.NotificationBodyClicked += LoadMessageNotificationMessage;
+                    AddNotification(notification);
                 }
             }
         }
@@ -317,9 +343,8 @@ namespace G5EmailClient.GUI
             cmp_subject_textbox.Text   = message.subject;
             cmp_mailbody_rtextbox.Text = message.body;
         }
-        private void LoadMessageEventDriver(object sender, EventArgs e)
+        private void LoadMessageNotificationMessage(object sender, EventArgs e)
         {
-            Debug.WriteLine("Running LoadMessage driver");
             var message = (IEmail.Message)sender;
             LoadMessage(message);
         }
@@ -333,14 +358,44 @@ namespace G5EmailClient.GUI
                                              + "\nFrom: " + msg_from_label.Text
                                              + "\nSubject: " + msg_subject_label.Text
                                              + "\n" + msg_body_rtextbox.Text;
+            message_flow_panel.ClearSelction();
             main_tab.SelectedTab = compose_message_tab;
         }
 
         private void refresh_button_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            EmailClient.UpdateActiveFolder();
-            updateFoldersView();
+            var button = (ToolStripButton)sender;
+            if (button.Owner.InvokeRequired)
+            {
+                Action safeRefresh = delegate { refresh_button_Click(sender, e); };
+                button.Owner.Invoke(safeRefresh);
+            }
+            else
+            {
+                tempDisableButton(button, -1);
+                button.Text = "Refreshing";
+                button.Image = Properties.Resources.RefreshAnimatedIcon;
+                EmailClient.UpdateInboxAsync();
+            }
+            this.Cursor = Cursors.Default;
+        }
+        private void InboxUpdateFinishedHandler(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            var button = (ToolStripButton)sender;
+            if (button.Owner.InvokeRequired)
+            {
+                Action safeInboxHandler = delegate { InboxUpdateFinishedHandler(sender, e); };
+                button.Owner.Invoke(safeInboxHandler);
+            }
+            else
+            {
+                reenableButton(button);
+                button.Text = "Refresh";
+                button.Image = Properties.Resources.RefreshIcon;
+                updateInboxView();
+            }
             this.Cursor = Cursors.Default;
         }
     }
