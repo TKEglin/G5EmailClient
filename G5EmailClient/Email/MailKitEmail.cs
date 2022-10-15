@@ -95,9 +95,29 @@ namespace G5EmailClient.Email
                 activeFolderMessagesSeen.Add(items.Flags.Value.HasFlag(MessageFlags.Seen));
             }
         }
+        void updateActiveFolder()
+        {
+            var folder = activeFolder;
+            folder.Open(FolderAccess.ReadWrite);
+
+            activeFolderMessages.Clear();
+            activeFolderUIDs.Clear();
+            // Adding the messages from oldest to newest
+            foreach (var message in activeFolder.Reverse())
+            {
+                activeFolderMessages.Add(message);
+            }
+            foreach (var items in activeFolder.Fetch(0, -1,
+                                                   MessageSummaryItems.UniqueId |
+                                                   MessageSummaryItems.Flags).Reverse())
+            {
+                activeFolderUIDs.Add(items.UniqueId);
+                activeFolderMessagesSeen.Add(items.Flags.Value.HasFlag(MessageFlags.Seen));
+            }
+        }
         #endregion
 
-         //__________________________________________
+        //__________________________________________
         // Functions that deal with server connection
         #region server connection functions
         void IEmail.Disconnect()
@@ -195,6 +215,22 @@ namespace G5EmailClient.Email
         IDatabase.User IEmail.GetActiveUser()
         {
             return activeUser;
+        }
+
+        void IEmail.UpdateFolder(int folderIndex)
+        {
+            IMailFolder folder;
+            if (folderIndex < 0)
+                folder = imapClient.Inbox;
+            else
+                folder = emailFolders[folderIndex];
+
+            updateActiveFolder(folder);
+        }
+
+        void IEmail.UpdateActiveFolder()
+        {
+            updateActiveFolder();
         }
 
         List<(string from, string subject, bool read)> IEmail.GetFolderEnvelopes()
@@ -319,14 +355,23 @@ namespace G5EmailClient.Email
 
         void IEmail.SendMessage(IEmail.Message message)
         {
-
+            // If the strings are invalid, an exception will be thrown.
             var MimeMsg = new MimeMessage();
-                MimeMsg.From.Add(new MailboxAddress("", activeUser.username));
-                MimeMsg.To.  Add(new MailboxAddress("", message.to));
-                //MimeMsg.Cc.  Add(new MailboxAddress("", message.cc));
-                //MimeMsg.Bcc. Add(new MailboxAddress("", message.bcc));
-                MimeMsg.Subject = message.subject;
-                MimeMsg.Body = new TextPart("plain") { Text = message.body };
+            try
+            {
+            MimeMsg.From.Add(new MailboxAddress("", activeUser.username));
+            MimeMsg.To.  Add(new MailboxAddress("", message.to));
+            MimeMsg.Cc.  Add(new MailboxAddress("", message.cc));
+            MimeMsg.Bcc. Add(new MailboxAddress("", message.bcc));
+            MimeMsg.Subject = message.subject;
+            MimeMsg.Body = new TextPart("plain") { Text = message.body };
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Send message syntax error: " + ex.ToString());
+                this.SentMessage(ex, message);
+                return;
+            }
 
             ThreadPool.QueueUserWorkItem(state => AsyncSendMessage(MimeMsg, message));
         }
@@ -339,7 +384,10 @@ namespace G5EmailClient.Email
             }
             catch (Exception? ex)
             {
+                Debug.WriteLine("AsyncSendMessage server exception: " + ex.ToString());
                 this.SentMessage(ex, message);
+                SmtpMutex.ReleaseMutex();
+                return;
             }
             SmtpMutex.ReleaseMutex();
             this.SentMessage(null, message);

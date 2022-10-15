@@ -294,7 +294,9 @@ namespace G5EmailClient.GUI
                 {
                     var notification = prepareNotification("Send Failed!",
                                                            Properties.Resources.ErrorAnimated_Icon,
-                                                           "Click to retry. Error:\n" + ex.Message);
+                                                           "Message sent to <" + message.to + "> with " 
+                                                         + " subject \"" + message.subject + "\" failed\n"
+                                                         + "\nClick to retry. Error:\n" + ex.Message);
                     notification.RespondsToClick = true;
                     notification.Object = message;
                     notification.NotificationBodyClicked += LoadMessageEventDriver;
@@ -326,12 +328,20 @@ namespace G5EmailClient.GUI
         {
             cmp_to_textbox.Text        = msg_from_label.Text;
             cmp_subject_textbox.Text   = "RE:" + msg_subject_label.Text;
-            cmp_mailbody_rtextbox.Text = "\n\n________________\n"
-                                           + "Previous Message:"
-                                           + "\nFrom: " + msg_from_label.Text
-                                           + "\nSubject: " + msg_subject_label.Text
-                                           + "\n" + msg_body_rtextbox.Text;
+            cmp_mailbody_rtextbox.Text = "\n\n\n________________\n"
+                                             + "Previous Message:"
+                                             + "\nFrom: " + msg_from_label.Text
+                                             + "\nSubject: " + msg_subject_label.Text
+                                             + "\n" + msg_body_rtextbox.Text;
             main_tab.SelectedTab = compose_message_tab;
+        }
+
+        private void refresh_button_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            EmailClient.UpdateActiveFolder();
+            updateFoldersView();
+            this.Cursor = Cursors.Default;
         }
     }
 }

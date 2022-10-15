@@ -99,7 +99,19 @@ namespace G5EmailClient.Email
         int SaveUser(IDatabase.User saveUser);
 
         /// <summary>
+        /// Updates the folder of the given folder index. If index is less than 0, inbox is updated.
+        /// </summary>
+        /// <param name="folderIndex"></param>
+        void UpdateFolder(int folderIndex);
+
+        /// <summary>
+        /// Updates the active folder.
+        /// </summary>
+        void UpdateActiveFolder();
+
+        /// <summary>
         /// Gets the from string, subject line and read status of all emails in the active folder.
+        /// Each index in the list corresponds to the index of the folder in the underlying list.
         /// </summary>
         /// <returns>A list of tuples.</returns>
         List<(string from, string subject, bool read)> GetFolderEnvelopes();
