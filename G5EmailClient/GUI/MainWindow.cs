@@ -156,8 +156,9 @@ namespace G5EmailClient.GUI
             foreach (var envelope in envelopes)
             {
                 index++;
-                message_flow_panel.Add(index, envelope.from.ToString(), 
-                                              envelope.subject, 
+                message_flow_panel.Add(index, envelope.from.ToString(),
+                                              envelope.date.ToString(),
+                                              envelope.subject,
                                               envelope.read);
             }
         }
@@ -180,6 +181,17 @@ namespace G5EmailClient.GUI
 
             var message = EmailClient.OpenMessage(envelope.index);
             msg_from_label.Text    = message.from;
+            if(message.cc != null & message.cc!.Length > 0)
+            {
+                msg_cc_label.Visible = true;
+                msg_padding_panel2.Visible = true;
+                msg_cc_label.Text = "cc: " + message.cc!.ToString();
+            }
+            else
+            {
+                msg_cc_label.Visible = false;
+                msg_padding_panel2.Visible = false;
+            }
             msg_subject_label.Text = message.subject;
             msg_body_rtextbox.Text = message.body;
 
@@ -234,12 +246,13 @@ namespace G5EmailClient.GUI
                 LastWindowState = WindowState;
 
                 // Resizing message labels
-                msg_from_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
+                msg_from_label.MaximumSize    = new Size(msg_senderinfo_panel.Width - 10, 0);
+                msg_cc_label.MaximumSize      = new Size(msg_senderinfo_panel.Width - 10, 0);
                 msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
                 msg_senderinfo_panel.Size = new Size(msg_senderinfo_panel.Width,
                                                      msg_from_label.Height
                                                    + msg_subject_label.Height
-                                                   + msg_senderinfo_padding_panel.Height);
+                                                   + msg_senderinfo_padding_panel1.Height);
             }
         }
 
@@ -250,7 +263,7 @@ namespace G5EmailClient.GUI
             cmp_bcc_textbox.Text       = "";
             cmp_subject_textbox.Text   = "";
             cmp_mailbody_rtextbox.Text = "";
-            message_flow_panel.ClearSelction();
+            message_flow_panel.ClearSelection();
             main_tab.SelectedTab = compose_message_tab;
         }
 
@@ -319,11 +332,25 @@ namespace G5EmailClient.GUI
                 }
                 else
                 {
-                    var notification = prepareNotification("Send Failed!",
-                                                           Properties.Resources.ErrorAnimatedIcon,
-                                                           "Message sent to <" + message.to + "> with " 
-                                                         + " subject \"" + message.subject + "\" failed\n"
-                                                         + "\nClick to retry. Error:\n" + ex.Message);
+                    NotificationPanel notification;
+                    if(ex.Data.Count > 0)
+                    {
+                        notification = prepareNotification("Multi send Failed!",
+                                            Properties.Resources.ErrorAnimatedIcon,
+                                            ex.Data["Multi receiver email failed"].ToString() + "\n"
+                                            + "Message sent to <" + message.to + "> with "
+                                            + " subject \"" + message.subject + "\" failed\n"
+                                            + "\nClick to retry. Error:\n" + ex.Message);;
+                    }
+                    else
+                    {
+                        notification = prepareNotification("Send Failed!",
+                                            Properties.Resources.ErrorAnimatedIcon,
+                                            "Message sent to <" + message.to + "> with "
+                                          + " subject \"" + message.subject + "\" failed\n"
+                                          + "\nClick to retry. Error:\n" + ex.Message);
+                    }
+
                     notification.Object = message;
                     notification.NotificationBodyClicked += LoadMessageNotificationMessage;
                     AddNotification(notification);
@@ -352,13 +379,14 @@ namespace G5EmailClient.GUI
         private void msg_reply_button_Click(object sender, EventArgs e)
         {
             cmp_to_textbox.Text        = msg_from_label.Text;
-            cmp_subject_textbox.Text   = "RE:" + msg_subject_label.Text;
+            cmp_subject_textbox.Text   = "RE: " + msg_subject_label.Text;
             cmp_mailbody_rtextbox.Text = "\n\n\n________________\n"
                                              + "Previous Message:"
                                              + "\nFrom: " + msg_from_label.Text
+                                             + "\ncc: " + msg_cc_label.Text
                                              + "\nSubject: " + msg_subject_label.Text
-                                             + "\n" + msg_body_rtextbox.Text;
-            message_flow_panel.ClearSelction();
+                                             + "\n\n" + msg_body_rtextbox.Text;
+            message_flow_panel.ClearSelection();
             main_tab.SelectedTab = compose_message_tab;
         }
 
@@ -373,9 +401,9 @@ namespace G5EmailClient.GUI
             }
             else
             {
-                tempDisableButton(button, -1);
-                button.Text = "Refreshing";
                 button.Image = Properties.Resources.RefreshAnimatedIcon;
+                button.Text = "Refreshing";
+                tempDisableButton(button, -1);
                 EmailClient.UpdateInboxAsync();
             }
             this.Cursor = Cursors.Default;
@@ -396,6 +424,39 @@ namespace G5EmailClient.GUI
                 updateInboxView();
                 this.Cursor = Cursors.Default;
             }
+        }
+
+        private void msg_forward_button_Click(object sender, EventArgs e)
+        {
+            cmp_subject_textbox.Text = "FW: " + msg_subject_label.Text;
+            cmp_mailbody_rtextbox.Text = "\n\n\n________________\n"
+                                             + "Forwarded Message:"
+                                             + "\nFrom: " + msg_from_label.Text
+                                             + "\ncc: " + msg_cc_label.Text
+                                             + "\nSubject: " + msg_subject_label.Text
+                                             + "\n\n" + msg_body_rtextbox.Text;
+            message_flow_panel.ClearSelection();
+            main_tab.SelectedTab = compose_message_tab;
+
+        }
+
+        private void msg_replyall_button_Click(object sender, EventArgs e)
+        {
+            cmp_to_textbox.Text = msg_from_label.Text;
+            // The "cc: " part of the cc string must be removed:
+            cmp_cc_textbox.Text = msg_cc_label.Text.Remove(0, 4);
+            if(!cmp_cc_panel.Visible)
+                add_cc_menuitem_Click(null, null);
+            cmp_subject_textbox.Text = "RE: " + msg_subject_label.Text;
+            cmp_mailbody_rtextbox.Text = "\n\n\n________________\n"
+                                             + "Previous Message:"
+                                             + "\nFrom: " + msg_from_label.Text
+                                             + "\ncc: " + msg_cc_label.Text
+                                             + "\nSubject: " + msg_subject_label.Text
+                                             + "\n\n" + msg_body_rtextbox.Text;
+            message_flow_panel.ClearSelection();
+            main_tab.SelectedTab = compose_message_tab;
+
         }
     }
 }

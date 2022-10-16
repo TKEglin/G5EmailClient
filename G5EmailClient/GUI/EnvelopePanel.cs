@@ -25,6 +25,7 @@ namespace G5EmailClient.GUI
             InitializeComponent();
 
             env_from_label.MaximumSize = new Size(this.Width - 15, 0);
+            env_date_label.MaximumSize = new Size(this.Width - 15, 0);
             env_subject_label.MaximumSize = new Size(this.Width - 15, 0);
         }
 
@@ -51,6 +52,18 @@ namespace G5EmailClient.GUI
             set
             {
                 env_from_label.Text = value;
+            }
+        }
+        [Category("Fields"), Description("The text of the date label")]
+        public string dateText
+        {
+            get
+            {
+                return env_date_label.Text;
+            }
+            set
+            {
+                env_date_label.Text = value;
             }
         }
         [Category("Fields"), Description("The text of the subject label")]
@@ -120,6 +133,7 @@ namespace G5EmailClient.GUI
         private void EnvelopePanel_SizeChanged(object sender, EventArgs e)
         {
             env_from_label.MaximumSize = new Size(Width - 15, 0);
+            env_date_label.MaximumSize = new Size(Width - 15, 0);
             env_subject_label.MaximumSize = new Size(Width - 15, 0);
         }
 

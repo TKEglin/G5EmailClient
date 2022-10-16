@@ -28,11 +28,12 @@ namespace G5EmailClient.GUI
         /// Adds a panel to the flow control. The index will be saved in the control and returned
         /// when getting selected items.
         /// </summary>
-        public void Add(int index, string from, string subject, bool seen)
+        public void Add(int index, string from, string date, string subject, bool seen)
         {
             var envelopePanel = new EnvelopePanel();
             envelopePanel.index = index;
             envelopePanel.fromText = from;
+            envelopePanel.dateText = date;
             envelopePanel.subjectText = subject;
             if (!seen)
                 envelopePanel.toggleRead();
@@ -91,7 +92,7 @@ namespace G5EmailClient.GUI
         /// <summary>
         /// Deselects all envelope panels.
         /// </summary>
-        public void ClearSelction()
+        public void ClearSelection()
         {
             foreach(var envelope in selectedPanels)
             {
@@ -134,7 +135,7 @@ namespace G5EmailClient.GUI
             if(!ModifierKeys.HasFlag(Keys.Control))
             {
                 // When the control button is not held, click opens the message
-                ClearSelction();
+                ClearSelection();
                 panel.SetSelected(true);
 
                 Debug.WriteLine("Flow panel opening message");

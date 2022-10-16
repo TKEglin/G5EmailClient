@@ -68,7 +68,9 @@
             this.msg_reply_button = new System.Windows.Forms.Button();
             this.msg_senderinfo_panel = new System.Windows.Forms.Panel();
             this.msg_subject_label = new System.Windows.Forms.Label();
-            this.msg_senderinfo_padding_panel = new System.Windows.Forms.Panel();
+            this.msg_senderinfo_padding_panel2 = new System.Windows.Forms.Panel();
+            this.msg_cc_label = new System.Windows.Forms.Label();
+            this.msg_senderinfo_padding_panel1 = new System.Windows.Forms.Panel();
             this.msg_from_label = new System.Windows.Forms.Label();
             this.compose_message_tab = new System.Windows.Forms.TabPage();
             this.cmp_body_panel = new System.Windows.Forms.Panel();
@@ -234,28 +236,28 @@
             // 
             this.user_settings_button.Image = global::G5EmailClient.Properties.Resources.AccountSettingsIcon;
             this.user_settings_button.Name = "user_settings_button";
-            this.user_settings_button.Size = new System.Drawing.Size(229, 32);
+            this.user_settings_button.Size = new System.Drawing.Size(199, 32);
             this.user_settings_button.Text = "User Settings";
             // 
             // add_user_button
             // 
             this.add_user_button.Image = global::G5EmailClient.Properties.Resources.AddUserIcon;
             this.add_user_button.Name = "add_user_button";
-            this.add_user_button.Size = new System.Drawing.Size(229, 32);
+            this.add_user_button.Size = new System.Drawing.Size(199, 32);
             this.add_user_button.Text = "Add User";
             // 
             // select_user_button
             // 
             this.select_user_button.Image = global::G5EmailClient.Properties.Resources.SelectUserIcon;
             this.select_user_button.Name = "select_user_button";
-            this.select_user_button.Size = new System.Drawing.Size(229, 32);
+            this.select_user_button.Size = new System.Drawing.Size(199, 32);
             this.select_user_button.Text = "Select User";
             // 
             // logout_button
             // 
             this.logout_button.Image = global::G5EmailClient.Properties.Resources.LogoutIcon;
             this.logout_button.Name = "logout_button";
-            this.logout_button.Size = new System.Drawing.Size(229, 32);
+            this.logout_button.Size = new System.Drawing.Size(199, 32);
             this.logout_button.Text = "Log Out";
             // 
             // contacts_button
@@ -330,7 +332,6 @@
             this.notification_panel.Controls.Add(this.notifications_label);
             this.notification_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.notification_panel.Location = new System.Drawing.Point(0, 601);
-            this.notification_panel.MaximumSize = new System.Drawing.Size(0, 400);
             this.notification_panel.Name = "notification_panel";
             this.notification_panel.Size = new System.Drawing.Size(228, 29);
             this.notification_panel.TabIndex = 3;
@@ -448,21 +449,23 @@
             this.msg_mailbody_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.msg_mailbody_panel.Controls.Add(this.msg_body_rtextbox);
             this.msg_mailbody_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.msg_mailbody_panel.Location = new System.Drawing.Point(10, 76);
+            this.msg_mailbody_panel.Location = new System.Drawing.Point(10, 100);
             this.msg_mailbody_panel.Name = "msg_mailbody_panel";
             this.msg_mailbody_panel.Padding = new System.Windows.Forms.Padding(3);
-            this.msg_mailbody_panel.Size = new System.Drawing.Size(474, 453);
+            this.msg_mailbody_panel.Size = new System.Drawing.Size(474, 429);
             this.msg_mailbody_panel.TabIndex = 4;
             this.msg_mailbody_panel.Tag = "";
             // 
             // msg_body_rtextbox
             // 
+            this.msg_body_rtextbox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.msg_body_rtextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.msg_body_rtextbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.msg_body_rtextbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.msg_body_rtextbox.Location = new System.Drawing.Point(3, 3);
             this.msg_body_rtextbox.Name = "msg_body_rtextbox";
-            this.msg_body_rtextbox.Size = new System.Drawing.Size(466, 445);
+            this.msg_body_rtextbox.ReadOnly = true;
+            this.msg_body_rtextbox.Size = new System.Drawing.Size(466, 421);
             this.msg_body_rtextbox.TabIndex = 0;
             this.msg_body_rtextbox.Text = "<Message body goes here>";
             // 
@@ -477,7 +480,7 @@
             // msg_padding_panel1
             // 
             this.msg_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.msg_padding_panel1.Location = new System.Drawing.Point(10, 66);
+            this.msg_padding_panel1.Location = new System.Drawing.Point(10, 90);
             this.msg_padding_panel1.Name = "msg_padding_panel1";
             this.msg_padding_panel1.Size = new System.Drawing.Size(474, 10);
             this.msg_padding_panel1.TabIndex = 2;
@@ -505,6 +508,7 @@
             this.msg_forward_button.Size = new System.Drawing.Size(48, 48);
             this.msg_forward_button.TabIndex = 2;
             this.msg_forward_button.UseVisualStyleBackColor = true;
+            this.msg_forward_button.Click += new System.EventHandler(this.msg_forward_button_Click);
             // 
             // msg_replyall_button
             // 
@@ -516,6 +520,7 @@
             this.msg_replyall_button.Size = new System.Drawing.Size(48, 48);
             this.msg_replyall_button.TabIndex = 1;
             this.msg_replyall_button.UseVisualStyleBackColor = true;
+            this.msg_replyall_button.Click += new System.EventHandler(this.msg_replyall_button_Click);
             // 
             // msg_reply_button
             // 
@@ -534,13 +539,15 @@
             this.msg_senderinfo_panel.AutoSize = true;
             this.msg_senderinfo_panel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.msg_senderinfo_panel.Controls.Add(this.msg_subject_label);
-            this.msg_senderinfo_panel.Controls.Add(this.msg_senderinfo_padding_panel);
+            this.msg_senderinfo_panel.Controls.Add(this.msg_senderinfo_padding_panel2);
+            this.msg_senderinfo_panel.Controls.Add(this.msg_cc_label);
+            this.msg_senderinfo_panel.Controls.Add(this.msg_senderinfo_padding_panel1);
             this.msg_senderinfo_panel.Controls.Add(this.msg_from_label);
             this.msg_senderinfo_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.msg_senderinfo_panel.Location = new System.Drawing.Point(10, 10);
             this.msg_senderinfo_panel.Margin = new System.Windows.Forms.Padding(10);
             this.msg_senderinfo_panel.Name = "msg_senderinfo_panel";
-            this.msg_senderinfo_panel.Size = new System.Drawing.Size(474, 56);
+            this.msg_senderinfo_panel.Size = new System.Drawing.Size(474, 80);
             this.msg_senderinfo_panel.TabIndex = 0;
             this.msg_senderinfo_panel.Resize += new System.EventHandler(this.msg_senderinfo_panel_Resize);
             // 
@@ -549,20 +556,42 @@
             this.msg_subject_label.AutoSize = true;
             this.msg_subject_label.Dock = System.Windows.Forms.DockStyle.Top;
             this.msg_subject_label.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.msg_subject_label.Location = new System.Drawing.Point(0, 33);
+            this.msg_subject_label.Location = new System.Drawing.Point(0, 57);
             this.msg_subject_label.Margin = new System.Windows.Forms.Padding(10);
             this.msg_subject_label.Name = "msg_subject_label";
             this.msg_subject_label.Size = new System.Drawing.Size(120, 23);
             this.msg_subject_label.TabIndex = 1;
             this.msg_subject_label.Text = "<subject line>";
             // 
-            // msg_senderinfo_padding_panel
+            // msg_senderinfo_padding_panel2
             // 
-            this.msg_senderinfo_padding_panel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.msg_senderinfo_padding_panel.Location = new System.Drawing.Point(0, 28);
-            this.msg_senderinfo_padding_panel.Name = "msg_senderinfo_padding_panel";
-            this.msg_senderinfo_padding_panel.Size = new System.Drawing.Size(474, 5);
-            this.msg_senderinfo_padding_panel.TabIndex = 2;
+            this.msg_senderinfo_padding_panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.msg_senderinfo_padding_panel2.Location = new System.Drawing.Point(0, 52);
+            this.msg_senderinfo_padding_panel2.Name = "msg_senderinfo_padding_panel2";
+            this.msg_senderinfo_padding_panel2.Size = new System.Drawing.Size(474, 5);
+            this.msg_senderinfo_padding_panel2.TabIndex = 3;
+            this.msg_senderinfo_padding_panel2.Visible = false;
+            // 
+            // msg_cc_label
+            // 
+            this.msg_cc_label.AutoSize = true;
+            this.msg_cc_label.Dock = System.Windows.Forms.DockStyle.Top;
+            this.msg_cc_label.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.msg_cc_label.Location = new System.Drawing.Point(0, 33);
+            this.msg_cc_label.Margin = new System.Windows.Forms.Padding(10);
+            this.msg_cc_label.Name = "msg_cc_label";
+            this.msg_cc_label.Size = new System.Drawing.Size(70, 19);
+            this.msg_cc_label.TabIndex = 4;
+            this.msg_cc_label.Text = "<cc_info>";
+            this.msg_cc_label.Visible = false;
+            // 
+            // msg_senderinfo_padding_panel1
+            // 
+            this.msg_senderinfo_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.msg_senderinfo_padding_panel1.Location = new System.Drawing.Point(0, 28);
+            this.msg_senderinfo_padding_panel1.Name = "msg_senderinfo_padding_panel1";
+            this.msg_senderinfo_padding_panel1.Size = new System.Drawing.Size(474, 5);
+            this.msg_senderinfo_padding_panel1.TabIndex = 2;
             // 
             // msg_from_label
             // 
@@ -1099,7 +1128,7 @@
         private Panel msg_padding_panel2;
         private Panel msg_padding_panel1;
         private Panel msg_buttons_panel;
-        private Panel msg_senderinfo_padding_panel;
+        private Panel msg_senderinfo_padding_panel1;
         private Button msg_reply_button;
         private Button msg_forward_button;
         private Button msg_replyall_button;
@@ -1143,5 +1172,7 @@
         private Panel notification_panel;
         private Label notifications_label;
         private FlowLayoutPanel notifications_flowpanel;
+        private Panel msg_senderinfo_padding_panel2;
+        private Label msg_cc_label;
     }
 }

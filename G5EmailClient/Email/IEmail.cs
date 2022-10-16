@@ -15,6 +15,7 @@ namespace G5EmailClient.Email
         /// </summary>
         public class Message
         {
+            public string date    { get; set; } = string.Empty;
             public string from    { get; set; } = string.Empty;
             public string to      { get; set; } = string.Empty;
             public string cc      { get; set; } = string.Empty;
@@ -116,7 +117,7 @@ namespace G5EmailClient.Email
         /// Each index in the list corresponds to the index of the folder in the underlying list.
         /// </summary>
         /// <returns>A list of tuples.</returns>
-        List<(string from, string subject, bool read)> GetFolderEnvelopes();
+        List<(string from, string date, string subject, bool read)> GetFolderEnvelopes();
 
         /// <summary>
         /// Retrives and returns a message from the active folder given an index.

@@ -58,9 +58,40 @@ namespace G5EmailClient.Email
             updateActiveFolder(imapClient.Inbox);
         }
 
+        //_________________
+        // Utility functions
+        #region utility function
+
+        /// <summary>
+        /// Splits and interprets a string of emails. The character ',' is used a separator.
+        /// All whitespace in the emails will be ignored.
+        /// </summary>
+        /// <returns>A list of email addresses. 
+        /// Returns null if string is empty or an error in an email is detected.</returns>
+        List<string> SplitEmails(string email_string)
+        {
+            List<string> result = new();
+            Debug.WriteLine("String pre split: " + email_string);
+            string[] emails = email_string.Split(',');
+
+            foreach(var InputEmail in emails)
+            {
+                Debug.WriteLine("Email pre replace: " + InputEmail);
+                var OutputEmail = InputEmail;
+                OutputEmail = InputEmail.Replace(",", "");
+                OutputEmail = OutputEmail.Replace(" ", "");
+                Debug.WriteLine("Email post replace: " + OutputEmail);
+                result.Add(OutputEmail);
+            }
+
+            return result;
+        }
+
+        #endregion
+
          //_____________________________________
         // Functions that access the imap server
-        #region IMAP server interaction functions
+        #region IMAP server retrieval functions
         /// <summary>
         /// Retrieves the folders from the server.
         /// </summary>
@@ -113,7 +144,7 @@ namespace G5EmailClient.Email
         }
         #endregion
 
-        //__________________________________________
+         //__________________________________________
         // Functions that deal with server connection
         #region server connection functions
         void IEmail.Disconnect()
@@ -234,9 +265,9 @@ namespace G5EmailClient.Email
         }
         public event EventHandler InboxUpdateFinished;
 
-        List<(string from, string subject, bool read)> IEmail.GetFolderEnvelopes()
+        List<(string from, string date, string subject, bool read)> IEmail.GetFolderEnvelopes()
         {
-            List<(string, string, bool)> envelopes = new();
+            List<(string, string, string, bool)> envelopes = new();
 
             // This list will contain the flags
             if (activeFolder != null)
@@ -245,7 +276,10 @@ namespace G5EmailClient.Email
                 foreach (var item in activeFolderMessages.Zip(activeFolderMessagesSeen, 
                                                               (a, b) => new { message = a, seen = b }))
                 {
-                    envelopes.Add((item.message.From.ToString(), item.message.Subject, item.seen));
+                    envelopes.Add((item.message.From.ToString(), 
+                                   item.message.Date.LocalDateTime.ToString(), 
+                                   item.message.Subject, 
+                                   item.seen));
                 }
 
             return envelopes;
@@ -265,10 +299,12 @@ namespace G5EmailClient.Email
                 // Getting message
                 var ImapMessage = activeFolderMessages[messageIndex];
                 IEmail.Message message = new();
-                    message.from = ImapMessage.From.ToString();
-                    message.to = ImapMessage.To.ToString();
+                    message.date    = ImapMessage.Date.ToString();
+                    message.from    = ImapMessage.From.ToString();
+                    message.to      = ImapMessage.To.ToString(); 
+                    message.cc      = ImapMessage.Cc.ToString();
                     message.subject = ImapMessage.Subject;
-                    message.body = ImapMessage.TextBody.ToString();
+                    message.body    = ImapMessage.TextBody.ToString();
                 return message;
             }
             else
@@ -356,27 +392,44 @@ namespace G5EmailClient.Email
 
         void IEmail.SendMessage(IEmail.Message message)
         {
+            var addresses     = SplitEmails(message.to);
+            var cc_addresses  = SplitEmails(message.cc);
+            var bcc_addresses = SplitEmails(message.bcc);
+            List<MimeMessage> messages = new();
+
             // If the strings are invalid, an exception will be thrown.
-            var MimeMsg = new MimeMessage();
-            try
+            foreach(var address in addresses)
             {
-            MimeMsg.From.Add(new MailboxAddress("", activeUser.username));
-            MimeMsg.To.  Add(new MailboxAddress("", message.to));
-            if(message.cc.Length > 0)
-                MimeMsg.Cc.  Add(new MailboxAddress("", message.cc));
-            if(message.bcc.Length > 0)
-                MimeMsg.Bcc. Add(new MailboxAddress("", message.bcc));
-            MimeMsg.Subject = message.subject;
-            MimeMsg.Body = new TextPart("plain") { Text = message.body };
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Send message syntax error: " + ex.ToString());
-                this.SentMessage(ex, message);
-                return;
+                var MimeMsg = new MimeMessage();
+                try
+                {
+                    MimeMsg.From.Add(new MailboxAddress("", activeUser.username));
+                    MimeMsg.To.Add(new MailboxAddress("", address));
+                    if (message.cc.Length > 0)
+                        foreach(var cc_address in cc_addresses)
+                            MimeMsg.Cc.Add(new MailboxAddress("", cc_address));
+                    if (message.bcc.Length > 0)
+                        foreach (var bcc_address in bcc_addresses)
+                            MimeMsg.Bcc.Add(new MailboxAddress("", bcc_address));
+                    MimeMsg.Subject = message.subject;
+                    MimeMsg.Body = new TextPart("plain") { Text = message.body };
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Send message syntax error: " + ex.ToString());
+                    if (addresses.Count > 1)
+                        ex.Data.Add("Multi receiver email failed",
+                                    "At least one email address of an email with multiple receivers returned an error. "
+                                  + "The email was not send to any of the addresses in the receiver list. "
+                                  + "Verify addresses and try again."); 
+                    this.SentMessage(ex, message);
+                    return;
+                }
+                messages.Add(MimeMsg);
             }
 
-            ThreadPool.QueueUserWorkItem(state => AsyncSendMessage(MimeMsg, message));
+            foreach(var MimeMsg in messages)
+                ThreadPool.QueueUserWorkItem(state => AsyncSendMessage(MimeMsg, message));
         }
         private void AsyncSendMessage(MimeMessage MimeMsg, IEmail.Message message)
         {
