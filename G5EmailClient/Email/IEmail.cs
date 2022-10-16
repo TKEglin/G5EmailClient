@@ -104,6 +104,7 @@ namespace G5EmailClient.Email
         /// </summary>
         /// <param name="folderIndex"></param>
         void UpdateFolder(int folderIndex);
+        void UpdateFolderAsync(int folderIndex);
 
         /// <summary>
         /// Updates the active folder.

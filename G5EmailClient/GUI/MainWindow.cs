@@ -171,8 +171,17 @@ namespace G5EmailClient.GUI
             folders_lisbox.Items.Clear();
             foreach (var folderName in EmailClient.GetFoldernames())
             {
+                // Folders list
                 folders_lisbox.Items.Add(folderName);
+
+                // Move button list
+                ToolStripButton folderButton = new();
+                folderButton.Text = folderName;
+                folderButton.Click += folder_move_button_Click;
+                move_message_dropdown.DropDownItems.Add(folderButton);
             }
+
+
         }
 
         private void EnvelopePanel_MessageOpen(object sender, EventArgs e)
@@ -457,6 +466,24 @@ namespace G5EmailClient.GUI
             message_flow_panel.ClearSelection();
             main_tab.SelectedTab = compose_message_tab;
 
+        }
+
+        private void folder_move_button_Click(object sender, EventArgs e)
+        {
+            var button = (ToolStripButton)sender;
+            Debug.WriteLine("Folder name click: " + button.Text);
+        }
+
+        private void folders_lisbox_DoubleClick(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+
+            int index = folders_lisbox.SelectedIndex;
+
+            EmailClient.UpdateFolder(index);
+            updateInboxView();
+
+            this.Cursor = Cursors.Default;
         }
     }
 }

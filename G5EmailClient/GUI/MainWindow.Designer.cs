@@ -322,6 +322,7 @@
             this.folders_lisbox.Size = new System.Drawing.Size(228, 571);
             this.folders_lisbox.TabIndex = 2;
             this.folders_lisbox.TabStop = false;
+            this.folders_lisbox.DoubleClick += new System.EventHandler(this.folders_lisbox_DoubleClick);
             // 
             // notification_panel
             // 
