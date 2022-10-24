@@ -413,6 +413,7 @@ namespace G5EmailClient.GUI
                 button.Image = Properties.Resources.RefreshAnimatedIcon;
                 button.Text = "Refreshing";
                 tempDisableButton(button, -1);
+
                 EmailClient.UpdateInboxAsync();
             }
             this.Cursor = Cursors.Default;
@@ -430,7 +431,12 @@ namespace G5EmailClient.GUI
                 reenableButton(refresh_button);
                 refresh_button.Text = "Refresh";
                 refresh_button.Image = Properties.Resources.RefreshIcon;
+
+                // Selecting and updating inbox
+                folders_lisbox.ClearSelected();
+                folders_lisbox.SetSelected(0, true);
                 updateInboxView();
+
                 this.Cursor = Cursors.Default;
             }
         }

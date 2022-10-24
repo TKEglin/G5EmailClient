@@ -120,19 +120,18 @@ namespace G5EmailClient.Email
         {
             ImapMutex.WaitOne();
 
-            // This will be used to remove duplicates once the new messages have been opened.
-            //int count = -1;
-            //if(activeFolder != null)
-            //    count = activeFolder.Folder!.Count;
-            // This is necessary to let the user access old messages while inbox is updating.
-
             activeFolder = folder;
 
-            activeFolder.Folder!.Open(FolderAccess.ReadWrite);
+            // This will be used to remove duplicates once the new messages have been opened.
+            int count = activeFolder.Folder!.Count;
+            // This is necessary to let the user access old messages while inbox is updating.
+
+            activeFolder!.Folder!.Open(FolderAccess.ReadWrite);
 
             // Adding the messages from oldest to newest
             foreach(var message in activeFolder.Folder.Reverse())
             {
+                Debug.WriteLine("Adding message with subject \"" + message.Subject + "\" to folder " + folder.FolderName);
                 activeFolder.Messages.Add(message);
             }
             foreach (var items in activeFolder.Folder.Fetch(0, -1, 
@@ -145,14 +144,14 @@ namespace G5EmailClient.Email
 
             ImapMutex.ReleaseMutex();
 
-            //Deleting duplicates
-            //if(count >= 0)
-            //{
-            //    activeFolder.Messages.RemoveRange(0, count);
-            //    activeFolder.UIDs    .RemoveRange(0, count);
-            //    activeFolder.Seen    .RemoveRange(0, count);
-            //}
-            if(InboxUpdateFinished != null)
+            // Deleting duplicates
+            if (count >= 0)
+            {
+                activeFolder.Messages.RemoveRange(0, count);
+                activeFolder.UIDs.RemoveRange(0, count);
+                activeFolder.Seen.RemoveRange(0, count);
+            }
+            if (InboxUpdateFinished != null)
                 this.InboxUpdateFinished(null, null);
         }
         #endregion
