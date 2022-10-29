@@ -326,12 +326,13 @@ namespace G5EmailClient.Email
             if(messageIndex < activeFolder!.Messages.Count & messageIndex >= 0)
             {
                 // Adding read flag
-                if (!activeFolder.Seen[messageIndex]) {
-                    ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(
-                                                          activeFolder!,
-                                                          activeFolder.UIDs[messageIndex],
-                                                          false)); }
-
+                if (!activeFolder.Seen[messageIndex])
+                {
+                    ToggleReadQueue.Enqueue(new ToggleReadParameters() {folder = activeFolder!,
+                                                                        ID = activeFolder.UIDs[messageIndex],
+                                                                        seenFlag = false  });
+                    ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(null, EventArgs.Empty));
+                }
                 // Getting message
                 var ImapMessage = activeFolder.Messages[messageIndex];
                 IEmail.Message message = new();
@@ -372,7 +373,7 @@ namespace G5EmailClient.Email
         {
             public EmailFolder? folder;
             public UniqueId     ID;
-            public bool         seen;
+            public bool         seenFlag;
         }
         Queue<ToggleReadParameters> ToggleReadQueue = new();
 
@@ -384,30 +385,44 @@ namespace G5EmailClient.Email
             if (!seen)
             {
                 activeFolder.Seen[messageIndex] = true; // Updating local data
-                ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(activeFolder!, UID, seen));
                 Debug.WriteLine("Locally adding flag");
             }  
             else
             {
                 activeFolder.Seen[messageIndex] = false;
-                ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(activeFolder!, UID, seen));
                 Debug.WriteLine("Locally removing flag");
             }
+            ToggleReadQueue.Enqueue(new ToggleReadParameters() { folder = activeFolder!,
+                                                                 ID = UID, 
+                                                                 seenFlag = seen         });
+            ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(null, EventArgs.Empty));
             Debug.WriteLine("MailKitEmail.ToggleRead() complete");
         }
-        private void AsyncToggleRead(EmailFolder folder, UniqueId ID, bool seen)
+        private void AsyncToggleRead(object? sender, EventArgs e)
         {
             ImapMutex.WaitOne();
-            if(!seen)
+
+            if (ToggleReadQueue.Count > 0)
             {
-                folder.Folder.AddFlags(ID, MessageFlags.Seen, true);
-                Debug.WriteLine("Server request to add flag");
+
+                // Gettings parameters
+                var parameters = ToggleReadQueue.Dequeue();
+
+                if (!parameters.seenFlag)
+                {
+                    parameters.folder!.Folder.AddFlags(parameters.ID, MessageFlags.Seen, true);
+                    Debug.WriteLine("Server request to add flag");
+                }
+                else
+                {
+                    parameters.folder!.Folder.RemoveFlags(parameters.ID, MessageFlags.Seen, true);
+                    Debug.WriteLine("Server request to remove flag");
+                }
+
+                // Recursive call to handle next queued task
+                ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(null, EventArgs.Empty));
             }
-            else
-            {
-                folder.Folder.RemoveFlags(ID, MessageFlags.Seen, true);
-                Debug.WriteLine("Server request to remove flag");
-            }
+
             ImapMutex.ReleaseMutex();
         }
 
