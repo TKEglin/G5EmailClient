@@ -62,7 +62,7 @@ namespace G5EmailClient.GUI
             {
             // Initializing email data.
                 // Data
-                updateFoldersView(); 
+                updateFoldersView();
                 updateFolderView(0, true);
                 active_email_label.Text = EmailClient.GetActiveUser().username;
                 // Events
@@ -194,6 +194,8 @@ namespace G5EmailClient.GUI
         /// </summary>
         void updateFolderView(int folderIndex, bool update)
         {
+            EmailClient.SetActiveFolder(folderIndex);
+
             // Getting panel
             var panel = EnvelopeFlowPanels[folderIndex];
 
@@ -343,7 +345,7 @@ namespace G5EmailClient.GUI
             cmp_bcc_textbox.Text       = "";
             cmp_subject_textbox.Text   = "";
             cmp_mailbody_rtextbox.Text = "";
-            activePanel.ClearSelection();
+            activePanel!.ClearSelection();
             main_tab.SelectedTab = compose_message_tab;
         }
 
@@ -465,11 +467,18 @@ namespace G5EmailClient.GUI
                                              + "\nFrom: " + msg_from_label.Text;
 
             if (msg_cc_label.Text.Length > 0)
-                cmp_mailbody_rtextbox.Text += msg_cc_label.Text;
+            {
+                cmp_mailbody_rtextbox.Text += "\n" + msg_cc_label.Text;
+            }
+            else
+            {
+                cmp_cc_textbox.Text = string.Empty;
+            }
 
             cmp_mailbody_rtextbox.Text += "\nSubject: " + msg_subject_label.Text
                                          + "\n\n" + msg_body_rtextbox.Text;
-            activePanel.ClearSelection();
+
+            activePanel!.ClearSelection();
             main_tab.SelectedTab = compose_message_tab;
         }
 
@@ -526,12 +535,12 @@ namespace G5EmailClient.GUI
                                              + "\nFrom: " + msg_from_label.Text;
 
             if (msg_cc_label.Text.Length > 0)
-                cmp_mailbody_rtextbox.Text += msg_cc_label.Text;
+                cmp_mailbody_rtextbox.Text += "\n" + msg_cc_label.Text;
 
             cmp_mailbody_rtextbox.Text += "\nSubject: " + msg_subject_label.Text
                                         + "\n\n" + msg_body_rtextbox.Text;
 
-            activePanel.ClearSelection();
+            activePanel!.ClearSelection();
             main_tab.SelectedTab = compose_message_tab;
 
         }
@@ -547,11 +556,11 @@ namespace G5EmailClient.GUI
                                              + "\nFrom: " + msg_from_label.Text;
 
             if (msg_cc_label.Text.Length > 0)
-                cmp_mailbody_rtextbox.Text += msg_cc_label.Text;
+                cmp_mailbody_rtextbox.Text += "\n" + msg_cc_label.Text;
 
             cmp_mailbody_rtextbox.Text += "\nSubject: " + msg_subject_label.Text
                                         + "\n\n" + msg_body_rtextbox.Text;
-            activePanel.ClearSelection();
+            activePanel!.ClearSelection();
             main_tab.SelectedTab = compose_message_tab;
 
         }
@@ -567,8 +576,6 @@ namespace G5EmailClient.GUI
             this.Cursor = Cursors.WaitCursor;
 
             int folderIndex = folders_lisbox.SelectedIndex;
-
-            EmailClient.SetActiveFolder(folderIndex);
 
             // Clearing selection
             EnvelopeFlowPanels[folderIndex].ClearSelection();

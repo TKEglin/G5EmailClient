@@ -58,7 +58,7 @@ namespace G5EmailClient.Email
         void initialise()
         {
             initializeFolders();
-            updateActiveFolder(0); // Updating inbox
+            updateFolder(0); // Updating inbox
         }
 
          //_________________
@@ -121,43 +121,53 @@ namespace G5EmailClient.Email
         /// </summary>
         /// <param name="folder"></param>
         /// 
-        private void updateActiveFolder(int folderIndex)
+        private void updateFolder(int folderIndex)
         {
             ImapMutex.WaitOne();
   
-            activeFolder = emailFolders[folderIndex];
+            var folder = emailFolders[folderIndex];
 
             // This will be used to remove duplicates once the new messages have been opened.
-            int count = activeFolder.Folder!.Count;
+            int count = folder.Folder!.Count;
             // This is necessary to let the user access old messages while inbox is updating.
 
-            activeFolder!.Folder!.Open(FolderAccess.ReadWrite);
+            folder!.Folder!.Open(FolderAccess.ReadWrite);
 
-            // Adding the messages from oldest to newest
-            foreach (var message in activeFolder.Folder.Reverse())
+            // Adding the messages to the given folder
+            foreach (var message in folder.Folder)
             {
                 Debug.WriteLine("Adding message with subject \"" + message.Subject 
-                              + "\" to folder " + activeFolder.FolderName);
-                activeFolder.Messages.Add(message);
+                              + "\" to folder " + folder.FolderName);
+                folder.Messages.Add(message);
             }
-            foreach (var items in activeFolder.Folder.Fetch(0, -1, 
+            foreach (var items in folder.Folder.Fetch(0, -1, 
                                                        MessageSummaryItems.UniqueId |
-                                                       MessageSummaryItems.Flags).Reverse())
+                                                       MessageSummaryItems.Flags))
             {
-                activeFolder.UIDs.Add(items.UniqueId);
-                activeFolder.Seen.Add(items.Flags!.Value.HasFlag(MessageFlags.Seen));
+                folder.UIDs.Add(items.UniqueId);
+                folder.Seen.Add(items.Flags!.Value.HasFlag(MessageFlags.Seen));
+            }
+
+            // For some reason inbox messages are listed in reverse (for gmail at least)
+            // so it will be reversed here. Note: if tests show this is not consistent for other
+            // email servers, we will have to implement sort here.
+            if(folder.FolderName == imapClient.Inbox.Name)
+            {
+                folder.Messages.Reverse();
+                folder.UIDs.Reverse();
+                folder.Seen.Reverse();
             }
 
             ImapMutex.ReleaseMutex();
 
-            activeFolder.isLoaded = true;
+            folder.isLoaded = true;
 
             // Deleting duplicates
             if (count >= 0)
             {
-                activeFolder.Messages.RemoveRange(0, count);
-                activeFolder.UIDs.    RemoveRange(0, count);
-                activeFolder.Seen.    RemoveRange(0, count);
+                folder.Messages.RemoveRange(0, count);
+                folder.UIDs.    RemoveRange(0, count);
+                folder.Seen.    RemoveRange(0, count);
             }
             if (InboxUpdateFinished != null)
             {
@@ -269,21 +279,21 @@ namespace G5EmailClient.Email
 
         void IEmail.UpdateFolder(int folderIndex)
         {
-            updateActiveFolder(folderIndex);
+            updateFolder(folderIndex);
         }
 
         void IEmail.UpdateFolderAsync(int folderIndex)
         {
-            ThreadPool.QueueUserWorkItem(state => updateActiveFolder(folderIndex));
+            ThreadPool.QueueUserWorkItem(state => updateFolder(folderIndex));
         }
 
         void IEmail.UpdateInbox()
         {
-            updateActiveFolder(0);
+            updateFolder(0);
         }
         void IEmail.UpdateInboxAsync()
         {
-            ThreadPool.QueueUserWorkItem(state => updateActiveFolder(0));
+            ThreadPool.QueueUserWorkItem(state => updateFolder(0));
         }
         public event EventHandler InboxUpdateFinished;
 
@@ -293,7 +303,7 @@ namespace G5EmailClient.Email
 
             if(!folder.isLoaded)
             {
-                ((IEmail)this).UpdateFolder(folderIndex);
+                updateFolder(folderIndex);
             }
 
             activeFolder = folder;
@@ -375,6 +385,9 @@ namespace G5EmailClient.Email
             public UniqueId     ID;
             public bool         seenFlag;
         }
+        /// <summary>
+        /// ToggleReadParameters must be enqueued before the AsyncToggleRead function is called.
+        /// </summary>
         Queue<ToggleReadParameters> ToggleReadQueue = new();
 
         void IEmail.ToggleRead(int messageIndex)
@@ -419,7 +432,7 @@ namespace G5EmailClient.Email
                     Debug.WriteLine("Server request to remove flag");
                 }
 
-                // Recursive call to handle next queued task
+                // Recursive call to handle next queued task if necessary
                 ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(null, EventArgs.Empty));
             }
 
