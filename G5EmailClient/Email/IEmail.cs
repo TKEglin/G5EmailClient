@@ -114,11 +114,16 @@ namespace G5EmailClient.Email
         event EventHandler InboxUpdateFinished;
 
         /// <summary>
+        /// Sets the active folder using a given index. Opens the folder if it is unopened.
+        /// </summary>
+        void SetActiveFolder(int folderIndex);
+
+        /// <summary>
         /// Gets the from string, subject line and read status of all emails in the active folder.
         /// Each index in the list corresponds to the index of the folder in the underlying list.
         /// </summary>
         /// <returns>A list of tuples.</returns>
-        List<(string from, string date, string subject, bool read)> GetFolderEnvelopes();
+        List<(string from, string date, string subject, bool read)> GetFolderEnvelopes(int folderIndex);
 
         /// <summary>
         /// Retrives and returns a message from the active folder given an index.

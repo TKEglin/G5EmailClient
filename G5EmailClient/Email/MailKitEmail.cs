@@ -22,8 +22,11 @@ namespace G5EmailClient.Email
         public class EmailFolder
         {
             public EmailFolder(IMailFolder folder, string name) { Folder = folder;
-                                                                  FolderName = name;  }
+                                                                  FolderName = name; }
+
             public IMailFolder? Folder { get; set; }
+            public bool isLoaded { get; set; } = false;
+
             public string? FolderName;
             public List<MimeMessage> Messages { get; set; } = new();
             public List<UniqueId>    UIDs     { get; set; } = new();
@@ -47,7 +50,6 @@ namespace G5EmailClient.Email
         {
             // Initalizing class data variables.
             List<IDatabase.User> users = data.GetUsers();
-
         }
 
         /// <summary>
@@ -56,12 +58,12 @@ namespace G5EmailClient.Email
         void initialise()
         {
             initializeFolders();
-            updateActiveFolder(emailFolders[0]); // Updating inbox
+            updateActiveFolder(0); // Updating inbox
         }
 
-        //_________________
+         //_________________
         // Utility functions
-        #region utility function
+        #region utility functions
 
         /// <summary>
         /// Splits and interprets a string of emails. The character ',' is used a separator.
@@ -101,12 +103,15 @@ namespace G5EmailClient.Email
         {
             // Adding inbox at index 0
             emailFolders.Add(new EmailFolder(imapClient.Inbox, imapClient.Inbox.Name));
+            string inbox_name = imapClient.Inbox.Name;
 
             // Adding folders
             var folders = imapClient.GetFolders(imapClient.PersonalNamespaces[0], false);
             foreach (var Folder in folders)
             {
-                emailFolders.Add(new EmailFolder(Folder, Folder.Name));
+                // If statement to avoid adding the inbox twice
+                if(Folder.Name != inbox_name & Folder.Exists)
+                    emailFolders.Add(new EmailFolder(Folder, Folder.Name));
             }
         }
 
@@ -116,11 +121,11 @@ namespace G5EmailClient.Email
         /// </summary>
         /// <param name="folder"></param>
         /// 
-        private void updateActiveFolder(EmailFolder folder)
+        private void updateActiveFolder(int folderIndex)
         {
             ImapMutex.WaitOne();
-
-            activeFolder = folder;
+  
+            activeFolder = emailFolders[folderIndex];
 
             // This will be used to remove duplicates once the new messages have been opened.
             int count = activeFolder.Folder!.Count;
@@ -129,9 +134,10 @@ namespace G5EmailClient.Email
             activeFolder!.Folder!.Open(FolderAccess.ReadWrite);
 
             // Adding the messages from oldest to newest
-            foreach(var message in activeFolder.Folder.Reverse())
+            foreach (var message in activeFolder.Folder.Reverse())
             {
-                Debug.WriteLine("Adding message with subject \"" + message.Subject + "\" to folder " + folder.FolderName);
+                Debug.WriteLine("Adding message with subject \"" + message.Subject 
+                              + "\" to folder " + activeFolder.FolderName);
                 activeFolder.Messages.Add(message);
             }
             foreach (var items in activeFolder.Folder.Fetch(0, -1, 
@@ -144,15 +150,20 @@ namespace G5EmailClient.Email
 
             ImapMutex.ReleaseMutex();
 
+            activeFolder.isLoaded = true;
+
             // Deleting duplicates
             if (count >= 0)
             {
                 activeFolder.Messages.RemoveRange(0, count);
-                activeFolder.UIDs.RemoveRange(0, count);
-                activeFolder.Seen.RemoveRange(0, count);
+                activeFolder.UIDs.    RemoveRange(0, count);
+                activeFolder.Seen.    RemoveRange(0, count);
             }
             if (InboxUpdateFinished != null)
-                this.InboxUpdateFinished(null, null);
+            {
+                this.InboxUpdateFinished(folderIndex, EventArgs.Empty);
+
+            }
         }
         #endregion
 
@@ -258,33 +269,47 @@ namespace G5EmailClient.Email
 
         void IEmail.UpdateFolder(int folderIndex)
         {
-            updateActiveFolder(emailFolders[folderIndex]);
+            updateActiveFolder(folderIndex);
         }
 
         void IEmail.UpdateFolderAsync(int folderIndex)
         {
-            ThreadPool.QueueUserWorkItem(state => updateActiveFolder(emailFolders[folderIndex]));
+            ThreadPool.QueueUserWorkItem(state => updateActiveFolder(folderIndex));
         }
 
         void IEmail.UpdateInbox()
         {
-            updateActiveFolder(emailFolders[0]);
+            updateActiveFolder(0);
         }
         void IEmail.UpdateInboxAsync()
         {
-            ThreadPool.QueueUserWorkItem(state => updateActiveFolder(emailFolders[0]));
+            ThreadPool.QueueUserWorkItem(state => updateActiveFolder(0));
         }
         public event EventHandler InboxUpdateFinished;
 
-        List<(string from, string date, string subject, bool read)> IEmail.GetFolderEnvelopes()
+        void IEmail.SetActiveFolder(int folderIndex)
+        {
+            var folder = emailFolders[folderIndex];
+
+            if(!folder.isLoaded)
+            {
+                ((IEmail)this).UpdateFolder(folderIndex);
+            }
+
+            activeFolder = folder;
+        }
+
+        List<(string from, string date, string subject, bool read)> IEmail.GetFolderEnvelopes(int folderIndex)
         {
             List<(string, string, string, bool)> envelopes = new();
 
+            var folder = emailFolders[folderIndex];
+
             // This list will contain the flags
-            if (activeFolder != null)
+            if (folder != null)
                 // This foreach loop merges the messages and UID lists to
                 // add them to the return list in one iteration.
-                foreach (var item in activeFolder.Messages.Zip(activeFolder.Seen, 
+                foreach (var item in folder.Messages.Zip(folder.Seen, 
                                                               (a, b) => new { message = a, seen = b }))
                 {
                     envelopes.Add((item.message.From.ToString(), 
@@ -298,7 +323,7 @@ namespace G5EmailClient.Email
 
         IEmail.Message? IEmail.OpenMessage(int messageIndex)
         {
-            if(messageIndex < activeFolder.Messages.Count & messageIndex >= 0)
+            if(messageIndex < activeFolder!.Messages.Count & messageIndex >= 0)
             {
                 // Adding read flag
                 if (!activeFolder.Seen[messageIndex]) {
@@ -330,7 +355,7 @@ namespace G5EmailClient.Email
             List<string> folderNames = new();
             foreach (var folder in emailFolders)
             {
-                folderNames.Add(folder.Folder.Name);
+                folderNames.Add(folder.Folder!.Name);
             }
             return folderNames;
         }
@@ -339,10 +364,22 @@ namespace G5EmailClient.Email
          //__________________________________________
         // Functions that make changes in IMAP server
         #region IMAP server changing functions
+        /// <summary>
+        /// This class and the corresponding queue is used to execute 
+        /// asynchronous toggle read instructions in FIFO order.
+        /// </summary>
+        public class ToggleReadParameters
+        {
+            public EmailFolder? folder;
+            public UniqueId     ID;
+            public bool         seen;
+        }
+        Queue<ToggleReadParameters> ToggleReadQueue = new();
+
         void IEmail.ToggleRead(int messageIndex)
         {
             Debug.WriteLine("Running MailKitEmail.ToggleRead()");
-            var UID = activeFolder.UIDs[messageIndex];
+            var UID = activeFolder!.UIDs[messageIndex];
             var seen = activeFolder.Seen[messageIndex];
             if (!seen)
             {
@@ -377,7 +414,7 @@ namespace G5EmailClient.Email
         void IEmail.Delete(int messageIndex)
         {
             Debug.WriteLine("Running MailKitEmail.Delete()");
-            var UID = activeFolder.UIDs[messageIndex];
+            var UID = activeFolder!.UIDs[messageIndex];
 
             // The local message entry will not
             ThreadPool.QueueUserWorkItem(state => AsyncDelete(activeFolder!, UID));
@@ -397,7 +434,7 @@ namespace G5EmailClient.Email
 
         #endregion
 
-        //____________________________________________
+         //____________________________________________
         // Functions that interact with the SMTP server 
         #region SMTP functions
 
@@ -462,5 +499,6 @@ namespace G5EmailClient.Email
         public event IEmail.SentMessageHandler SentMessage;
 
         #endregion
+
     }
 }

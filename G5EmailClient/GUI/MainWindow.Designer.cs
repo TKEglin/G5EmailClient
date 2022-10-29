@@ -104,9 +104,10 @@
             this.cmp_to_textbox = new System.Windows.Forms.TextBox();
             this.cmp_to_left_panel = new System.Windows.Forms.Panel();
             this.cmp_to_label = new System.Windows.Forms.Label();
-            this.message_flow_panel = new G5EmailClient.GUI.EnvelopeFlowPanel();
+            this.template_flow_panel = new G5EmailClient.GUI.EnvelopeFlowPanel();
             this.search_folder_textbox = new System.Windows.Forms.TextBox();
             this.inbox_panel = new System.Windows.Forms.Panel();
+            this.search_bar_panel = new System.Windows.Forms.Panel();
             this.brief_control_explain_tooltop = new System.Windows.Forms.ToolTip(this.components);
             this.cmp_add_contextstrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.add_cc_menuitem = new System.Windows.Forms.ToolStripMenuItem();
@@ -137,6 +138,7 @@
             this.cmp_to_panel.SuspendLayout();
             this.cmp_to_left_panel.SuspendLayout();
             this.inbox_panel.SuspendLayout();
+            this.search_bar_panel.SuspendLayout();
             this.cmp_add_contextstrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -314,6 +316,7 @@
             // 
             this.folders_lisbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.folders_lisbox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.folders_lisbox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.folders_lisbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.folders_lisbox.FormattingEnabled = true;
             this.folders_lisbox.ItemHeight = 23;
@@ -322,7 +325,8 @@
             this.folders_lisbox.Size = new System.Drawing.Size(228, 571);
             this.folders_lisbox.TabIndex = 2;
             this.folders_lisbox.TabStop = false;
-            this.folders_lisbox.DoubleClick += new System.EventHandler(this.folders_lisbox_DoubleClick);
+            this.folders_lisbox.Click += new System.EventHandler(this.folders_lisbox_Click);
+            this.folders_lisbox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listBox1_DrawItem);
             // 
             // notification_panel
             // 
@@ -418,14 +422,12 @@
             // 
             // welcome_picture_box
             // 
-            this.welcome_picture_box.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.welcome_picture_box.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.welcome_picture_box.Dock = System.Windows.Forms.DockStyle.Fill;
             this.welcome_picture_box.Image = global::G5EmailClient.Properties.Resources.Group5Logo;
-            this.welcome_picture_box.Location = new System.Drawing.Point(28, 28);
+            this.welcome_picture_box.Location = new System.Drawing.Point(0, 0);
             this.welcome_picture_box.Name = "welcome_picture_box";
-            this.welcome_picture_box.Size = new System.Drawing.Size(438, 143);
+            this.welcome_picture_box.Size = new System.Drawing.Size(494, 597);
             this.welcome_picture_box.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.welcome_picture_box.TabIndex = 0;
             this.welcome_picture_box.TabStop = false;
@@ -961,24 +963,25 @@
             this.cmp_to_label.TabIndex = 0;
             this.cmp_to_label.Text = "To: ";
             // 
-            // message_flow_panel
+            // template_flow_panel
             // 
-            this.message_flow_panel.AutoScroll = true;
-            this.message_flow_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.message_flow_panel.Location = new System.Drawing.Point(0, 23);
-            this.message_flow_panel.Name = "message_flow_panel";
-            this.message_flow_panel.Size = new System.Drawing.Size(350, 607);
-            this.message_flow_panel.TabIndex = 2;
+            this.template_flow_panel.AutoScroll = true;
+            this.template_flow_panel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.template_flow_panel.Location = new System.Drawing.Point(0, 30);
+            this.template_flow_panel.Name = "template_flow_panel";
+            this.template_flow_panel.Size = new System.Drawing.Size(350, 600);
+            this.template_flow_panel.TabIndex = 2;
+            this.template_flow_panel.Visible = false;
             // 
             // search_folder_textbox
             // 
             this.search_folder_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.search_folder_textbox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.search_folder_textbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.search_folder_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.search_folder_textbox.Location = new System.Drawing.Point(0, 0);
+            this.search_folder_textbox.Location = new System.Drawing.Point(3, 3);
             this.search_folder_textbox.Name = "search_folder_textbox";
             this.search_folder_textbox.PlaceholderText = " Search...";
-            this.search_folder_textbox.Size = new System.Drawing.Size(350, 23);
+            this.search_folder_textbox.Size = new System.Drawing.Size(344, 23);
             this.search_folder_textbox.TabIndex = 4;
             this.search_folder_textbox.TabStop = false;
             // 
@@ -986,13 +989,23 @@
             // 
             this.inbox_panel.AutoScroll = true;
             this.inbox_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.inbox_panel.Controls.Add(this.message_flow_panel);
-            this.inbox_panel.Controls.Add(this.search_folder_textbox);
+            this.inbox_panel.Controls.Add(this.template_flow_panel);
+            this.inbox_panel.Controls.Add(this.search_bar_panel);
             this.inbox_panel.Dock = System.Windows.Forms.DockStyle.Left;
             this.inbox_panel.Location = new System.Drawing.Point(230, 30);
             this.inbox_panel.Name = "inbox_panel";
             this.inbox_panel.Size = new System.Drawing.Size(352, 632);
             this.inbox_panel.TabIndex = 2;
+            // 
+            // search_bar_panel
+            // 
+            this.search_bar_panel.Controls.Add(this.search_folder_textbox);
+            this.search_bar_panel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.search_bar_panel.Location = new System.Drawing.Point(0, 0);
+            this.search_bar_panel.Name = "search_bar_panel";
+            this.search_bar_panel.Padding = new System.Windows.Forms.Padding(3);
+            this.search_bar_panel.Size = new System.Drawing.Size(350, 30);
+            this.search_bar_panel.TabIndex = 5;
             // 
             // brief_control_explain_tooltop
             // 
@@ -1086,7 +1099,8 @@
             this.cmp_to_left_panel.ResumeLayout(false);
             this.cmp_to_left_panel.PerformLayout();
             this.inbox_panel.ResumeLayout(false);
-            this.inbox_panel.PerformLayout();
+            this.search_bar_panel.ResumeLayout(false);
+            this.search_bar_panel.PerformLayout();
             this.cmp_add_contextstrip.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -1120,7 +1134,7 @@
         private Panel inbox_panel;
         private TabPage intro_tab;
         private PictureBox welcome_picture_box;
-        private EnvelopeFlowPanel message_flow_panel;
+        private EnvelopeFlowPanel template_flow_panel;
         private Panel msg_senderinfo_panel;
         private Label msg_from_label;
         private Label msg_subject_label;
@@ -1175,5 +1189,6 @@
         private FlowLayoutPanel notifications_flowpanel;
         private Panel msg_senderinfo_padding_panel2;
         private Label msg_cc_label;
+        private Panel search_bar_panel;
     }
 }

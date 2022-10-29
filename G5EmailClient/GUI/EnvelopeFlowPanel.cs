@@ -16,13 +16,24 @@ namespace G5EmailClient.GUI
         List<EnvelopePanel> panelList = new();
         List<EnvelopePanel> selectedPanels = new();
 
-        // Event subcriptions
-
 
         public EnvelopeFlowPanel()
         {
             InitializeComponent();
         }
+
+        // Defining indexing operator
+        public EnvelopePanel this[int index]
+        {
+            get { return panelList[index]; }
+        }
+
+
+        public int ListSize
+        {
+            get { return panelList.Count; }
+        }
+
 
         /// <summary>
         /// Adds a panel to the flow control. The index will be saved in the control and returned

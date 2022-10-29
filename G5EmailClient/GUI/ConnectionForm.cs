@@ -55,6 +55,14 @@ namespace G5EmailClient.GUI
                 "select a user and load it.");
         }
 
+        public IEmail IEmail
+        {
+            get => default;
+            set
+            {
+            }
+        }
+
         /// <summary>
         /// Updates the values of all text boxes
         /// </summary>
