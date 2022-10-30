@@ -63,11 +63,11 @@ namespace G5EmailClient.GUI
             // Initializing email data.
                 // Data
                 updateFoldersView();
-                updateFolderView(0, true);
+                updateFolderView(0, true, true);
                 active_email_label.Text = EmailClient.GetActiveUser().username;
                 // Events
                 EmailClient.SentMessage += SentMessageHandler;
-                EmailClient.InboxUpdateFinished += InboxUpdateFinishedHandler;
+                EmailClient.FolderUpdateFinished += FolderUpdateFinishedHandler;
 
                 // Setting inbox as default selected folder
                 folders_lisbox.SetSelected(0, true);
@@ -192,7 +192,7 @@ namespace G5EmailClient.GUI
         /// <summary>
         /// Gets message envelopes for the given folder and adds them to the corresponding flow_panel.
         /// </summary>
-        void updateFolderView(int folderIndex, bool update)
+        void updateFolderView(int folderIndex, bool update, bool switchView)
         {
             EmailClient.SetActiveFolder(folderIndex);
 
@@ -200,7 +200,7 @@ namespace G5EmailClient.GUI
             var panel = EnvelopeFlowPanels[folderIndex];
 
             // If list is empty or update is true, repopulate list.
-            if(panel.ListSize == 0 | update == true)
+            if(update == true)
             {
                 panel.Clear();
 
@@ -218,10 +218,13 @@ namespace G5EmailClient.GUI
                 }
             }
 
-            if(activePanel != null)
-                activePanel.Visible = false;
-            panel.Visible = true;
-            activePanel = panel;
+            if(activePanel != panel)
+            {
+                if (activePanel != null)
+                    activePanel.Visible = false;
+                panel.Visible = true;
+                activePanel = panel;
+            }
         }
 
         /// <summary>
@@ -230,6 +233,10 @@ namespace G5EmailClient.GUI
         void updateFoldersView()
         {
             folders_lisbox.Items.Clear();
+
+            // The folder index is saved as a tag in each button
+            int index = -1;
+
             foreach (var folderName in EmailClient.GetFoldernames())
             {
                 // Folders list
@@ -248,8 +255,10 @@ namespace G5EmailClient.GUI
                 EnvelopeFlowPanels.Add(flowPanel);
 
                 // Move button list
+                index++;
                 ToolStripButton folderButton = new();
                 folderButton.Text = folderName;
+                folderButton.Tag = index;
                 folderButton.Click += folder_move_button_Click;
                 move_message_dropdown.DropDownItems.Add(folderButton);
             }
@@ -403,7 +412,7 @@ namespace G5EmailClient.GUI
             cmp_mailbody_rtextbox.Text = "";
             this.Cursor = Cursors.Default;
         }    
-        private void SentMessageHandler(Exception ex, IEmail.Message message)
+        private void SentMessageHandler(Exception? ex, IEmail.Message message)
         {
             if(ex != null)
             {
@@ -501,13 +510,13 @@ namespace G5EmailClient.GUI
             }
             this.Cursor = Cursors.Default;
         }
-        private void InboxUpdateFinishedHandler(object sender, EventArgs e)
+        private void FolderUpdateFinishedHandler(object sender, EventArgs e)
         {
             var index = (int)sender;
 
             if (refresh_button.Owner.InvokeRequired)
             {
-                Action safeInboxHandler = delegate { InboxUpdateFinishedHandler(sender, e); };
+                Action safeInboxHandler = delegate { FolderUpdateFinishedHandler(sender, e); };
                 refresh_button.Owner.Invoke(safeInboxHandler);
             }
             else
@@ -520,7 +529,9 @@ namespace G5EmailClient.GUI
                 // Selecting and updating inbox
                 folders_lisbox.ClearSelected();
                 folders_lisbox.SetSelected(index, true);
-                updateFolderView(index, true);
+
+                // Switches only if inbox is being updated
+                updateFolderView(index, true, index == 0);
 
                 this.Cursor = Cursors.Default;
             }
@@ -568,7 +579,18 @@ namespace G5EmailClient.GUI
         private void folder_move_button_Click(object sender, EventArgs e)
         {
             var button = (ToolStripButton)sender;
-            Debug.WriteLine("Folder name click: " + button.Text);
+
+            var folderIndex = (int)button.Tag;
+
+            // The messages to be moved will be deleted from the active panel
+            var messageIndices = activePanel!.DeleteSelected();
+
+            foreach(var messageIndex in messageIndices)
+            {
+                EmailClient.MoveMessage(messageIndex, folderIndex);
+            }
+
+            Debug.WriteLine("Folder with index " + button.Tag + " and name " + button.Text + " clicked.");
         }
 
         private void folders_lisbox_Click(object sender, EventArgs e)
@@ -578,9 +600,11 @@ namespace G5EmailClient.GUI
             int folderIndex = folders_lisbox.SelectedIndex;
 
             // Clearing selection
-            EnvelopeFlowPanels[folderIndex].ClearSelection();
+            var FlowPanel = EnvelopeFlowPanels[folderIndex];
+            FlowPanel.ClearSelection();
 
-            updateFolderView(folderIndex, false);
+            // Setting to update folder if necesarry
+            updateFolderView(folderIndex, FlowPanel.needsUpdate, true);
 
             this.Cursor = Cursors.Default;
         }

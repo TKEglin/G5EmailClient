@@ -92,7 +92,7 @@ namespace G5EmailClient.Email
 
         #endregion
 
-         //_____________________________________
+        //_____________________________________
         // Functions that access the imap server
         #region IMAP server retrieval functions
 
@@ -110,9 +110,11 @@ namespace G5EmailClient.Email
             foreach (var Folder in folders)
             {
                 // If statement to avoid adding the inbox twice
-                if(Folder.Name != inbox_name & Folder.Exists)
+                if (Folder.Name != inbox_name & Folder.Exists)
                     emailFolders.Add(new EmailFolder(Folder, Folder.Name));
             }
+
+            FolderRemainingMoveTasks = new (new int[emailFolders.Count]);
         }
 
         /// <summary>
@@ -144,6 +146,7 @@ namespace G5EmailClient.Email
                                                        MessageSummaryItems.UniqueId |
                                                        MessageSummaryItems.Flags))
             {
+                Debug.WriteLine("Fetching summary items from folder " + folder.FolderName);
                 folder.UIDs.Add(items.UniqueId);
                 folder.Seen.Add(items.Flags!.Value.HasFlag(MessageFlags.Seen));
             }
@@ -169,10 +172,9 @@ namespace G5EmailClient.Email
                 folder.UIDs.    RemoveRange(0, count);
                 folder.Seen.    RemoveRange(0, count);
             }
-            if (InboxUpdateFinished != null)
+            if (FolderUpdateFinished != null)
             {
-                this.InboxUpdateFinished(folderIndex, EventArgs.Empty);
-
+                this.FolderUpdateFinished(folderIndex, EventArgs.Empty);
             }
         }
         #endregion
@@ -295,7 +297,7 @@ namespace G5EmailClient.Email
         {
             ThreadPool.QueueUserWorkItem(state => updateFolder(0));
         }
-        public event EventHandler InboxUpdateFinished;
+        public event EventHandler FolderUpdateFinished;
 
         void IEmail.SetActiveFolder(int folderIndex)
         {
@@ -348,10 +350,13 @@ namespace G5EmailClient.Email
                 IEmail.Message message = new();
                     message.date    = ImapMessage.Date.ToString();
                     message.from    = ImapMessage.From.ToString();
-                    message.to      = ImapMessage.To.ToString(); 
-                    message.cc      = ImapMessage.Cc.ToString();
-                    message.subject = ImapMessage.Subject;
-                    message.body    = ImapMessage.TextBody.ToString();
+                    message.to      = ImapMessage.To.ToString();
+                    if (ImapMessage.Cc != null)
+                        message.cc      = ImapMessage.Cc.ToString();
+                    if (ImapMessage.Subject != null)
+                        message.subject = ImapMessage.Subject;
+                    if (ImapMessage.TextBody != null)
+                        message.body    = ImapMessage.TextBody.ToString();
                 return message;
             }
             else
@@ -421,6 +426,9 @@ namespace G5EmailClient.Email
                 // Gettings parameters
                 var parameters = ToggleReadQueue.Dequeue();
 
+                if (!parameters.folder!.Folder!.IsOpen)
+                    parameters.folder.Folder.Open(FolderAccess.ReadWrite);
+
                 if (!parameters.seenFlag)
                 {
                     parameters.folder!.Folder.AddFlags(parameters.ID, MessageFlags.Seen, true);
@@ -444,9 +452,8 @@ namespace G5EmailClient.Email
             Debug.WriteLine("Running MailKitEmail.Delete()");
             var UID = activeFolder!.UIDs[messageIndex];
 
-            // The local message entry will not
+            // The local message entry will not be removed
             ThreadPool.QueueUserWorkItem(state => AsyncDelete(activeFolder!, UID));
-            Debug.WriteLine("Locally adding flag");
 
             Debug.WriteLine("MailKitEmail.Delete() complete");
         }
@@ -454,11 +461,55 @@ namespace G5EmailClient.Email
         {
             ImapMutex.WaitOne();
 
+            if(!folder.Folder!.IsOpen)
+            {
+                folder.Folder.Open(FolderAccess.ReadWrite);
+            }
+
             folder.Folder.AddFlags(ID, MessageFlags.Deleted, true);
             Debug.WriteLine("Server request to add deleted flag");
 
             ImapMutex.ReleaseMutex();
         }
+
+        // This list is increment when a move task is started. 
+        // It will be decremented when a move task is done.
+        // The MoveMessageCompleted signal will be sent when the value is 0 for the given folder.
+        List<int> FolderRemainingMoveTasks; // = new(emailFolders.Count);
+        void IEmail.MoveMessage(int messageIndex, int folderIndex)
+        {
+            Debug.WriteLine("Running MailKitEmail.MoveMessage() with destination " 
+                           + emailFolders[folderIndex].Folder!.Name);
+            var UID = activeFolder!.UIDs[messageIndex];
+
+            FolderRemainingMoveTasks[folderIndex]++;
+            ThreadPool.QueueUserWorkItem(state => AsyncMoveMessage(UID, activeFolder!, folderIndex));
+
+            Debug.WriteLine("MailKitEmail.MoveMessage() complete");
+        }
+        private void AsyncMoveMessage(UniqueId UID, EmailFolder origin, int destinationIndex)
+        {
+            ImapMutex.WaitOne();
+
+            if (!origin.Folder!.IsOpen)
+            {
+                origin.Folder.Open(FolderAccess.ReadWrite);
+            }
+
+            Debug.WriteLine("Server request to move message.");
+
+            origin!.Folder!.MoveTo(UID, emailFolders[destinationIndex].Folder);
+            FolderRemainingMoveTasks[destinationIndex]--;
+
+            ImapMutex.ReleaseMutex();
+
+            if (FolderRemainingMoveTasks[destinationIndex] == 0)
+            {
+                Debug.WriteLine("No waiting move tasks. Updating folder and sending event");
+                updateFolder(destinationIndex);
+            }
+        }
+
 
         #endregion
 

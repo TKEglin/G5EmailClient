@@ -33,7 +33,6 @@
             this.top_panel = new System.Windows.Forms.Panel();
             this.top_toolstrip = new System.Windows.Forms.ToolStrip();
             this.new_message_button = new System.Windows.Forms.ToolStripButton();
-            this.open_inbox_button = new System.Windows.Forms.ToolStripButton();
             this.move_message_dropdown = new System.Windows.Forms.ToolStripDropDownButton();
             this.delete_button = new System.Windows.Forms.ToolStripButton();
             this.toggle_read_button = new System.Windows.Forms.ToolStripButton();
@@ -159,7 +158,6 @@
             this.top_toolstrip.ImageScalingSize = new System.Drawing.Size(25, 25);
             this.top_toolstrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.new_message_button,
-            this.open_inbox_button,
             this.move_message_dropdown,
             this.delete_button,
             this.toggle_read_button,
@@ -183,14 +181,6 @@
             this.new_message_button.Size = new System.Drawing.Size(111, 29);
             this.new_message_button.Text = "Compose";
             this.new_message_button.Click += new System.EventHandler(this.new_message_button_Click);
-            // 
-            // open_inbox_button
-            // 
-            this.open_inbox_button.Image = global::G5EmailClient.Properties.Resources.InboxIcon;
-            this.open_inbox_button.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.open_inbox_button.Name = "open_inbox_button";
-            this.open_inbox_button.Size = new System.Drawing.Size(82, 29);
-            this.open_inbox_button.Text = "Inbox";
             // 
             // move_message_dropdown
             // 

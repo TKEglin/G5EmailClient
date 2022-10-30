@@ -16,6 +16,8 @@ namespace G5EmailClient.GUI
         List<EnvelopePanel> panelList = new();
         List<EnvelopePanel> selectedPanels = new();
 
+        public bool needsUpdate = false;
+
 
         public EnvelopeFlowPanel()
         {
