@@ -200,7 +200,7 @@ namespace G5EmailClient.GUI
             var panel = EnvelopeFlowPanels[folderIndex];
 
             // If list is empty or update is true, repopulate list.
-            if(panel.ListSize == 0 | update == true)
+            if(update == true)
             {
                 panel.Clear();
 
@@ -218,10 +218,13 @@ namespace G5EmailClient.GUI
                 }
             }
 
-            if(activePanel != null)
-                activePanel.Visible = false;
-            panel.Visible = true;
-            activePanel = panel;
+            if(activePanel != panel)
+            {
+                if (activePanel != null)
+                    activePanel.Visible = false;
+                panel.Visible = true;
+                activePanel = panel;
+            }
         }
 
         /// <summary>
