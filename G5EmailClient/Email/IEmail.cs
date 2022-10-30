@@ -111,7 +111,7 @@ namespace G5EmailClient.Email
         /// </summary>
         void UpdateInbox();
         void UpdateInboxAsync();
-        event EventHandler InboxUpdateFinished;
+        event EventHandler FolderUpdateFinished;
 
         /// <summary>
         /// Sets the active folder using a given index. Opens the folder if it is unopened.
@@ -150,10 +150,20 @@ namespace G5EmailClient.Email
         /// Deletes the message in the active folder that corresponds to the index.
         /// Note: The message will not be locally deleted. The client assumes
         /// that the GUI will remove the message from the UI, so the message cannot
-        /// be deleted again.
+        /// be accessed again.
         /// </summary>
         /// <param name="messageIndex"></param>
         void Delete(int messageIndex);
+
+        /// <summary>
+        /// Takes a message from the given message index and moves it
+        /// to the folder with the given folder index. 
+        /// The destinatin folder must be updated when the 
+        /// Note: The message will not be locally removed form the origin folder. 
+        /// The client assumes that the GUI will remove the message from the UI, 
+        /// so the message cannot be accessed again.
+        /// </summary>
+        void MoveMessage(int messageIndex, int folderIndex);
 
         /// <summary>
         /// Sends the given message to the given email. Empty strings will be ignored.
