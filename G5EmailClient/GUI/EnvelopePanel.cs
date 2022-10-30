@@ -14,7 +14,7 @@ namespace G5EmailClient.GUI
     public partial class EnvelopePanel : UserControl
     {
         internal bool Selected = false;
-        public int index = -1;
+        public string UID = string.Empty;
 
         // Definition of the color of the edge bar for each status
         static Color ReadColor = Color.LightGray;

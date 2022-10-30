@@ -123,14 +123,14 @@ namespace G5EmailClient.Email
         /// Each index in the list corresponds to the index of the folder in the underlying list.
         /// </summary>
         /// <returns>A list of tuples.</returns>
-        List<(string from, string date, string subject, bool read)> GetFolderEnvelopes(int folderIndex);
+        List<(string UID, string from, string date, string subject, bool read)> GetFolderEnvelopes(int folderIndex);
 
         /// <summary>
         /// Retrives and returns a message from the active folder given an index.
         /// </summary>
         /// <param name="messageIndex"></param>
         /// <returns>Returns a message if index is within range. Otherwise, retuns null.</returns>
-        Message? OpenMessage(int messageIndex);
+        Message? OpenMessage(string UID);
 
         /// <summary>
         /// Gets a list of all foldernames. The index of the list will match the underlying index
@@ -144,7 +144,7 @@ namespace G5EmailClient.Email
         /// If the index is out of bounds, nothing happens.
         /// </summary>
         /// <param name="messageIndex"></param>
-        void ToggleRead(int messageIndex);
+        void ToggleRead(string UID);
 
         /// <summary>
         /// Deletes the message in the active folder that corresponds to the index.
@@ -153,7 +153,7 @@ namespace G5EmailClient.Email
         /// be accessed again.
         /// </summary>
         /// <param name="messageIndex"></param>
-        void Delete(int messageIndex);
+        void Delete(string UID);
 
         /// <summary>
         /// Takes a message from the given message index and moves it
@@ -163,7 +163,7 @@ namespace G5EmailClient.Email
         /// The client assumes that the GUI will remove the message from the UI, 
         /// so the message cannot be accessed again.
         /// </summary>
-        void MoveMessage(int messageIndex, int folderIndex);
+        void MoveMessage(string UID, int folderIndex);
 
         /// <summary>
         /// Sends the given message to the given email. Empty strings will be ignored.

@@ -41,10 +41,10 @@ namespace G5EmailClient.GUI
         /// Adds a panel to the flow control. The index will be saved in the control and returned
         /// when getting selected items.
         /// </summary>
-        public void Add(int index, string from, string date, string subject, bool seen)
+        public void Add(string UID, string from, string date, string subject, bool seen)
         {
             var envelopePanel = new EnvelopePanel();
-            envelopePanel.index = index;
+            envelopePanel.UID = UID;
             envelopePanel.fromText = from;
             envelopePanel.dateText = date;
             envelopePanel.subjectText = subject;
@@ -62,34 +62,34 @@ namespace G5EmailClient.GUI
 
         /// <summary>
         /// Toggles read appearance for all envelopes currently selected. Returns a list of the
-        /// indices of the affected envelopePanels
+        /// UIDs of the affected envelopePanels
         /// </summary>
         /// <returns></returns>
-        public List<int> ToggleReadSelected()
+        public List<string> ToggleReadSelected()
         {
-            List<int> indices = new();
+            List<string> UIDs = new();
             foreach (var envelope in selectedPanels)
             {
                 envelope.toggleRead();
-                indices.Add(envelope.index);
+                UIDs.Add(envelope.UID);
             }
-            return indices;
+            return UIDs;
         }
 
         /// <summary>
         /// Remove all selected envelopePanels from the control. Returns a list of the
-        /// indices of the affected envelopePanels.
+        /// UIDs of the affected envelopePanels.
         /// </summary>
         /// <returns></returns>
-        public List<int> DeleteSelected()
+        public List<string> DeleteSelected()
         {
-            List<int> indices = new();
+            List<string> UIDs = new();
             foreach (var envelope in selectedPanels)
             {
                 envelope.Dispose();
-                indices.Add(envelope.index);
+                UIDs.Add(envelope.UID);
             }
-            return indices;
+            return UIDs;
         }
 
         /// <summary>
@@ -115,28 +115,28 @@ namespace G5EmailClient.GUI
         }
 
         /// <summary>
-        /// Returns the selected index. 
-        /// If more than one panel is selected, it returns the first index.
+        /// Returns the selected UID. 
+        /// If more than one panel is selected, it returns the first UID.
         /// If no panel is selected, returns -1.
         /// </summary>
-        public int SelectedIndex()
+        public string SelectedUID()
         {
             if (selectedPanels.Count == 0) 
-                return -1;
+                return string.Empty;
             else 
-                return selectedPanels[0].index;
+                return selectedPanels[0].UID;
         }
 
         /// <summary>
-        /// Returns a list of indices for all selected panels. If no panels are selected, returns an empty list.
+        /// Returns a list of UIDs for all selected panels. If no panels are selected, returns an empty list.
         /// </summary>
         /// <returns></returns>
-        public List<int> SelectedIndices()
+        public List<string> SelectedIndices()
         {
-            List<int> indices = new();
+            List<string> UIDs = new();
             foreach(var panel in selectedPanels) 
-                indices.Add(panel.index);
-            return indices;
+                UIDs.Add(panel.UID);
+            return UIDs;
         }
 
         //
@@ -160,6 +160,29 @@ namespace G5EmailClient.GUI
                 panel.SetSelected(!panel.Selected);
             }
             selectedPanels.Add(panel);
+        }
+
+        public class EnvelopeDateComparer : Comparer<EnvelopePanel>
+        {
+
+            public override int Compare(EnvelopePanel? x, EnvelopePanel? y)
+            {
+                var date_x = DateTimeOffset.Parse(x.dateText);
+                var date_y = DateTimeOffset.Parse(y.dateText);
+
+                return date_x.CompareTo(date_y);
+            }
+        }
+        /// <summary>
+        /// Sorts the panels by date
+        /// </summary>
+        public void SortDate()
+        {
+            panelList.Sort(0, panelList.Count, new EnvelopeDateComparer());
+
+            flow_control.Controls.Clear();
+
+            foreach(var panel in panelList) flow_control.Controls.Add(panel);
         }
 
         //
