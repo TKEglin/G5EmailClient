@@ -204,19 +204,17 @@ namespace G5EmailClient.GUI
             {
                 panel.Clear();
 
-                // The internal index value of the envelope will match the index in the envelopePanels list
-                int index = -1;
-
                 var envelopes = EmailClient.GetFolderEnvelopes(folderIndex);
                 foreach (var envelope in envelopes)
                 {
-                    index++;
-                    panel.Add(index, envelope.from.ToString(),
-                                     envelope.date.ToString(),
-                                     envelope.subject,
-                                     envelope.read);
+                    panel.Add(envelope.UID, envelope.from.ToString(),
+                                            envelope.date.ToString(),
+                                            envelope.subject,
+                                            envelope.read);
                 }
             }
+
+            panel.SortDate();
 
             if(activePanel != panel)
             {
@@ -268,9 +266,11 @@ namespace G5EmailClient.GUI
 
         private void EnvelopePanel_MessageOpen(object sender, EventArgs e)
         {
+            this.Cursor = Cursors.WaitCursor;
+
             var envelope = (EnvelopePanel)sender;
 
-            var message = EmailClient.OpenMessage(envelope.index);
+            var message = EmailClient.OpenMessage(envelope.UID);
             msg_from_label.Text = message.from;
             if(message.cc != null & message.cc!.Length > 0)
             {
@@ -290,6 +290,8 @@ namespace G5EmailClient.GUI
             //              + message.from + message.subject + message.body);
 
             main_tab.SelectedTab = open_message_tab;
+
+            this.Cursor = Cursors.Default;
         }
 
         private void toggle_read_button_Click(object sender, EventArgs e)
@@ -298,11 +300,11 @@ namespace G5EmailClient.GUI
             ToolStripButton button = (ToolStripButton)sender;
             tempDisableButton(button, 0.2);
 
-            var indices = activePanel.ToggleReadSelected();
+            var UIDs = activePanel.ToggleReadSelected();
 
-            foreach(var index in indices)
+            foreach(var UID in UIDs)
             {
-                EmailClient.ToggleRead(index);
+                EmailClient.ToggleRead(UID);
             }
             this.Cursor = Cursors.Default;
         }
@@ -311,10 +313,10 @@ namespace G5EmailClient.GUI
         {
             this.Cursor = Cursors.WaitCursor;
 
-            var deleted_indices = activePanel.DeleteSelected();
-            foreach(var index in deleted_indices)
+            var deleted_UIDs = activePanel.DeleteSelected();
+            foreach(var UID in deleted_UIDs)
             {
-                EmailClient.Delete(index);
+                EmailClient.Delete(UID);
             }
             
             this.Cursor = Cursors.Default;
@@ -530,7 +532,7 @@ namespace G5EmailClient.GUI
                 folders_lisbox.ClearSelected();
                 folders_lisbox.SetSelected(index, true);
 
-                // Switches only if inbox is being updated
+                                           // Switches only if it's the inbox being updated
                 updateFolderView(index, true, index == 0);
 
                 this.Cursor = Cursors.Default;
@@ -583,11 +585,11 @@ namespace G5EmailClient.GUI
             var folderIndex = (int)button.Tag;
 
             // The messages to be moved will be deleted from the active panel
-            var messageIndices = activePanel!.DeleteSelected();
+            var messageUIDs = activePanel!.DeleteSelected();
 
-            foreach(var messageIndex in messageIndices)
+            foreach(var messageUID in messageUIDs)
             {
-                EmailClient.MoveMessage(messageIndex, folderIndex);
+                EmailClient.MoveMessage(messageUID, folderIndex);
             }
 
             Debug.WriteLine("Folder with index " + button.Tag + " and name " + button.Text + " clicked.");
