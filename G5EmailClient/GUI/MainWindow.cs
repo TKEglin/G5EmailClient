@@ -68,6 +68,7 @@ namespace G5EmailClient.GUI
                 // Events
                 EmailClient.SentMessage += SentMessageHandler;
                 EmailClient.FolderUpdateFinished += FolderUpdateFinishedHandler;
+                EmailClient.MoveMessageFinished += MoveMessageFinishedHandler;
 
                 // Setting inbox as default selected folder
                 folders_lisbox.SetSelected(0, true);
@@ -76,7 +77,7 @@ namespace G5EmailClient.GUI
 
         #region utility functions
         // This timer will be used for the button functions.
-        // It is declared here so it can be reset by new calls of tempDisableButton
+        // It is declared here so it can be reset by new calls of DisableButton
         System.Timers.Timer buttonTimer = new(1000) { Enabled = false };
         /// <summary>
         /// Temporarily disables a button for time 'double seconds'.
@@ -84,11 +85,11 @@ namespace G5EmailClient.GUI
         /// using reenableButton();
         /// </summary>
         /// <param name="button"></param>
-        void tempDisableButton(ToolStripButton button, double seconds)
+        void DisableButton(ToolStripButton button, double seconds)
         {
             if(button.Owner.InvokeRequired)
             {
-                Action safeDisable = delegate { tempDisableButton(button, seconds); };
+                Action safeDisable = delegate { DisableButton(button, seconds); };
                 button.Owner.Invoke(safeDisable);
             }
             else
@@ -194,7 +195,9 @@ namespace G5EmailClient.GUI
         /// </summary>
         void updateFolderView(int folderIndex, bool update, bool switchView)
         {
-            EmailClient.SetActiveFolder(folderIndex);
+            // If set active fails, the folder cannot be updated.
+            if (EmailClient.SetActiveFolder(folderIndex) < 0)
+                return;
 
             // Getting panel
             var panel = EnvelopeFlowPanels[folderIndex];
@@ -214,9 +217,7 @@ namespace G5EmailClient.GUI
                 }
             }
 
-            panel.SortDate();
-
-            if(activePanel != panel)
+            if(activePanel != panel & switchView)
             {
                 if (activePanel != null)
                     activePanel.Visible = false;
@@ -298,7 +299,7 @@ namespace G5EmailClient.GUI
         {
             this.Cursor = Cursors.WaitCursor;
             ToolStripButton button = (ToolStripButton)sender;
-            tempDisableButton(button, 0.2);
+            DisableButton(button, 0.2);
 
             var UIDs = activePanel.ToggleReadSelected();
 
@@ -506,7 +507,7 @@ namespace G5EmailClient.GUI
             {
                 button.Image = Properties.Resources.RefreshAnimatedIcon;
                 button.Text = "Refreshing";
-                tempDisableButton(button, -1);
+                DisableButton(button, -1);
 
                 EmailClient.UpdateInboxAsync();
             }
@@ -592,7 +593,24 @@ namespace G5EmailClient.GUI
                 EmailClient.MoveMessage(messageUID, folderIndex);
             }
 
-            Debug.WriteLine("Folder with index " + button.Tag + " and name " + button.Text + " clicked.");
+            Debug.WriteLine("Folder with index " + button.Tag + " and name " + button.Text + " selected for move.");
+        }
+        private void MoveMessageFinishedHandler(string UID, int folderIndex, IEmail.Message Envelope, bool seen)
+        {
+            var panel = EnvelopeFlowPanels[folderIndex];
+
+            if(panel.InvokeRequired)
+            {
+                Action safeMoveHandler = delegate { MoveMessageFinishedHandler(UID, folderIndex, Envelope, seen); };
+                panel.Invoke(safeMoveHandler);
+            }
+            else
+            {
+                panel.Add(UID, Envelope.from,
+                               Envelope.date,
+                               Envelope.subject,
+                               seen);
+            }
         }
 
         private void folders_lisbox_Click(object sender, EventArgs e)

@@ -22,32 +22,59 @@ namespace G5EmailClient.Email
     {
         public class EmailFolder
         {
-            public EmailFolder(IMailFolder folder, string name) { Folder = folder;
-                                                                  FolderName = name; }
+            public EmailFolder(IMailFolder mainFolder, IMailFolder preloadFolder, string name) 
+            { 
+                MainImapFolder = mainFolder;
+                PreloadImapFolder = preloadFolder;
+                FolderName = name; 
+            }
 
-            public IMailFolder? Folder { get; set; }
+            public Mutex Mutex = new();
+
+            public IMailFolder? MainImapFolder    { get; set; }
+            public IMailFolder? PreloadImapFolder { get; set; }
+            // __Flags__
+
             public bool isLoaded { get; set; } = false;
+            // Is used to stop preload if it is progress during a new update
+            public bool stopPreload { get; set; } = false;
+            // Is used to lock a folder while loading is in progress
+            public bool isLocked { get; set; } = false;
 
+            // __Folder Data__
             public string? FolderName;
             public List<UniqueId> UIDs { get; set; } = new();
             public Dictionary<UniqueId, MimeMessage>    Messages  { get; set; } = new();
             public Dictionary<UniqueId, bool>           Seen      { get; set; } = new();
-            // The following dictionary only contains envelope informations. The remaining fields are empty.
+            // The following messages only contains envelope information. The remaining fields are empty.
             public Dictionary<UniqueId, IEmail.Message> Envelopes { get; set; } = new();
         }
 
         IDatabase data = new JSONDatabase();
 
-        Mutex ImapMutex = new();
-        Mutex SmtpMutex = new();
 
-        ImapClient imapClient = new();
+
+
+        /// <summary>
+        /// This client is the primary connection used to interact with the imap server
+        /// </summary>
+        ImapClient mainImapClient = new();
+        Mutex MainImapMutex = new();
+        /// <summary>
+        /// This imap client is used to preload messenges.
+        /// </summary>
+        ImapClient preloadImapClient = new();
+        Mutex preloadImapMutex = new();
+
         SmtpClient smtpClient = new();
+        Mutex SmtpMutex = new();
 
         IDatabase.User activeUser = new();
 
         List<EmailFolder> emailFolders = new();
         EmailFolder? activeFolder;
+        // This variable is used to throttle preloading speed when multiple folders are loading
+        int foldersPreloading = 0;
 
         public MailKitEmail()
         {
@@ -105,16 +132,22 @@ namespace G5EmailClient.Email
         private void initializeFolders()
         {
             // Adding inbox at index 0
-            emailFolders.Add(new EmailFolder(imapClient.Inbox, imapClient.Inbox.Name));
-            string inbox_name = imapClient.Inbox.Name;
+            emailFolders.Add(new EmailFolder(mainImapClient.Inbox, 
+                                             preloadImapClient.Inbox, 
+                                             mainImapClient.Inbox.Name));
+            string inbox_name = mainImapClient.Inbox.Name;
 
             // Adding folders
-            var folders = imapClient.GetFolders(imapClient.PersonalNamespaces[0], false);
-            foreach (var Folder in folders)
+            var mainFolders = mainImapClient.GetFolders(mainImapClient.PersonalNamespaces[0], false);
+            var preloadFolders = preloadImapClient.GetFolders(mainImapClient.PersonalNamespaces[0], false);
+            for (int i = 0; i < mainFolders.Count; i++)
             {
+                var mainFolder = mainFolders[i];
                 // If statement to avoid adding the inbox twice
-                if (Folder.Name != inbox_name & Folder.Exists)
-                    emailFolders.Add(new EmailFolder(Folder, Folder.Name));
+                if (mainFolder.Name != inbox_name & mainFolder.Exists)
+                {
+                    emailFolders.Add(new EmailFolder(mainFolder, preloadFolders[i], mainFolder.Name));
+                }
             }
 
             FolderRemainingMoveTasks = new (new int[emailFolders.Count]);
@@ -128,23 +161,31 @@ namespace G5EmailClient.Email
         /// 
         private void updateFolder(int folderIndex)
         {
-            ImapMutex.WaitOne();
-  
+
             var folder = emailFolders[folderIndex];
 
+            folder.stopPreload = true;
+
+            MainImapMutex.WaitOne();
+            folder.Mutex.WaitOne();
+
             // This will be used to remove duplicates once the new messages have been opened.
-            int count = folder.Folder!.Count;
+            int count = folder.UIDs!.Count;
             // This is necessary to let the user access old messages while inbox is updating.
 
-            folder!.Folder!.Open(FolderAccess.ReadWrite);
+            folder!.MainImapFolder!.Open(FolderAccess.ReadWrite);
 
+            // Emptying lists and dictionaries to avoid adding things twice on reload
+            folder.UIDs.Clear();
+            folder.Seen.Clear();
+            folder.Envelopes.Clear();
 
-            foreach (var items in folder.Folder.Fetch(0, -1, 
+            Debug.WriteLine("Fetching summary items from folder " + folder.FolderName);
+            foreach (var items in folder.MainImapFolder.Fetch(0, -1, 
                                                        MessageSummaryItems.Envelope |
                                                        MessageSummaryItems.UniqueId |
                                                        MessageSummaryItems.Flags))
             {
-                Debug.WriteLine("Fetching summary items from folder " + folder.FolderName);
                 folder.UIDs.Add(items.UniqueId);
                 folder.Seen.Add(items.UniqueId, items.Flags!.Value.HasFlag(MessageFlags.Seen));
 
@@ -157,30 +198,73 @@ namespace G5EmailClient.Email
                 folder.Envelopes.Add(items.UniqueId, envelope);
 
             }
-            // Adding the messages to the given folder
-            //for (int i = 0; i < folder.Folder.Count; i++)
-            //{
-            //    var UID = folder.UIDs[i];
-            //    var message = folder.Folder.GetMessage(UID);
-            //    Debug.WriteLine("Adding message with subject \"" + message.Subject
-            //                  + "\" to folder " + folder.FolderName);
-            //    folder.Messages[UID] = message;
-            //}
 
-            ImapMutex.ReleaseMutex();
+            MainImapMutex.ReleaseMutex();
 
             folder.isLoaded = true;
 
-            // Deleting UIDs of previously downloaded messages
-            if (count >= 0)
-            {
-                folder.UIDs.RemoveRange(0, count);
-            }
+            //// Deleting UIDs of previously downloaded messages
+            //if (count >= 0)
+            //{
+            //    folder.UIDs.RemoveRange(0, count);
+            //}
+
             if (FolderUpdateFinished != null)
             {
                 this.FolderUpdateFinished(folderIndex, EventArgs.Empty);
             }
+
+            folder.Mutex.ReleaseMutex();
+
+            // Proloading messages
+            folder.stopPreload = false;
+            ThreadPool.QueueUserWorkItem(state => PreloadMessages(folder));
         }
+
+        private void PreloadMessages(EmailFolder folder)
+        {
+            foldersPreloading++;
+
+            // This integer value sets a limit of how many messenges are preloaded.
+            int loadLimit = 50;
+            int maxCount = Math.Min(folder.UIDs.Count, loadLimit);
+
+            for(int i = 0; i < maxCount; i++)
+            {
+                if (folder.stopPreload)
+                {
+                    folder.stopPreload = false;
+                    return;
+                }
+
+                //Thread.Sleep(500 * foldersPreloading);
+
+                var UID = folder.UIDs[i];
+                if (!folder.Messages.ContainsKey(UID))
+                {
+                    preloadImapMutex.WaitOne();
+
+                    if (!folder!.PreloadImapFolder!.IsOpen)
+                        folder!.PreloadImapFolder.Open(FolderAccess.ReadWrite);
+
+                    var message = folder!.PreloadImapFolder!.GetMessage(UID);
+
+                    Debug.WriteLine("Folder " + folder.FolderName + " preloading message with subject " + message.Subject 
+                                  + ". " + foldersPreloading.ToString() + " folders currently preloading.");
+
+                    folder.Mutex.WaitOne();
+                    folder.Messages[UID] = message;
+                    folder.Mutex.ReleaseMutex();
+
+                    preloadImapMutex.ReleaseMutex();
+                }
+            }
+
+            Debug.WriteLine("Preload of folder \"" + folder.FolderName + "\" completed.");
+
+            foldersPreloading--;
+        }
+
         #endregion
 
          //__________________________________________
@@ -188,20 +272,22 @@ namespace G5EmailClient.Email
         #region server connection functions
         void IEmail.Disconnect()
         {
-            imapClient.Disconnect(true);
+            mainImapClient.Disconnect(true);
+            preloadImapClient.Disconnect(true);
             smtpClient.Disconnect(true);
         }
 
         bool IEmail.isConnected()
         {
-            return (imapClient.IsConnected & smtpClient.IsConnected);
+            return (mainImapClient.IsConnected & smtpClient.IsConnected);
         }
 
         Exception? IEmail.Connect(string IMAP_hostname, int IMAP_port, string SMTP_hostname, int SMTP_port)
         {
             try
             {
-                imapClient.Connect(IMAP_hostname, IMAP_port, SecureSocketOptions.SslOnConnect);
+                mainImapClient.Connect(IMAP_hostname, IMAP_port, SecureSocketOptions.SslOnConnect);
+                preloadImapClient.Connect(IMAP_hostname, IMAP_port, SecureSocketOptions.SslOnConnect);
                 smtpClient.Connect(SMTP_hostname, SMTP_port, SecureSocketOptions.SslOnConnect);
             }
             catch(Exception ex)
@@ -220,7 +306,8 @@ namespace G5EmailClient.Email
         {
             try
             {
-                imapClient.Authenticate(username, password);
+                mainImapClient.Authenticate(username, password);
+                preloadImapClient.Authenticate(username, password);
                 smtpClient.Authenticate(username, password);
             }
             catch(Exception ex)
@@ -303,16 +390,23 @@ namespace G5EmailClient.Email
         }
         public event EventHandler FolderUpdateFinished;
 
-        void IEmail.SetActiveFolder(int folderIndex)
+        int IEmail.SetActiveFolder(int folderIndex)
         {
             var folder = emailFolders[folderIndex];
 
+            // If folder is locked, return
+            if (folder.isLocked)
+                return -1;
+
+            // Else, set active with load if not loaded yet
             if(!folder.isLoaded)
             {
                 updateFolder(folderIndex);
             }
 
             activeFolder = folder;
+
+            return 0;
         }
 
         List<(string UID, string from, string date, string subject, bool read)> IEmail.GetFolderEnvelopes(int folderIndex)
@@ -323,9 +417,10 @@ namespace G5EmailClient.Email
 
             // This list will contain the flags
             if (folder != null)
+            {
                 // This foreach loop merges the messages and UID lists to
                 // add them to the return list in one iteration.
-                for(int i = 0; i < folder.Envelopes.Count; i++)
+                for (int i = 0; i < folder.Envelopes.Count; i++)
                 {
                     var UID = folder.UIDs[i];
                     envelopes.Add((UID.ToString(),
@@ -334,6 +429,7 @@ namespace G5EmailClient.Email
                                    folder.Envelopes[UID].subject,
                                    folder.Seen[UID]));
                 }
+            }
             return envelopes;
         }
 
@@ -356,17 +452,17 @@ namespace G5EmailClient.Email
                 ImapMessage = activeFolder.Messages[UID];
             else
             {
-                ImapMutex.WaitOne();
+                MainImapMutex.WaitOne();
 
-                if (!activeFolder!.Folder!.IsOpen) { }
-                    activeFolder!.Folder.Open(FolderAccess.ReadWrite);
+                if (!activeFolder!.MainImapFolder!.IsOpen) { }
+                    activeFolder!.MainImapFolder.Open(FolderAccess.ReadWrite);
 
                 Debug.WriteLine("Message not loaded. Loading...");
-                ImapMessage = activeFolder!.Folder!.GetMessage(UID);
+                ImapMessage = activeFolder!.MainImapFolder!.GetMessage(UID);
                 activeFolder.Messages[UID] = ImapMessage;
                 Debug.WriteLine("Message with subject {0} loaded", ImapMessage.Subject);
 
-                ImapMutex.ReleaseMutex();
+                MainImapMutex.ReleaseMutex();
             }
             IEmail.Message message = new();
                 message.date    = ImapMessage.Date.ToString();
@@ -386,7 +482,7 @@ namespace G5EmailClient.Email
             List<string> folderNames = new();
             foreach (var folder in emailFolders)
             {
-                folderNames.Add(folder.Folder!.Name);
+                folderNames.Add(folder.MainImapFolder!.Name);
             }
             return folderNames;
         }
@@ -433,7 +529,7 @@ namespace G5EmailClient.Email
         }
         private void AsyncToggleRead(object? sender, EventArgs e)
         {
-            ImapMutex.WaitOne();
+            MainImapMutex.WaitOne();
 
             if (ToggleReadQueue.Count > 0)
             {
@@ -441,17 +537,17 @@ namespace G5EmailClient.Email
                 // Gettings parameters
                 var parameters = ToggleReadQueue.Dequeue();
 
-                if (!parameters.folder!.Folder!.IsOpen)
-                    parameters.folder.Folder.Open(FolderAccess.ReadWrite);
+                if (!parameters.folder!.MainImapFolder!.IsOpen)
+                    parameters.folder.MainImapFolder.Open(FolderAccess.ReadWrite);
 
                 if (!parameters.seenFlag)
                 {
-                    parameters.folder!.Folder.AddFlags(parameters.ID, MessageFlags.Seen, true);
+                    parameters.folder!.MainImapFolder.AddFlags(parameters.ID, MessageFlags.Seen, true);
                     Debug.WriteLine("Server request to add flag");
                 }
                 else
                 {
-                    parameters.folder!.Folder.RemoveFlags(parameters.ID, MessageFlags.Seen, true);
+                    parameters.folder!.MainImapFolder.RemoveFlags(parameters.ID, MessageFlags.Seen, true);
                     Debug.WriteLine("Server request to remove flag");
                 }
 
@@ -459,7 +555,7 @@ namespace G5EmailClient.Email
                 ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(null, EventArgs.Empty));
             }
 
-            ImapMutex.ReleaseMutex();
+            MainImapMutex.ReleaseMutex();
         }
 
         void IEmail.Delete(string sUID)
@@ -474,17 +570,17 @@ namespace G5EmailClient.Email
         }
         private void AsyncDelete(EmailFolder folder, UniqueId ID)
         {
-            ImapMutex.WaitOne();
+            MainImapMutex.WaitOne();
 
-            if(!folder.Folder!.IsOpen)
+            if(!folder.MainImapFolder!.IsOpen)
             {
-                folder.Folder.Open(FolderAccess.ReadWrite);
+                folder.MainImapFolder.Open(FolderAccess.ReadWrite);
             }
 
-            folder.Folder.AddFlags(ID, MessageFlags.Deleted, true);
+            folder.MainImapFolder.AddFlags(ID, MessageFlags.Deleted, true);
             Debug.WriteLine("Server request to add deleted flag");
 
-            ImapMutex.ReleaseMutex();
+            MainImapMutex.ReleaseMutex();
         }
 
         // This list is increment when a move task is started. 
@@ -494,36 +590,49 @@ namespace G5EmailClient.Email
         void IEmail.MoveMessage(string sUID, int folderIndex)
         {
             Debug.WriteLine("Running MailKitEmail.MoveMessage() with destination " 
-                           + emailFolders[folderIndex].Folder!.Name);
+                           + emailFolders[folderIndex].MainImapFolder!.Name);
             var UID = UniqueId.Parse(sUID);
 
             FolderRemainingMoveTasks[folderIndex]++;
+
             ThreadPool.QueueUserWorkItem(state => AsyncMoveMessage(UID, activeFolder!, folderIndex));
 
             Debug.WriteLine("MailKitEmail.MoveMessage() complete");
         }
         private void AsyncMoveMessage(UniqueId UID, EmailFolder origin, int destinationIndex)
         {
-            ImapMutex.WaitOne();
+            MainImapMutex.WaitOne();
+            var destinationFolder = emailFolders[destinationIndex];
 
-            if (!origin.Folder!.IsOpen)
+            if (!origin.MainImapFolder!.IsOpen)
             {
-                origin.Folder.Open(FolderAccess.ReadWrite);
+                origin.MainImapFolder.Open(FolderAccess.ReadWrite);
             }
 
             Debug.WriteLine("Server request to move message.");
 
-            origin!.Folder!.MoveTo(UID, emailFolders[destinationIndex].Folder);
+            var destinationUID = origin!.MainImapFolder!.MoveTo(UID, destinationFolder.MainImapFolder)!.Value;
+
+            // Adding message information to new folder
+            destinationFolder.UIDs.Add(destinationUID);
+            destinationFolder.Envelopes[destinationUID] = origin.Envelopes[UID];
+            destinationFolder.Seen[destinationUID] = origin.Seen[UID];
+            destinationFolder.Messages[destinationUID] = origin.Messages[UID];
+
+            // Removing the message from the origin folder locally:
+            origin.Messages.Remove(UID);
+
             FolderRemainingMoveTasks[destinationIndex]--;
 
-            ImapMutex.ReleaseMutex();
+            MainImapMutex.ReleaseMutex();
 
-            if (FolderRemainingMoveTasks[destinationIndex] == 0)
-            {
-                Debug.WriteLine("No waiting move tasks. Updating folder and sending event");
-                updateFolder(destinationIndex);
-            }
+            Debug.WriteLine("Sending MoveMessageFinished event for message with subject " + origin.Envelopes[UID].subject);
+            this.MoveMessageFinished(destinationUID.ToString()!,
+                                     destinationIndex,
+                                     origin.Envelopes[UID],
+                                     origin.Seen[UID]);
         }
+        public event IEmail.MoveMessageFinishedHandler MoveMessageFinished;
 
 
         #endregion

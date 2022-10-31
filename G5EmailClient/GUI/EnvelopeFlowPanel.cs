@@ -151,7 +151,6 @@ namespace G5EmailClient.GUI
                 ClearSelection();
                 panel.SetSelected(true);
 
-                Debug.WriteLine("Flow panel opening message");
                 panel.setRead();
                 this.EnvelopePanelOpened(panel, e);
             }

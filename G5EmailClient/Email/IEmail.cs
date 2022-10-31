@@ -116,7 +116,9 @@ namespace G5EmailClient.Email
         /// <summary>
         /// Sets the active folder using a given index. Opens the folder if it is unopened.
         /// </summary>
-        void SetActiveFolder(int folderIndex);
+        /// <param name="folderIndex"></param>
+        /// <returns>Returns 0 if succesful, -1 if not.</returns>
+        int SetActiveFolder(int folderIndex);
 
         /// <summary>
         /// Gets the from string, subject line and read status of all emails in the active folder.
@@ -164,6 +166,9 @@ namespace G5EmailClient.Email
         /// so the message cannot be accessed again.
         /// </summary>
         void MoveMessage(string UID, int folderIndex);
+        event MoveMessageFinishedHandler MoveMessageFinished;
+        public delegate void MoveMessageFinishedHandler(string UID, int folderIndex, 
+                                                        Message Envelope, bool seen);
 
         /// <summary>
         /// Sends the given message to the given email. Empty strings will be ignored.

@@ -101,13 +101,11 @@ namespace G5EmailClient.GUI
             {
                 if (value == false)
                 {
-                    Debug.WriteLine("Setting selected false flag and changing color");
                     BackColor = SystemColors.ButtonHighlight;
                     Selected = false;
                 }
                 else
                 {
-                    Debug.WriteLine("Setting selected true flag and changing color");
                     BackColor = SystemColors.ActiveBorder;
                     Selected = true;
                 }
@@ -118,13 +116,11 @@ namespace G5EmailClient.GUI
         {
             if (value == false)
             {
-                Debug.WriteLine("Setting selected false flag and changing color");
                 BackColor = SystemColors.ButtonHighlight;
                 Selected = false;
             }
             else
             {
-                Debug.WriteLine("Setting selected true flag and changing color");
                 BackColor = SystemColors.ActiveBorder;
                 Selected = true;
             }
