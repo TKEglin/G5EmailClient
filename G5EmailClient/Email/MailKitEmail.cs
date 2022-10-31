@@ -36,7 +36,8 @@ namespace G5EmailClient.Email
             // __Flags__
 
             public bool isLoaded { get; set; } = false;
-            // Is used to stop preload if it is progress during a new update
+            // These bools are used to check and stop a preload if it is progress during a new update
+            public bool preloadInProgress { get; set; } = false;
             public bool stopPreload { get; set; } = false;
             // Is used to lock a folder while loading is in progress
             public bool isLocked { get; set; } = false;
@@ -164,8 +165,6 @@ namespace G5EmailClient.Email
 
             var folder = emailFolders[folderIndex];
 
-            folder.stopPreload = true;
-
             MainImapMutex.WaitOne();
             folder.Mutex.WaitOne();
 
@@ -203,12 +202,6 @@ namespace G5EmailClient.Email
 
             folder.isLoaded = true;
 
-            //// Deleting UIDs of previously downloaded messages
-            //if (count >= 0)
-            //{
-            //    folder.UIDs.RemoveRange(0, count);
-            //}
-
             if (FolderUpdateFinished != null)
             {
                 this.FolderUpdateFinished(folderIndex, EventArgs.Empty);
@@ -216,14 +209,21 @@ namespace G5EmailClient.Email
 
             folder.Mutex.ReleaseMutex();
 
+            // Waiting for in-progress preload to stop.
+            while(folder.preloadInProgress)
+            {
+                folder.stopPreload = true;
+                Thread.Sleep(50);
+            }
+
             // Proloading messages
-            folder.stopPreload = false;
             ThreadPool.QueueUserWorkItem(state => PreloadMessages(folder));
         }
 
         private void PreloadMessages(EmailFolder folder)
         {
             foldersPreloading++;
+            folder.preloadInProgress = true;
 
             // This integer value sets a limit of how many messenges are preloaded.
             int loadLimit = 50;
@@ -231,13 +231,13 @@ namespace G5EmailClient.Email
 
             for(int i = 0; i < maxCount; i++)
             {
-                if (folder.stopPreload)
+                if(folder.stopPreload)
                 {
+                    Debug.WriteLine("Preload of folder " + folder.FolderName + " interrupted.");
+                    folder.preloadInProgress = false;
                     folder.stopPreload = false;
                     return;
                 }
-
-                //Thread.Sleep(500 * foldersPreloading);
 
                 var UID = folder.UIDs[i];
                 if (!folder.Messages.ContainsKey(UID))
@@ -262,6 +262,7 @@ namespace G5EmailClient.Email
 
             Debug.WriteLine("Preload of folder \"" + folder.FolderName + "\" completed.");
 
+            folder.preloadInProgress = false;
             foldersPreloading--;
         }
 
