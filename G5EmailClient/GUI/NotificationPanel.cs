@@ -117,7 +117,8 @@ namespace G5EmailClient.GUI
         private void not_text_panel_Click(object sender, EventArgs e)
         {
             this.NotificationClosed(null, e);
-            this.NotificationBodyClicked(StoredObject, e);
+            if(NotificationBodyClicked != null)
+                this.NotificationBodyClicked(StoredObject, e);
             this.Dispose();
         }
         public event EventHandler NotificationBodyClicked;

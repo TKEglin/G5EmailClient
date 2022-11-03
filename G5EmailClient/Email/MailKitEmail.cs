@@ -44,6 +44,7 @@ namespace G5EmailClient.Email
 
             // __Folder Data__
             public string? FolderName;
+            public int     FolderIndex; // Contains the folders index in the emailFolders list
             public List<UniqueId> UIDs { get; set; } = new();
             public Dictionary<UniqueId, MimeMessage>    Messages  { get; set; } = new();
             public Dictionary<UniqueId, bool>           Seen      { get; set; } = new();
@@ -148,6 +149,10 @@ namespace G5EmailClient.Email
                 if (mainFolder.Name != inbox_name & mainFolder.Exists)
                 {
                     emailFolders.Add(new EmailFolder(mainFolder, preloadFolders[i], mainFolder.Name));
+
+                    // Weird way to find the index. Is probably a better way.
+                    int index = emailFolders.IndexOf(emailFolders.Last());
+                    emailFolders.Last().FolderIndex = index;
                 }
             }
 
@@ -586,7 +591,6 @@ namespace G5EmailClient.Email
 
         // This list is increment when a move task is started. 
         // It will be decremented when a move task is done.
-        // The MoveMessageCompleted signal will be sent when the value is 0 for the given folder.
         List<int> FolderRemainingMoveTasks; // = new(emailFolders.Count);
         void IEmail.MoveMessage(string sUID, int folderIndex)
         {
@@ -612,26 +616,55 @@ namespace G5EmailClient.Email
 
             Debug.WriteLine("Server request to move message.");
 
-            var destinationUID = origin!.MainImapFolder!.MoveTo(UID, destinationFolder.MainImapFolder)!.Value;
+            UniqueId destinationUID = UID;
+            bool succes = true;
+            Exception? Exception = null;
+
+            // Saving message data before move
+            var Envelope = origin.Envelopes[UID];
+            var Seen     = origin.Seen[UID];
+            var Message  = origin.Messages[UID];
+
+            try
+            {
+                destinationUID = origin!.MainImapFolder!.MoveTo(UID, destinationFolder.MainImapFolder)!.Value;
+            }
+            catch(Exception ex)
+            {
+                // If the operation failed, the message will be returned to the original folder.
+                destinationUID = UID;
+                destinationFolder = origin;
+                succes = false;
+                Exception = ex;
+            }
 
             // Adding message information to new folder
             destinationFolder.UIDs.Add(destinationUID);
-            destinationFolder.Envelopes[destinationUID] = origin.Envelopes[UID];
-            destinationFolder.Seen[destinationUID] = origin.Seen[UID];
-            destinationFolder.Messages[destinationUID] = origin.Messages[UID];
+            if (!destinationFolder.Envelopes.ContainsKey(destinationUID))
+                destinationFolder.Envelopes[destinationUID] = Envelope;
+            if (!destinationFolder.Seen.ContainsKey(destinationUID))
+                destinationFolder.Seen[destinationUID] = Seen;
+            if (!destinationFolder.Messages.ContainsKey(destinationUID))
+                destinationFolder.Messages[destinationUID] = Message;
 
             // Removing the message from the origin folder locally:
-            origin.Messages.Remove(UID);
-
+            if(succes)
+            {
+                origin.Messages.Remove(UID);
+                origin.Seen.Remove(UID);
+                origin.Envelopes.Remove(UID);
+            }
+            
             FolderRemainingMoveTasks[destinationIndex]--;
 
             MainImapMutex.ReleaseMutex();
 
-            Debug.WriteLine("Sending MoveMessageFinished event for message with subject " + origin.Envelopes[UID].subject);
+            Debug.WriteLine("Sending MoveMessageFinished event for message with subject " + Envelope.subject);
             this.MoveMessageFinished(destinationUID.ToString()!,
                                      destinationIndex,
-                                     origin.Envelopes[UID],
-                                     origin.Seen[UID]);
+                                     Envelope,
+                                     Seen,
+                                     succes, Exception);
         }
         public event IEmail.MoveMessageFinishedHandler MoveMessageFinished;
 

@@ -595,21 +595,44 @@ namespace G5EmailClient.GUI
 
             Debug.WriteLine("Folder with index " + button.Tag + " and name " + button.Text + " selected for move.");
         }
-        private void MoveMessageFinishedHandler(string UID, int folderIndex, IEmail.Message Envelope, bool seen)
+        private void MoveMessageFinishedHandler(string UID, int folderIndex, IEmail.Message Envelope, 
+                                                bool seen, bool succes, Exception? ex)
         {
             var panel = EnvelopeFlowPanels[folderIndex];
 
             if(panel.InvokeRequired)
             {
-                Action safeMoveHandler = delegate { MoveMessageFinishedHandler(UID, folderIndex, Envelope, seen); };
+                Action safeMoveHandler = delegate { MoveMessageFinishedHandler(UID, folderIndex, Envelope, 
+                                                                               seen, succes, ex); };
                 panel.Invoke(safeMoveHandler);
             }
             else
             {
+                if(!succes & ex != null)
+                {
+                    MoveMessageFailed(UID, folderIndex, ex);
+                }
+
                 panel.Add(UID, Envelope.from,
                                Envelope.date,
                                Envelope.subject,
                                seen);
+            }
+        }
+        private void MoveMessageFailed(string UID, int folderIndex, Exception ex)
+        {
+            if(notifications_flowpanel.InvokeRequired)
+            {
+                Action safeHandler = delegate { MoveMessageFailed(UID, folderIndex, ex); };
+                notifications_flowpanel.Invoke(safeHandler);
+            }
+            else
+            {
+                var notification = prepareNotification("Move message failed.",
+                                       Properties.Resources.ErrorAnimatedIcon,
+                                       "Move message failed. Message moved back to origin folder.\n\n"
+                                     + "Error message: \n" + ex!.Message);
+                notifications_flowpanel.Controls.Add(notification);
             }
         }
 

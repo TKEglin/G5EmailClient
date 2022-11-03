@@ -43,7 +43,6 @@
             this.logout_button = new System.Windows.Forms.ToolStripMenuItem();
             this.contacts_button = new System.Windows.Forms.ToolStripButton();
             this.refresh_button = new System.Windows.Forms.ToolStripButton();
-            this.markspam_panel = new System.Windows.Forms.ToolStripButton();
             this.folders_panel = new System.Windows.Forms.Panel();
             this.notifications_separator_panel = new System.Windows.Forms.Panel();
             this.folders_lisbox = new System.Windows.Forms.ListBox();
@@ -107,6 +106,7 @@
             this.search_folder_textbox = new System.Windows.Forms.TextBox();
             this.inbox_panel = new System.Windows.Forms.Panel();
             this.search_bar_panel = new System.Windows.Forms.Panel();
+            this.search_button = new System.Windows.Forms.Button();
             this.brief_control_explain_tooltop = new System.Windows.Forms.ToolTip(this.components);
             this.cmp_add_contextstrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.add_cc_menuitem = new System.Windows.Forms.ToolStripMenuItem();
@@ -163,8 +163,7 @@
             this.toggle_read_button,
             this.settings_dropdown,
             this.contacts_button,
-            this.refresh_button,
-            this.markspam_panel});
+            this.refresh_button});
             this.top_toolstrip.Location = new System.Drawing.Point(0, 0);
             this.top_toolstrip.Name = "top_toolstrip";
             this.top_toolstrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
@@ -271,14 +270,6 @@
             this.refresh_button.Size = new System.Drawing.Size(95, 29);
             this.refresh_button.Text = "Refresh";
             this.refresh_button.Click += new System.EventHandler(this.refresh_button_Click);
-            // 
-            // markspam_panel
-            // 
-            this.markspam_panel.Image = global::G5EmailClient.Properties.Resources.SpamIcon;
-            this.markspam_panel.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.markspam_panel.Name = "markspam_panel";
-            this.markspam_panel.Size = new System.Drawing.Size(125, 29);
-            this.markspam_panel.Text = "Mark Spam";
             // 
             // folders_panel
             // 
@@ -966,12 +957,11 @@
             // search_folder_textbox
             // 
             this.search_folder_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.search_folder_textbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.search_folder_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.search_folder_textbox.Location = new System.Drawing.Point(3, 3);
             this.search_folder_textbox.Name = "search_folder_textbox";
             this.search_folder_textbox.PlaceholderText = " Search...";
-            this.search_folder_textbox.Size = new System.Drawing.Size(344, 23);
+            this.search_folder_textbox.Size = new System.Drawing.Size(192, 23);
             this.search_folder_textbox.TabIndex = 4;
             this.search_folder_textbox.TabStop = false;
             // 
@@ -989,6 +979,7 @@
             // 
             // search_bar_panel
             // 
+            this.search_bar_panel.Controls.Add(this.search_button);
             this.search_bar_panel.Controls.Add(this.search_folder_textbox);
             this.search_bar_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.search_bar_panel.Location = new System.Drawing.Point(0, 0);
@@ -996,6 +987,21 @@
             this.search_bar_panel.Padding = new System.Windows.Forms.Padding(3);
             this.search_bar_panel.Size = new System.Drawing.Size(350, 30);
             this.search_bar_panel.TabIndex = 5;
+            // 
+            // search_button
+            // 
+            this.search_button.BackgroundImage = global::G5EmailClient.Properties.Resources.SearchIconSmall;
+            this.search_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.search_button.Dock = System.Windows.Forms.DockStyle.Right;
+            this.search_button.FlatAppearance.BorderSize = 0;
+            this.search_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.search_button.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.search_button.Location = new System.Drawing.Point(323, 3);
+            this.search_button.Margin = new System.Windows.Forms.Padding(0);
+            this.search_button.Name = "search_button";
+            this.search_button.Size = new System.Drawing.Size(24, 24);
+            this.search_button.TabIndex = 5;
+            this.search_button.UseVisualStyleBackColor = true;
             // 
             // brief_control_explain_tooltop
             // 
@@ -1116,7 +1122,6 @@
         private ToolStripMenuItem select_user_button;
         private ToolStripMenuItem add_user_button;
         private ToolStripButton refresh_button;
-        private ToolStripButton markspam_panel;
         private ListBox folders_lisbox;
         private Panel account_info_panel;
         private Label active_email_label;
@@ -1180,5 +1185,6 @@
         private Panel msg_senderinfo_padding_panel2;
         private Label msg_cc_label;
         private Panel search_bar_panel;
+        private Button search_button;
     }
 }

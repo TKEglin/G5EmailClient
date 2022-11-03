@@ -168,7 +168,8 @@ namespace G5EmailClient.Email
         void MoveMessage(string UID, int folderIndex);
         event MoveMessageFinishedHandler MoveMessageFinished;
         public delegate void MoveMessageFinishedHandler(string UID, int folderIndex, 
-                                                        Message Envelope, bool seen);
+                                                        Message Envelope, bool seen, 
+                                                        bool succes, Exception? ex);
 
         /// <summary>
         /// Sends the given message to the given email. Empty strings will be ignored.
