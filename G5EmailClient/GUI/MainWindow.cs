@@ -17,6 +17,7 @@ namespace G5EmailClient.GUI
         // This list will be used to smoothly switch between folders
         List<EnvelopeFlowPanel> EnvelopeFlowPanels = new();
         EnvelopeFlowPanel? activePanel;
+        EnvelopeFlowPanel  searchPanel;
 
         public MainWindow(IEmail ParamEmailClient)
         {
@@ -43,6 +44,9 @@ namespace G5EmailClient.GUI
             main_tab.SizeMode = TabSizeMode.Fixed;
                 // Message flow panel
             template_flow_panel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
+                // Search panel
+            searchPanel = new EnvelopeFlowPanel();
+            searchPanel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
                 // Message open tab
             msg_from_label.MaximumSize    = new Size(msg_senderinfo_panel.Width - 10, 0);
             msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
@@ -210,8 +214,8 @@ namespace G5EmailClient.GUI
                 var envelopes = EmailClient.GetFolderEnvelopes(folderIndex);
                 foreach (var envelope in envelopes)
                 {
-                    panel.Add(envelope.UID, envelope.from.ToString(),
-                                            envelope.date.ToString(),
+                    panel.Add(envelope.UID, envelope.from,
+                                            envelope.date,
                                             envelope.subject,
                                             envelope.read);
                 }

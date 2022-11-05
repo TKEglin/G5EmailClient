@@ -54,14 +54,12 @@ namespace G5EmailClient.Email
 
         IDatabase data = new JSONDatabase();
 
-
-
-
         /// <summary>
         /// This client is the primary connection used to interact with the imap server
         /// </summary>
         ImapClient mainImapClient = new();
         Mutex MainImapMutex = new();
+
         /// <summary>
         /// This imap client is used to preload messenges.
         /// </summary>
@@ -155,8 +153,6 @@ namespace G5EmailClient.Email
                     emailFolders.Last().FolderIndex = index;
                 }
             }
-
-            FolderRemainingMoveTasks = new (new int[emailFolders.Count]);
         }
 
         /// <summary>
@@ -230,8 +226,8 @@ namespace G5EmailClient.Email
             foldersPreloading++;
             folder.preloadInProgress = true;
 
-            // This integer value sets a limit of how many messenges are preloaded.
-            int loadLimit = 50;
+            // The integer defines how many new messages are loaded.
+            int loadLimit = folder.Messages.Count + 50;
             int maxCount = Math.Min(folder.UIDs.Count, loadLimit);
 
             for(int i = 0; i < maxCount; i++)
@@ -252,7 +248,18 @@ namespace G5EmailClient.Email
                     if (!folder!.PreloadImapFolder!.IsOpen)
                         folder!.PreloadImapFolder.Open(FolderAccess.ReadWrite);
 
-                    var message = folder!.PreloadImapFolder!.GetMessage(UID);
+
+                    MimeMessage message;
+                    
+                    try
+                    {
+                        message = folder!.PreloadImapFolder!.GetMessage(UID);
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.WriteLine("Failed to loard message. Error: \n" + ex.ToString());
+                        continue;
+                    }
 
                     Debug.WriteLine("Folder " + folder.FolderName + " preloading message with subject " + message.Subject 
                                   + ". " + foldersPreloading.ToString() + " folders currently preloading.");
@@ -589,22 +596,24 @@ namespace G5EmailClient.Email
             MainImapMutex.ReleaseMutex();
         }
 
-        // This list is increment when a move task is started. 
-        // It will be decremented when a move task is done.
-        List<int> FolderRemainingMoveTasks; // = new(emailFolders.Count);
         void IEmail.MoveMessage(string sUID, int folderIndex)
         {
             Debug.WriteLine("Running MailKitEmail.MoveMessage() with destination " 
                            + emailFolders[folderIndex].MainImapFolder!.Name);
             var UID = UniqueId.Parse(sUID);
 
-            FolderRemainingMoveTasks[folderIndex]++;
+            // Saving message data before move
+            var Envelope = activeFolder!.Envelopes[UID];
+            var Seen = activeFolder.Seen[UID];
+            var Message = activeFolder.Messages[UID];
 
-            ThreadPool.QueueUserWorkItem(state => AsyncMoveMessage(UID, activeFolder!, folderIndex));
+            ThreadPool.QueueUserWorkItem(state => AsyncMoveMessage(UID, folderIndex, activeFolder!,
+                                                                   Envelope, Seen, Message));
 
             Debug.WriteLine("MailKitEmail.MoveMessage() complete");
         }
-        private void AsyncMoveMessage(UniqueId UID, EmailFolder origin, int destinationIndex)
+        private void AsyncMoveMessage(UniqueId UID, int destinationIndex, EmailFolder origin, 
+                                      IEmail.Message Envelope, bool Seen, MimeMessage Message)
         {
             MainImapMutex.WaitOne();
             var destinationFolder = emailFolders[destinationIndex];
@@ -619,11 +628,6 @@ namespace G5EmailClient.Email
             UniqueId destinationUID = UID;
             bool succes = true;
             Exception? Exception = null;
-
-            // Saving message data before move
-            var Envelope = origin.Envelopes[UID];
-            var Seen     = origin.Seen[UID];
-            var Message  = origin.Messages[UID];
 
             try
             {
@@ -654,8 +658,6 @@ namespace G5EmailClient.Email
                 origin.Seen.Remove(UID);
                 origin.Envelopes.Remove(UID);
             }
-            
-            FolderRemainingMoveTasks[destinationIndex]--;
 
             MainImapMutex.ReleaseMutex();
 
