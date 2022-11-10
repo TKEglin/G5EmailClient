@@ -103,7 +103,7 @@
             this.cmp_to_left_panel = new System.Windows.Forms.Panel();
             this.cmp_to_label = new System.Windows.Forms.Label();
             this.template_flow_panel = new G5EmailClient.GUI.EnvelopeFlowPanel();
-            this.search_folder_textbox = new System.Windows.Forms.TextBox();
+            this.search_textbox = new System.Windows.Forms.TextBox();
             this.inbox_panel = new System.Windows.Forms.Panel();
             this.search_bar_panel = new System.Windows.Forms.Panel();
             this.search_button = new System.Windows.Forms.Button();
@@ -952,18 +952,21 @@
             this.template_flow_panel.Name = "template_flow_panel";
             this.template_flow_panel.Size = new System.Drawing.Size(350, 600);
             this.template_flow_panel.TabIndex = 2;
-            this.template_flow_panel.Visible = false;
             // 
-            // search_folder_textbox
+            // search_textbox
             // 
-            this.search_folder_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.search_folder_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.search_folder_textbox.Location = new System.Drawing.Point(3, 3);
-            this.search_folder_textbox.Name = "search_folder_textbox";
-            this.search_folder_textbox.PlaceholderText = " Search...";
-            this.search_folder_textbox.Size = new System.Drawing.Size(192, 23);
-            this.search_folder_textbox.TabIndex = 4;
-            this.search_folder_textbox.TabStop = false;
+            this.search_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.search_textbox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.search_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.search_textbox.Location = new System.Drawing.Point(3, 3);
+            this.search_textbox.Name = "search_textbox";
+            this.search_textbox.PlaceholderText = " Search...";
+            this.search_textbox.Size = new System.Drawing.Size(320, 23);
+            this.search_textbox.TabIndex = 4;
+            this.search_textbox.TabStop = false;
+            this.search_textbox.Click += new System.EventHandler(this.search_textbox_Enter);
+            this.search_textbox.Enter += new System.EventHandler(this.search_textbox_Enter);
+            this.search_textbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.search_textbox_KeyUp);
             // 
             // inbox_panel
             // 
@@ -979,8 +982,8 @@
             // 
             // search_bar_panel
             // 
+            this.search_bar_panel.Controls.Add(this.search_textbox);
             this.search_bar_panel.Controls.Add(this.search_button);
-            this.search_bar_panel.Controls.Add(this.search_folder_textbox);
             this.search_bar_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.search_bar_panel.Location = new System.Drawing.Point(0, 0);
             this.search_bar_panel.Name = "search_bar_panel";
@@ -1002,6 +1005,7 @@
             this.search_button.Size = new System.Drawing.Size(24, 24);
             this.search_button.TabIndex = 5;
             this.search_button.UseVisualStyleBackColor = true;
+            this.search_button.Click += new System.EventHandler(this.search_button_Click);
             // 
             // brief_control_explain_tooltop
             // 
@@ -1125,7 +1129,7 @@
         private ListBox folders_lisbox;
         private Panel account_info_panel;
         private Label active_email_label;
-        private TextBox search_folder_textbox;
+        private TextBox search_textbox;
         private Panel inbox_panel;
         private TabPage intro_tab;
         private PictureBox welcome_picture_box;

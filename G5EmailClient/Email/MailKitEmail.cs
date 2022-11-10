@@ -63,8 +63,8 @@ namespace G5EmailClient.Email
         /// <summary>
         /// This imap client is used to preload messenges.
         /// </summary>
-        ImapClient preloadImapClient = new();
-        Mutex preloadImapMutex = new();
+        ImapClient loadImapClient = new();
+        Mutex loadImapMutex = new();
 
         SmtpClient smtpClient = new();
         Mutex SmtpMutex = new();
@@ -133,13 +133,13 @@ namespace G5EmailClient.Email
         {
             // Adding inbox at index 0
             emailFolders.Add(new EmailFolder(mainImapClient.Inbox, 
-                                             preloadImapClient.Inbox, 
+                                             loadImapClient.Inbox, 
                                              mainImapClient.Inbox.Name));
             string inbox_name = mainImapClient.Inbox.Name;
 
             // Adding folders
             var mainFolders = mainImapClient.GetFolders(mainImapClient.PersonalNamespaces[0], false);
-            var preloadFolders = preloadImapClient.GetFolders(mainImapClient.PersonalNamespaces[0], false);
+            var preloadFolders = loadImapClient.GetFolders(mainImapClient.PersonalNamespaces[0], false);
             for (int i = 0; i < mainFolders.Count; i++)
             {
                 var mainFolder = mainFolders[i];
@@ -166,7 +166,7 @@ namespace G5EmailClient.Email
 
             var folder = emailFolders[folderIndex];
 
-            MainImapMutex.WaitOne();
+            loadImapMutex.WaitOne();
             folder.Mutex.WaitOne();
 
             // This will be used to remove duplicates once the new messages have been opened.
@@ -199,8 +199,6 @@ namespace G5EmailClient.Email
 
             }
 
-            MainImapMutex.ReleaseMutex();
-
             folder.isLoaded = true;
 
             if (FolderUpdateFinished != null)
@@ -209,9 +207,10 @@ namespace G5EmailClient.Email
             }
 
             folder.Mutex.ReleaseMutex();
+            loadImapMutex.ReleaseMutex();
 
             // Waiting for in-progress preload to stop.
-            while(folder.preloadInProgress)
+            while (folder.preloadInProgress)
             {
                 folder.stopPreload = true;
                 Thread.Sleep(50);
@@ -243,7 +242,7 @@ namespace G5EmailClient.Email
                 var UID = folder.UIDs[i];
                 if (!folder.Messages.ContainsKey(UID))
                 {
-                    preloadImapMutex.WaitOne();
+                    loadImapMutex.WaitOne();
 
                     if (!folder!.PreloadImapFolder!.IsOpen)
                         folder!.PreloadImapFolder.Open(FolderAccess.ReadWrite);
@@ -268,7 +267,7 @@ namespace G5EmailClient.Email
                     folder.Messages[UID] = message;
                     folder.Mutex.ReleaseMutex();
 
-                    preloadImapMutex.ReleaseMutex();
+                    loadImapMutex.ReleaseMutex();
                 }
             }
 
@@ -276,6 +275,43 @@ namespace G5EmailClient.Email
 
             folder.preloadInProgress = false;
             foldersPreloading--;
+        }
+
+        (List<IEmail.Message> messages, List<string> UIDs) IEmail.SearchFolder(string searchString)
+        {
+            (List<IEmail.Message> messages, List<string> UIDs) envelopes = new();
+
+            if (searchString.Length <= 0) return envelopes;
+
+            IList<UniqueId> UIDs = new List<UniqueId>();
+            var folder = activeFolder!;
+
+            if(!folder.MainImapFolder!.IsOpen)
+                folder.MainImapFolder!.Open(FolderAccess.ReadWrite);
+
+            foreach(var UID in folder.MainImapFolder.Search(SearchQuery.Or(SearchQuery.Or(
+                                                            SearchQuery.SubjectContains(searchString),
+                                                            SearchQuery.ToContains(searchString)),
+                                                            SearchQuery.BodyContains(searchString))))
+            {
+                if (!UIDs.Contains(UID)) UIDs.Add(UID);
+            }
+
+            List<IEmail.Message> messages = new();
+            List<string>         stringUIDs = new();
+            foreach(var UID in UIDs)
+            {
+                IEmail.Message message = new();
+                    message.subject = folder.Envelopes[UID].subject;
+                    message.date    = folder.Envelopes[UID].date;
+                    message.from    = folder.Envelopes[UID].from;
+                    message.seen    = folder.Seen[UID];
+                messages.Add(message);
+                stringUIDs.Add(UID.ToString());
+            }
+            envelopes = (messages, stringUIDs);
+
+            return envelopes;
         }
 
         #endregion
@@ -286,7 +322,7 @@ namespace G5EmailClient.Email
         void IEmail.Disconnect()
         {
             mainImapClient.Disconnect(true);
-            preloadImapClient.Disconnect(true);
+            loadImapClient.Disconnect(true);
             smtpClient.Disconnect(true);
         }
 
@@ -300,7 +336,7 @@ namespace G5EmailClient.Email
             try
             {
                 mainImapClient.Connect(IMAP_hostname, IMAP_port, SecureSocketOptions.SslOnConnect);
-                preloadImapClient.Connect(IMAP_hostname, IMAP_port, SecureSocketOptions.SslOnConnect);
+                loadImapClient.Connect(IMAP_hostname, IMAP_port, SecureSocketOptions.SslOnConnect);
                 smtpClient.Connect(SMTP_hostname, SMTP_port, SecureSocketOptions.SslOnConnect);
             }
             catch(Exception ex)
@@ -320,7 +356,7 @@ namespace G5EmailClient.Email
             try
             {
                 mainImapClient.Authenticate(username, password);
-                preloadImapClient.Authenticate(username, password);
+                loadImapClient.Authenticate(username, password);
                 smtpClient.Authenticate(username, password);
             }
             catch(Exception ex)
@@ -534,10 +570,14 @@ namespace G5EmailClient.Email
                 activeFolder.Seen[UID] = false;
                 Debug.WriteLine("Locally removing flag");
             }
-            ToggleReadQueue.Enqueue(new ToggleReadParameters() { folder = activeFolder!,
-                                                                 ID = UID, 
-                                                                 seenFlag = seen         });
+            ToggleReadQueue.Enqueue(new ToggleReadParameters()
+            {
+                folder = activeFolder!,
+                ID = UID,
+                seenFlag = seen
+            });
             ThreadPool.QueueUserWorkItem(state => AsyncToggleRead(null, EventArgs.Empty));
+
             Debug.WriteLine("MailKitEmail.ToggleRead() complete");
         }
         private void AsyncToggleRead(object? sender, EventArgs e)

@@ -22,6 +22,7 @@ namespace G5EmailClient.Email
             public string bcc     { get; set; } = string.Empty;
             public string subject { get; set; } = string.Empty;
             public string body    { get; set; } = string.Empty;
+            public bool   seen    { get; set; } = false;
         }
 
         /// <summary>
@@ -186,5 +187,10 @@ namespace G5EmailClient.Email
         event SentMessageHandler SentMessage;
         public delegate void SentMessageHandler(Exception? ex, IEmail.Message message);
 
+        /// <summary>
+        /// Searches the 
+        /// </summary>
+        /// <returns>Returns a list of folder envelopes</returns>
+        (List<IEmail.Message> messages, List<string> UIDs) SearchFolder(string searchString);
     }
 }

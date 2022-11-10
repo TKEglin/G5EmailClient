@@ -13,10 +13,16 @@ namespace G5EmailClient.GUI
 {
     public partial class EnvelopeFlowPanel : UserControl
     {
-        List<EnvelopePanel> panelList = new();
+        Dictionary<string, EnvelopePanel> panelList = new();
         List<EnvelopePanel> selectedPanels = new();
 
         public bool needsUpdate = false;
+
+        /// <summary>
+        /// Set to true if the Envelopes in this panel are copies
+        /// </summary>
+        public bool isCopyPanel = false;
+        public EnvelopeFlowPanel? sourcePanel;
 
 
         public EnvelopeFlowPanel()
@@ -25,9 +31,9 @@ namespace G5EmailClient.GUI
         }
 
         // Defining indexing operator
-        public EnvelopePanel this[int index]
+        public EnvelopePanel this[string UID]
         {
-            get { return panelList[index]; }
+            get { return panelList[UID]; }
         }
 
 
@@ -72,7 +78,34 @@ namespace G5EmailClient.GUI
                 }
             }
             // Adding to the list
-            panelList.Add(envelopePanel);
+            panelList[UID] = envelopePanel;
+        }
+        public void Add(EnvelopePanel envelopePanel)
+        {
+            panelList[envelopePanel.UID] = envelopePanel;
+            
+            if(envelopePanel.Selected)
+                selectedPanels.Add(envelopePanel);
+
+            // Adding the control to the window
+            flow_control.Controls.Add(envelopePanel);
+            var NewPanelDate = DateTimeOffset.Parse(envelopePanel.dateText);
+
+            // Finding date sorted location
+            foreach (EnvelopePanel OldPanel in flow_control.Controls)
+            {
+                var OldPanelDate = DateTimeOffset.Parse(OldPanel.dateText);
+                if (OldPanelDate.CompareTo(NewPanelDate) < 0)
+                {
+                    Debug.WriteLine("Reached later message. Setting index");
+                    var index = flow_control.Controls.IndexOf(OldPanel);
+                    flow_control.Controls.SetChildIndex(envelopePanel, index);
+                    flow_control.Controls.SetChildIndex(OldPanel, index + 1);
+                    break;
+                }
+            }
+            // Adding to the list
+            panelList[envelopePanel.UID] = envelopePanel;
         }
 
         /// <summary>
@@ -108,11 +141,17 @@ namespace G5EmailClient.GUI
         }
 
         /// <summary>
-        /// Dispoces all envelope panels in the control.
+        /// Disposes all envelope panels in the control.
         /// </summary>
         public void Clear()
         {
-            foreach (var panel in panelList) panel.Dispose();
+            if (!isCopyPanel)
+                foreach (var panel in panelList) panel.Value.Dispose();
+            else
+                if(sourcePanel != null)
+                    foreach (var panel in panelList)
+                        sourcePanel.Add(panel.Value);
+
             panelList.Clear();
             selectedPanels.Clear();
         }
@@ -154,6 +193,25 @@ namespace G5EmailClient.GUI
             return UIDs;
         }
 
+        /// <summary>
+        /// Makes all panels visible.
+        /// </summary>
+        public void ShowAll()
+        {
+            foreach (var panel in panelList) panel.Value.Visible = true;
+        }
+
+        /// <summary>
+        /// Hides all panels with UIDs not included in the parameter list.
+        /// </summary>
+        public void HideRest(List<string> UIDs)
+        {
+            //Hiding all
+            foreach (var panel in panelList) panel.Value.Visible = false;
+            //Showing selected
+            foreach (var UID in UIDs) panelList[UID].Visible = true;
+        }
+
         //
         // Internal events
         //
@@ -176,28 +234,6 @@ namespace G5EmailClient.GUI
             selectedPanels.Add(panel);
         }
 
-        public class EnvelopeDateComparer : Comparer<EnvelopePanel>
-        {
-
-            public override int Compare(EnvelopePanel? x, EnvelopePanel? y)
-            {
-                var date_x = DateTimeOffset.Parse(x.dateText);
-                var date_y = DateTimeOffset.Parse(y.dateText);
-
-                return date_x.CompareTo(date_y);
-            }
-        }
-        /// <summary>
-        /// Sorts the panels by date
-        /// </summary>
-        public void SortDate()
-        {
-            panelList.Sort(0, panelList.Count, new EnvelopeDateComparer());
-
-            flow_control.Controls.Clear();
-
-            foreach(var panel in panelList) flow_control.Controls.Add(panel);
-        }
 
         //
         // External events

@@ -46,8 +46,19 @@ namespace G5EmailClient.GUI
             template_flow_panel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
                 // Search panel
             searchPanel = new EnvelopeFlowPanel();
-            searchPanel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
-                // Message open tab
+                searchPanel.isCopyPanel = true;
+                searchPanel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
+                searchPanel.Visible = false;
+                searchPanel.Size = template_flow_panel.Size;
+                searchPanel.Dock = template_flow_panel.Dock;
+                searchPanel.Location = template_flow_panel.Location;
+                searchPanel.AutoScroll = template_flow_panel.AutoScroll;
+                searchPanel.Parent = template_flow_panel.Parent;
+                searchPanel.BringToFront();
+            // Clear search panel
+
+
+            // Message open tab
             msg_from_label.MaximumSize    = new Size(msg_senderinfo_panel.Width - 10, 0);
             msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
             msg_cc_label.Text = string.Empty;
@@ -68,6 +79,7 @@ namespace G5EmailClient.GUI
                 // Data
                 updateFoldersView();
                 updateFolderView(0, true, true);
+                searchPanel.sourcePanel = EnvelopeFlowPanels[0];
                 active_email_label.Text = EmailClient.GetActiveUser().username;
                 // Events
                 EmailClient.SentMessage += SentMessageHandler;
@@ -164,7 +176,6 @@ namespace G5EmailClient.GUI
             return split_string.Last().Replace(">", "");
         }
 
-        #endregion
 
         /// <summary>
         /// Prepares and returns a notification panel.
@@ -193,6 +204,8 @@ namespace G5EmailClient.GUI
             notifications_label.Text = "Notifications (" + NotificationsCount.ToString() + ")";
             notifications_flowpanel.Controls.Add(notification);
         }
+
+        #endregion
 
         /// <summary>
         /// Gets message envelopes for the given folder and adds them to the corresponding flow_panel.
@@ -223,9 +236,8 @@ namespace G5EmailClient.GUI
 
             if(activePanel != panel & switchView)
             {
-                if (activePanel != null)
-                    activePanel.Visible = false;
                 panel.Visible = true;
+                panel.BringToFront();
                 activePanel = panel;
             }
         }
@@ -305,7 +317,7 @@ namespace G5EmailClient.GUI
             ToolStripButton button = (ToolStripButton)sender;
             DisableButton(button, 0.2);
 
-            var UIDs = activePanel.ToggleReadSelected();
+            var UIDs = activePanel!.ToggleReadSelected();
 
             foreach(var UID in UIDs)
             {
@@ -318,8 +330,8 @@ namespace G5EmailClient.GUI
         {
             this.Cursor = Cursors.WaitCursor;
 
-            var deleted_UIDs = activePanel.DeleteSelected();
-            foreach(var UID in deleted_UIDs)
+            var deleted_UIDs = activePanel!.DeleteSelected();
+            foreach (var UID in deleted_UIDs)
             {
                 EmailClient.Delete(UID);
             }
@@ -646,14 +658,48 @@ namespace G5EmailClient.GUI
 
             int folderIndex = folders_lisbox.SelectedIndex;
 
+            search_textbox.Text = string.Empty;
+            activePanel.ShowAll();
+
             // Clearing selection
             var FlowPanel = EnvelopeFlowPanels[folderIndex];
             FlowPanel.ClearSelection();
 
             // Setting to update folder if necesarry
-            updateFolderView(folderIndex, FlowPanel.needsUpdate, true);
+            updateFolderView(folderIndex, false, true);
 
             this.Cursor = Cursors.Default;
+        }
+
+        // Used to return to the previous panel when search is cleared
+        private void search_button_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+
+            if(activePanel != null)
+                activePanel!.ClearSelection();
+
+            var envelopes = EmailClient.SearchFolder(search_textbox.Text);
+
+            activePanel!.HideRest(envelopes.UIDs);
+
+            search_textbox.Text = " " + envelopes.UIDs.Count.ToString() + " messages found. Click here to clear.";
+
+            this.Cursor = Cursors.Default;
+        }
+
+        private void search_textbox_Enter(object sender, EventArgs e)
+        {
+            var textBox = (TextBox)sender;
+            textBox.Text = string.Empty;
+
+            activePanel!.ShowAll();
+            
+        }
+
+        private void search_textbox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) search_button_Click(sender, e);
         }
     }
 }
