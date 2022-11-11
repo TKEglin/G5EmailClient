@@ -166,8 +166,7 @@ namespace G5EmailClient.Email
 
             var folder = emailFolders[folderIndex];
 
-            loadImapMutex.WaitOne();
-            folder.Mutex.WaitOne();
+            MainImapMutex.WaitOne();
 
             // This will be used to remove duplicates once the new messages have been opened.
             int count = folder.UIDs!.Count;
@@ -206,8 +205,7 @@ namespace G5EmailClient.Email
                 this.FolderUpdateFinished(folderIndex, EventArgs.Empty);
             }
 
-            folder.Mutex.ReleaseMutex();
-            loadImapMutex.ReleaseMutex();
+            MainImapMutex.ReleaseMutex();
 
             // Waiting for in-progress preload to stop.
             while (folder.preloadInProgress)
@@ -226,7 +224,7 @@ namespace G5EmailClient.Email
             folder.preloadInProgress = true;
 
             // The integer defines how many new messages are loaded.
-            int loadLimit = folder.Messages.Count + 50;
+            int loadLimit = folder.Messages.Count + 25;
             int maxCount = Math.Min(folder.UIDs.Count, loadLimit);
 
             for(int i = 0; i < maxCount; i++)
@@ -240,41 +238,48 @@ namespace G5EmailClient.Email
                 }
 
                 var UID = folder.UIDs[i];
-                if (!folder.Messages.ContainsKey(UID))
-                {
-                    loadImapMutex.WaitOne();
-
-                    if (!folder!.PreloadImapFolder!.IsOpen)
-                        folder!.PreloadImapFolder.Open(FolderAccess.ReadWrite);
-
-
-                    MimeMessage message;
-                    
-                    try
-                    {
-                        message = folder!.PreloadImapFolder!.GetMessage(UID);
-                    }
-                    catch(Exception ex)
-                    {
-                        Debug.WriteLine("Failed to loard message. Error: \n" + ex.ToString());
-                        continue;
-                    }
-
-                    Debug.WriteLine("Folder " + folder.FolderName + " preloading message with subject " + message.Subject 
-                                  + ". " + foldersPreloading.ToString() + " folders currently preloading.");
-
-                    folder.Mutex.WaitOne();
-                    folder.Messages[UID] = message;
-                    folder.Mutex.ReleaseMutex();
-
-                    loadImapMutex.ReleaseMutex();
-                }
+                PreloadMessage(folder, UID);
             }
 
             Debug.WriteLine("Preload of folder \"" + folder.FolderName + "\" completed.");
 
             folder.preloadInProgress = false;
             foldersPreloading--;
+        }
+
+        private void PreloadMessage(EmailFolder folder, UniqueId UID)
+        {
+            if (!folder.Messages.ContainsKey(UID))
+            {
+                loadImapMutex.WaitOne();
+
+                if (!folder!.PreloadImapFolder!.IsOpen)
+                    folder!.PreloadImapFolder.Open(FolderAccess.ReadWrite);
+
+                MimeMessage message;
+
+                try
+                {
+                    message = folder!.PreloadImapFolder!.GetMessage(UID);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("!!!!\nFailed to loard message. Error: \n!!!!\n" + ex.ToString());
+                    return;
+                }
+
+                Debug.WriteLine("Folder " + folder.FolderName + " preloading message with subject " + message.Subject
+                              + ". " + foldersPreloading.ToString() + " folders currently preloading.");
+
+                folder.Messages[UID] = message;
+
+                loadImapMutex.ReleaseMutex();
+            }
+        }
+        void IEmail.PreloadMessage(int folderIndex, string sUID)
+        {
+            ThreadPool.QueueUserWorkItem(state => PreloadMessage(emailFolders[folderIndex], 
+                                                                 UniqueId.Parse(sUID)));
         }
 
         (List<IEmail.Message> messages, List<string> UIDs) IEmail.SearchFolder(string searchString)
@@ -678,6 +683,7 @@ namespace G5EmailClient.Email
                 // If the operation failed, the message will be returned to the original folder.
                 destinationUID = UID;
                 destinationFolder = origin;
+                destinationIndex = origin.FolderIndex;
                 succes = false;
                 Exception = ex;
             }

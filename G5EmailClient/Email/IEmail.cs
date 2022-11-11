@@ -129,6 +129,11 @@ namespace G5EmailClient.Email
         List<(string UID, string from, string date, string subject, bool read)> GetFolderEnvelopes(int folderIndex);
 
         /// <summary>
+        /// Preloads the message corresponding to the UID in the given folder.
+        /// </summary>
+        void PreloadMessage(int folderIndex, string UID);
+
+        /// <summary>
         /// Retrives and returns a message from the active folder given an index.
         /// </summary>
         /// <param name="messageIndex"></param>

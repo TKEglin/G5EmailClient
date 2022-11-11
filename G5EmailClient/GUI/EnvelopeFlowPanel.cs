@@ -36,6 +36,12 @@ namespace G5EmailClient.GUI
             get { return panelList[UID]; }
         }
 
+        // Defining indexing operator
+        public EnvelopePanel this[int index]
+        {
+            get { return (EnvelopePanel)flow_control.Controls[index]; }
+        }
+
 
         public int ListSize
         {

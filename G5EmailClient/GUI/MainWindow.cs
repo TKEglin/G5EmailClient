@@ -77,7 +77,7 @@ namespace G5EmailClient.GUI
             {
             // Initializing email data.
                 // Data
-                updateFoldersView();
+                initializeFoldersView();
                 updateFolderView(0, true, true);
                 searchPanel.sourcePanel = EnvelopeFlowPanels[0];
                 active_email_label.Text = EmailClient.GetActiveUser().username;
@@ -232,6 +232,12 @@ namespace G5EmailClient.GUI
                                             envelope.subject,
                                             envelope.read);
                 }
+
+                // Preloading the first 20 messages
+                for(int i = 0; i < 20 & i < envelopes.Count; i++)
+                {
+                    EmailClient.PreloadMessage(folderIndex, panel[i].UID);
+                }
             }
 
             if(activePanel != panel & switchView)
@@ -245,7 +251,7 @@ namespace G5EmailClient.GUI
         /// <summary>
         /// Updates the folder listbox
         /// </summary>
-        void updateFoldersView()
+        void initializeFoldersView()
         {
             folders_lisbox.Items.Clear();
 
@@ -277,8 +283,6 @@ namespace G5EmailClient.GUI
                 folderButton.Click += folder_move_button_Click;
                 move_message_dropdown.DropDownItems.Add(folderButton);
             }
-
-
         }
 
         private void EnvelopePanel_MessageOpen(object sender, EventArgs e)
@@ -614,9 +618,10 @@ namespace G5EmailClient.GUI
         private void MoveMessageFinishedHandler(string UID, int folderIndex, IEmail.Message Envelope, 
                                                 bool seen, bool succes, Exception? ex)
         {
+
             var panel = EnvelopeFlowPanels[folderIndex];
 
-            if(panel.InvokeRequired)
+            if (panel.InvokeRequired)
             {
                 Action safeMoveHandler = delegate { MoveMessageFinishedHandler(UID, folderIndex, Envelope, 
                                                                                seen, succes, ex); };
@@ -629,10 +634,11 @@ namespace G5EmailClient.GUI
                     MoveMessageFailed(UID, folderIndex, ex);
                 }
 
+                // Panel will be origin folder if operation is failed. Otherwise, destination index
                 panel.Add(UID, Envelope.from,
-                               Envelope.date,
-                               Envelope.subject,
-                               seen);
+                                Envelope.date,
+                                Envelope.subject,
+                                seen);
             }
         }
         private void MoveMessageFailed(string UID, int folderIndex, Exception ex)
@@ -659,7 +665,7 @@ namespace G5EmailClient.GUI
             int folderIndex = folders_lisbox.SelectedIndex;
 
             search_textbox.Text = string.Empty;
-            activePanel.ShowAll();
+            activePanel!.ShowAll();
 
             // Clearing selection
             var FlowPanel = EnvelopeFlowPanels[folderIndex];
@@ -675,6 +681,8 @@ namespace G5EmailClient.GUI
         private void search_button_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
+
+            if (search_textbox.Text.Length == 0) return;
 
             if(activePanel != null)
                 activePanel!.ClearSelection();
