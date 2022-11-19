@@ -153,6 +153,16 @@ namespace G5EmailClient.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DeleteUserIcon {
+            get {
+                object obj = ResourceManager.GetObject("DeleteUserIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ErrorAnimatedIcon {
             get {
                 object obj = ResourceManager.GetObject("ErrorAnimatedIcon", resourceCulture);

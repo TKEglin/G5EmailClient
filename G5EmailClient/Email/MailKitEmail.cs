@@ -52,6 +52,7 @@ namespace G5EmailClient.Email
             public Dictionary<UniqueId, IEmail.Message> Envelopes { get; set; } = new();
         }
 
+
         IDatabase data = new JSONDatabase();
 
         /// <summary>
@@ -122,7 +123,7 @@ namespace G5EmailClient.Email
 
         #endregion
 
-        //_____________________________________
+         //_____________________________________
         // Functions that access the imap server
         #region IMAP server retrieval functions
 
@@ -143,6 +144,7 @@ namespace G5EmailClient.Email
             for (int i = 0; i < mainFolders.Count; i++)
             {
                 var mainFolder = mainFolders[i];
+
                 // If statement to avoid adding the inbox twice
                 if (mainFolder.Name != inbox_name & mainFolder.Exists)
                 {
@@ -264,7 +266,8 @@ namespace G5EmailClient.Email
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("!!!!\nFailed to loard message. Error: \n!!!!\n" + ex.ToString());
+                    Debug.WriteLine("!!!!\nFailed to load message. Error: \n!!!!\n" + ex.ToString());
+                    loadImapMutex.ReleaseMutex();
                     return;
                 }
 
@@ -282,22 +285,33 @@ namespace G5EmailClient.Email
                                                                  UniqueId.Parse(sUID)));
         }
 
-        (List<IEmail.Message> messages, List<string> UIDs) IEmail.SearchFolder(string searchString)
+        (List<IEmail.Message> messages, List<string> UIDs) IEmail.SearchFolder(string searchString, IEmail.SearchFlags flags)
         {
             (List<IEmail.Message> messages, List<string> UIDs) envelopes = new();
 
-            if (searchString.Length <= 0) return envelopes;
+            if (searchString.Length <= 0 | flags == IEmail.SearchFlags.Empty) return envelopes;
 
             IList<UniqueId> UIDs = new List<UniqueId>();
+
             var folder = activeFolder!;
 
             if(!folder.MainImapFolder!.IsOpen)
                 folder.MainImapFolder!.Open(FolderAccess.ReadWrite);
 
-            foreach(var UID in folder.MainImapFolder.Search(SearchQuery.Or(SearchQuery.Or(
-                                                            SearchQuery.SubjectContains(searchString),
-                                                            SearchQuery.ToContains(searchString)),
-                                                            SearchQuery.BodyContains(searchString))))
+            SearchQuery Query = SearchQuery.Not(SearchQuery.All);
+
+            if (flags.HasFlag(IEmail.SearchFlags.From))    Query = SearchQuery.Or(Query, 
+                                                                   SearchQuery.FromContains(searchString));
+            if (flags.HasFlag(IEmail.SearchFlags.Subject)) Query = SearchQuery.Or(Query,
+                                                                   SearchQuery.SubjectContains(searchString));
+            if (flags.HasFlag(IEmail.SearchFlags.Body))    Query = SearchQuery.Or(Query,
+                                                                   SearchQuery.BodyContains(searchString));
+            if (flags.HasFlag(IEmail.SearchFlags.Cc))      Query = SearchQuery.Or(Query,
+                                                                   SearchQuery.CcContains(searchString));
+            if (flags.HasFlag(IEmail.SearchFlags.Bcc))     Query = SearchQuery.Or(Query,
+                                                                   SearchQuery.BccContains(searchString));
+
+            foreach (var UID in folder.MainImapFolder.Search(Query))
             {
                 if (!UIDs.Contains(UID)) UIDs.Add(UID);
             }
@@ -326,8 +340,14 @@ namespace G5EmailClient.Email
         #region server connection functions
         void IEmail.Disconnect()
         {
+
+            MainImapMutex.WaitOne();
             mainImapClient.Disconnect(true);
+
+            loadImapMutex.WaitOne();
             loadImapClient.Disconnect(true);
+
+            SmtpMutex.WaitOne();
             smtpClient.Disconnect(true);
         }
 
@@ -379,6 +399,16 @@ namespace G5EmailClient.Email
          //__________________________________
         // Functions that access the database
         #region database functions
+
+        IDatabase IEmail.GetDatabase()
+        {
+            return data;
+        }
+        void IEmail.SetDatabase(IDatabase database)
+        {
+            data = database;
+        }
+
         List<string> IEmail.GetUsernames()
         {
             var users = data.GetUsers();
@@ -444,7 +474,7 @@ namespace G5EmailClient.Email
         }
         public event EventHandler FolderUpdateFinished;
 
-        int IEmail.SetActiveFolder(int folderIndex)
+        int IEmail.LoadSetActiveFolder(int folderIndex)
         {
             var folder = emailFolders[folderIndex];
 
@@ -650,15 +680,17 @@ namespace G5EmailClient.Email
             // Saving message data before move
             var Envelope = activeFolder!.Envelopes[UID];
             var Seen = activeFolder.Seen[UID];
-            var Message = activeFolder.Messages[UID];
+            MimeMessage? message = null;
+            if (activeFolder.Messages.ContainsKey(UID))
+                message = activeFolder.Messages[UID];
 
             ThreadPool.QueueUserWorkItem(state => AsyncMoveMessage(UID, folderIndex, activeFolder!,
-                                                                   Envelope, Seen, Message));
+                                                                   Envelope, Seen, message));
 
             Debug.WriteLine("MailKitEmail.MoveMessage() complete");
         }
         private void AsyncMoveMessage(UniqueId UID, int destinationIndex, EmailFolder origin, 
-                                      IEmail.Message Envelope, bool Seen, MimeMessage Message)
+                                      IEmail.Message Envelope, bool Seen, MimeMessage? Message)
         {
             MainImapMutex.WaitOne();
             var destinationFolder = emailFolders[destinationIndex];
@@ -694,13 +726,14 @@ namespace G5EmailClient.Email
                 destinationFolder.Envelopes[destinationUID] = Envelope;
             if (!destinationFolder.Seen.ContainsKey(destinationUID))
                 destinationFolder.Seen[destinationUID] = Seen;
-            if (!destinationFolder.Messages.ContainsKey(destinationUID))
-                destinationFolder.Messages[destinationUID] = Message;
+            if (!destinationFolder.Messages.ContainsKey(destinationUID) & Message != null)
+                destinationFolder.Messages[destinationUID] = Message!;
 
             // Removing the message from the origin folder locally:
             if(succes)
             {
-                origin.Messages.Remove(UID);
+                if(origin.Messages.ContainsKey(UID))
+                    origin.Messages.Remove(UID);
                 origin.Seen.Remove(UID);
                 origin.Envelopes.Remove(UID);
             }

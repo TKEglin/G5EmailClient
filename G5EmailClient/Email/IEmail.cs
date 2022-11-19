@@ -26,6 +26,19 @@ namespace G5EmailClient.Email
         }
 
         /// <summary>
+        /// A bit field of possible email search flags.
+        /// </summary>
+        public enum SearchFlags
+        {
+            Empty   = 0,
+            From    = 1,
+            Subject = 2,
+            Body    = 4,
+            Cc      = 8,
+            Bcc     = 16
+        }
+
+        /// <summary>
         /// Cleanly disconnects from all servers.
         /// </summary>
         public void Disconnect();
@@ -53,6 +66,16 @@ namespace G5EmailClient.Email
         /// <param name="password"></param>
         /// <returns>Returns null if successful. Otherwise, the exception is returned.</returns>
         public Exception? Authenticate(string username, string password);
+
+        /// <summary>
+        /// Gets a reference to the client database
+        /// </summary>
+        public IDatabase GetDatabase();
+
+        /// <summary>
+        /// Sets the database of the client
+        /// </summary>
+        void SetDatabase(IDatabase database);
 
         /// <summary>
         /// Gets a list of usernames from the database.
@@ -116,10 +139,11 @@ namespace G5EmailClient.Email
 
         /// <summary>
         /// Sets the active folder using a given index. Opens the folder if it is unopened.
+        /// Loads the folder if it is unloaded.
         /// </summary>
         /// <param name="folderIndex"></param>
         /// <returns>Returns 0 if succesful, -1 if not.</returns>
-        int SetActiveFolder(int folderIndex);
+        int LoadSetActiveFolder(int folderIndex);
 
         /// <summary>
         /// Gets the from string, subject line and read status of all emails in the active folder.
@@ -196,6 +220,6 @@ namespace G5EmailClient.Email
         /// Searches the 
         /// </summary>
         /// <returns>Returns a list of folder envelopes</returns>
-        (List<IEmail.Message> messages, List<string> UIDs) SearchFolder(string searchString);
+        (List<IEmail.Message> messages, List<string> UIDs) SearchFolder(string searchString, SearchFlags flags);
     }
 }

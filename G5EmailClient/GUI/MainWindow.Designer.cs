@@ -38,10 +38,7 @@
             this.toggle_read_button = new System.Windows.Forms.ToolStripButton();
             this.settings_dropdown = new System.Windows.Forms.ToolStripDropDownButton();
             this.user_settings_button = new System.Windows.Forms.ToolStripMenuItem();
-            this.add_user_button = new System.Windows.Forms.ToolStripMenuItem();
-            this.select_user_button = new System.Windows.Forms.ToolStripMenuItem();
             this.logout_button = new System.Windows.Forms.ToolStripMenuItem();
-            this.contacts_button = new System.Windows.Forms.ToolStripButton();
             this.refresh_button = new System.Windows.Forms.ToolStripButton();
             this.folders_panel = new System.Windows.Forms.Panel();
             this.notifications_separator_panel = new System.Windows.Forms.Panel();
@@ -102,10 +99,31 @@
             this.cmp_to_textbox = new System.Windows.Forms.TextBox();
             this.cmp_to_left_panel = new System.Windows.Forms.Panel();
             this.cmp_to_label = new System.Windows.Forms.Label();
+            this.user_settings_tab = new System.Windows.Forms.TabPage();
+            this.user_settings_panel = new System.Windows.Forms.Panel();
+            this.send_as_email_underline_panel = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.send_as_email_textbox = new System.Windows.Forms.TextBox();
+            this.send_as_email_label = new System.Windows.Forms.Label();
+            this.send_as_name_padding_panel = new System.Windows.Forms.Panel();
+            this.send_as_name_underline_panel = new System.Windows.Forms.Panel();
+            this.send_as_name_textbox = new System.Windows.Forms.TextBox();
+            this.send_as_name_label = new System.Windows.Forms.Label();
+            this.connected_users_panel = new System.Windows.Forms.Panel();
+            this.connected_users_listbox = new System.Windows.Forms.ListBox();
+            this.add_user_button = new System.Windows.Forms.Button();
+            this.delete_user_button = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.template_flow_panel = new G5EmailClient.GUI.EnvelopeFlowPanel();
             this.search_textbox = new System.Windows.Forms.TextBox();
             this.inbox_panel = new System.Windows.Forms.Panel();
+            this.search_settings_panel = new System.Windows.Forms.Panel();
+            this.search_cc_checkbox = new System.Windows.Forms.CheckBox();
+            this.search_body_checkbox = new System.Windows.Forms.CheckBox();
+            this.search_subject_checkbox = new System.Windows.Forms.CheckBox();
+            this.search_sender_checkbox = new System.Windows.Forms.CheckBox();
             this.search_bar_panel = new System.Windows.Forms.Panel();
+            this.search_settings_button = new System.Windows.Forms.Button();
             this.search_button = new System.Windows.Forms.Button();
             this.brief_control_explain_tooltop = new System.Windows.Forms.ToolTip(this.components);
             this.cmp_add_contextstrip = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -136,7 +154,14 @@
             this.cmp_cc_left_panel.SuspendLayout();
             this.cmp_to_panel.SuspendLayout();
             this.cmp_to_left_panel.SuspendLayout();
+            this.user_settings_tab.SuspendLayout();
+            this.user_settings_panel.SuspendLayout();
+            this.send_as_email_underline_panel.SuspendLayout();
+            this.send_as_name_padding_panel.SuspendLayout();
+            this.connected_users_panel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.inbox_panel.SuspendLayout();
+            this.search_settings_panel.SuspendLayout();
             this.search_bar_panel.SuspendLayout();
             this.cmp_add_contextstrip.SuspendLayout();
             this.SuspendLayout();
@@ -162,7 +187,6 @@
             this.delete_button,
             this.toggle_read_button,
             this.settings_dropdown,
-            this.contacts_button,
             this.refresh_button});
             this.top_toolstrip.Location = new System.Drawing.Point(0, 0);
             this.top_toolstrip.Name = "top_toolstrip";
@@ -214,8 +238,6 @@
             this.settings_dropdown.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.settings_dropdown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.user_settings_button,
-            this.add_user_button,
-            this.select_user_button,
             this.logout_button});
             this.settings_dropdown.Image = global::G5EmailClient.Properties.Resources.Settings_Icon;
             this.settings_dropdown.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -229,20 +251,7 @@
             this.user_settings_button.Name = "user_settings_button";
             this.user_settings_button.Size = new System.Drawing.Size(199, 32);
             this.user_settings_button.Text = "User Settings";
-            // 
-            // add_user_button
-            // 
-            this.add_user_button.Image = global::G5EmailClient.Properties.Resources.AddUserIcon;
-            this.add_user_button.Name = "add_user_button";
-            this.add_user_button.Size = new System.Drawing.Size(199, 32);
-            this.add_user_button.Text = "Add User";
-            // 
-            // select_user_button
-            // 
-            this.select_user_button.Image = global::G5EmailClient.Properties.Resources.SelectUserIcon;
-            this.select_user_button.Name = "select_user_button";
-            this.select_user_button.Size = new System.Drawing.Size(199, 32);
-            this.select_user_button.Text = "Select User";
+            this.user_settings_button.Click += new System.EventHandler(this.user_settings_button_Click);
             // 
             // logout_button
             // 
@@ -250,16 +259,7 @@
             this.logout_button.Name = "logout_button";
             this.logout_button.Size = new System.Drawing.Size(199, 32);
             this.logout_button.Text = "Log Out";
-            // 
-            // contacts_button
-            // 
-            this.contacts_button.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.contacts_button.Image = global::G5EmailClient.Properties.Resources.ContactsIcon;
-            this.contacts_button.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.contacts_button.Name = "contacts_button";
-            this.contacts_button.Size = new System.Drawing.Size(106, 29);
-            this.contacts_button.Text = "Contacts";
-            this.contacts_button.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.logout_button.Click += new System.EventHandler(this.logout_button_Click);
             // 
             // refresh_button
             // 
@@ -384,6 +384,7 @@
             this.main_tab.Controls.Add(this.intro_tab);
             this.main_tab.Controls.Add(this.open_message_tab);
             this.main_tab.Controls.Add(this.compose_message_tab);
+            this.main_tab.Controls.Add(this.user_settings_tab);
             this.main_tab.Dock = System.Windows.Forms.DockStyle.Fill;
             this.main_tab.Location = new System.Drawing.Point(0, 0);
             this.main_tab.Name = "main_tab";
@@ -609,10 +610,10 @@
             this.cmp_body_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.cmp_body_panel.Controls.Add(this.cmp_mailbody_rtextbox);
             this.cmp_body_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cmp_body_panel.Location = new System.Drawing.Point(10, 152);
+            this.cmp_body_panel.Location = new System.Drawing.Point(10, 159);
             this.cmp_body_panel.Name = "cmp_body_panel";
             this.cmp_body_panel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.cmp_body_panel.Size = new System.Drawing.Size(474, 377);
+            this.cmp_body_panel.Size = new System.Drawing.Size(474, 370);
             this.cmp_body_panel.TabIndex = 4;
             this.cmp_body_panel.Tag = "";
             // 
@@ -623,7 +624,7 @@
             this.cmp_mailbody_rtextbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.cmp_mailbody_rtextbox.Location = new System.Drawing.Point(3, 0);
             this.cmp_mailbody_rtextbox.Name = "cmp_mailbody_rtextbox";
-            this.cmp_mailbody_rtextbox.Size = new System.Drawing.Size(466, 375);
+            this.cmp_mailbody_rtextbox.Size = new System.Drawing.Size(466, 368);
             this.cmp_mailbody_rtextbox.TabIndex = 4;
             this.cmp_mailbody_rtextbox.Text = "";
             // 
@@ -638,7 +639,7 @@
             // cmp_padding_panel1
             // 
             this.cmp_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.cmp_padding_panel1.Location = new System.Drawing.Point(10, 142);
+            this.cmp_padding_panel1.Location = new System.Drawing.Point(10, 149);
             this.cmp_padding_panel1.Name = "cmp_padding_panel1";
             this.cmp_padding_panel1.Size = new System.Drawing.Size(474, 10);
             this.cmp_padding_panel1.TabIndex = 2;
@@ -693,7 +694,7 @@
             this.cmp_info_panel.Location = new System.Drawing.Point(10, 10);
             this.cmp_info_panel.Margin = new System.Windows.Forms.Padding(10);
             this.cmp_info_panel.Name = "cmp_info_panel";
-            this.cmp_info_panel.Size = new System.Drawing.Size(474, 132);
+            this.cmp_info_panel.Size = new System.Drawing.Size(474, 139);
             this.cmp_info_panel.TabIndex = 0;
             // 
             // cmp_subject_panel
@@ -704,15 +705,16 @@
             this.cmp_subject_panel.Controls.Add(this.cmp_subject_left_panel);
             this.cmp_subject_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_subject_panel.Location = new System.Drawing.Point(0, 108);
+            this.cmp_subject_panel.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_subject_panel.Name = "cmp_subject_panel";
-            this.cmp_subject_panel.Size = new System.Drawing.Size(474, 24);
+            this.cmp_subject_panel.Size = new System.Drawing.Size(474, 31);
             this.cmp_subject_panel.TabIndex = 7;
             // 
             // cmp_subject_underscore_panel
             // 
             this.cmp_subject_underscore_panel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.cmp_subject_underscore_panel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.cmp_subject_underscore_panel.Location = new System.Drawing.Point(75, 23);
+            this.cmp_subject_underscore_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.cmp_subject_underscore_panel.Location = new System.Drawing.Point(75, 30);
             this.cmp_subject_underscore_panel.Name = "cmp_subject_underscore_panel";
             this.cmp_subject_underscore_panel.Size = new System.Drawing.Size(399, 1);
             this.cmp_subject_underscore_panel.TabIndex = 3;
@@ -723,9 +725,9 @@
             this.cmp_subject_textbox.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_subject_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.cmp_subject_textbox.Location = new System.Drawing.Point(75, 0);
-            this.cmp_subject_textbox.MinimumSize = new System.Drawing.Size(0, 20);
+            this.cmp_subject_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_subject_textbox.Name = "cmp_subject_textbox";
-            this.cmp_subject_textbox.Size = new System.Drawing.Size(399, 23);
+            this.cmp_subject_textbox.Size = new System.Drawing.Size(399, 30);
             this.cmp_subject_textbox.TabIndex = 3;
             // 
             // cmp_subject_left_panel
@@ -736,7 +738,7 @@
             this.cmp_subject_left_panel.Dock = System.Windows.Forms.DockStyle.Left;
             this.cmp_subject_left_panel.Location = new System.Drawing.Point(0, 0);
             this.cmp_subject_left_panel.Name = "cmp_subject_left_panel";
-            this.cmp_subject_left_panel.Size = new System.Drawing.Size(75, 24);
+            this.cmp_subject_left_panel.Size = new System.Drawing.Size(75, 31);
             this.cmp_subject_left_panel.TabIndex = 2;
             // 
             // cmp_subject_label
@@ -944,13 +946,195 @@
             this.cmp_to_label.TabIndex = 0;
             this.cmp_to_label.Text = "To: ";
             // 
+            // user_settings_tab
+            // 
+            this.user_settings_tab.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.user_settings_tab.Controls.Add(this.user_settings_panel);
+            this.user_settings_tab.Controls.Add(this.connected_users_panel);
+            this.user_settings_tab.Controls.Add(this.pictureBox1);
+            this.user_settings_tab.Location = new System.Drawing.Point(4, 29);
+            this.user_settings_tab.Name = "user_settings_tab";
+            this.user_settings_tab.Padding = new System.Windows.Forms.Padding(3);
+            this.user_settings_tab.Size = new System.Drawing.Size(494, 597);
+            this.user_settings_tab.TabIndex = 4;
+            this.user_settings_tab.Text = "User Settings";
+            // 
+            // user_settings_panel
+            // 
+            this.user_settings_panel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.user_settings_panel.Controls.Add(this.send_as_email_underline_panel);
+            this.user_settings_panel.Controls.Add(this.send_as_email_textbox);
+            this.user_settings_panel.Controls.Add(this.send_as_email_label);
+            this.user_settings_panel.Controls.Add(this.send_as_name_padding_panel);
+            this.user_settings_panel.Controls.Add(this.send_as_name_textbox);
+            this.user_settings_panel.Controls.Add(this.send_as_name_label);
+            this.user_settings_panel.Location = new System.Drawing.Point(6, 6);
+            this.user_settings_panel.Name = "user_settings_panel";
+            this.user_settings_panel.Padding = new System.Windows.Forms.Padding(3);
+            this.user_settings_panel.Size = new System.Drawing.Size(263, 260);
+            this.user_settings_panel.TabIndex = 4;
+            // 
+            // send_as_email_underline_panel
+            // 
+            this.send_as_email_underline_panel.BackColor = System.Drawing.Color.Black;
+            this.send_as_email_underline_panel.Controls.Add(this.panel2);
+            this.send_as_email_underline_panel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.send_as_email_underline_panel.Location = new System.Drawing.Point(3, 119);
+            this.send_as_email_underline_panel.Name = "send_as_email_underline_panel";
+            this.send_as_email_underline_panel.Size = new System.Drawing.Size(257, 1);
+            this.send_as_email_underline_panel.TabIndex = 7;
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.Black;
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(257, 1);
+            this.panel2.TabIndex = 5;
+            // 
+            // send_as_email_textbox
+            // 
+            this.send_as_email_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.send_as_email_textbox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.send_as_email_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.send_as_email_textbox.Location = new System.Drawing.Point(3, 89);
+            this.send_as_email_textbox.MinimumSize = new System.Drawing.Size(0, 30);
+            this.send_as_email_textbox.Name = "send_as_email_textbox";
+            this.send_as_email_textbox.Size = new System.Drawing.Size(257, 30);
+            this.send_as_email_textbox.TabIndex = 6;
+            // 
+            // send_as_email_label
+            // 
+            this.send_as_email_label.AutoSize = true;
+            this.send_as_email_label.Dock = System.Windows.Forms.DockStyle.Top;
+            this.send_as_email_label.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.send_as_email_label.Location = new System.Drawing.Point(3, 66);
+            this.send_as_email_label.Margin = new System.Windows.Forms.Padding(3);
+            this.send_as_email_label.MinimumSize = new System.Drawing.Size(45, 0);
+            this.send_as_email_label.Name = "send_as_email_label";
+            this.send_as_email_label.Size = new System.Drawing.Size(189, 23);
+            this.send_as_email_label.TabIndex = 5;
+            this.send_as_email_label.Text = "Email seen by recipient:";
+            // 
+            // send_as_name_padding_panel
+            // 
+            this.send_as_name_padding_panel.Controls.Add(this.send_as_name_underline_panel);
+            this.send_as_name_padding_panel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.send_as_name_padding_panel.Location = new System.Drawing.Point(3, 56);
+            this.send_as_name_padding_panel.Name = "send_as_name_padding_panel";
+            this.send_as_name_padding_panel.Size = new System.Drawing.Size(257, 10);
+            this.send_as_name_padding_panel.TabIndex = 4;
+            // 
+            // send_as_name_underline_panel
+            // 
+            this.send_as_name_underline_panel.BackColor = System.Drawing.Color.Black;
+            this.send_as_name_underline_panel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.send_as_name_underline_panel.Location = new System.Drawing.Point(0, 0);
+            this.send_as_name_underline_panel.Name = "send_as_name_underline_panel";
+            this.send_as_name_underline_panel.Size = new System.Drawing.Size(257, 1);
+            this.send_as_name_underline_panel.TabIndex = 5;
+            // 
+            // send_as_name_textbox
+            // 
+            this.send_as_name_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.send_as_name_textbox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.send_as_name_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.send_as_name_textbox.Location = new System.Drawing.Point(3, 26);
+            this.send_as_name_textbox.MinimumSize = new System.Drawing.Size(0, 30);
+            this.send_as_name_textbox.Name = "send_as_name_textbox";
+            this.send_as_name_textbox.Size = new System.Drawing.Size(257, 30);
+            this.send_as_name_textbox.TabIndex = 2;
+            // 
+            // send_as_name_label
+            // 
+            this.send_as_name_label.AutoSize = true;
+            this.send_as_name_label.Dock = System.Windows.Forms.DockStyle.Top;
+            this.send_as_name_label.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.send_as_name_label.Location = new System.Drawing.Point(3, 3);
+            this.send_as_name_label.Margin = new System.Windows.Forms.Padding(3);
+            this.send_as_name_label.MinimumSize = new System.Drawing.Size(45, 0);
+            this.send_as_name_label.Name = "send_as_name_label";
+            this.send_as_name_label.Size = new System.Drawing.Size(194, 23);
+            this.send_as_name_label.TabIndex = 1;
+            this.send_as_name_label.Text = "Name seen by recipient:";
+            // 
+            // connected_users_panel
+            // 
+            this.connected_users_panel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.connected_users_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.connected_users_panel.Controls.Add(this.connected_users_listbox);
+            this.connected_users_panel.Controls.Add(this.add_user_button);
+            this.connected_users_panel.Controls.Add(this.delete_user_button);
+            this.connected_users_panel.Location = new System.Drawing.Point(275, 6);
+            this.connected_users_panel.Name = "connected_users_panel";
+            this.connected_users_panel.Padding = new System.Windows.Forms.Padding(3);
+            this.connected_users_panel.Size = new System.Drawing.Size(213, 260);
+            this.connected_users_panel.TabIndex = 3;
+            // 
+            // connected_users_listbox
+            // 
+            this.connected_users_listbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.connected_users_listbox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.connected_users_listbox.FormattingEnabled = true;
+            this.connected_users_listbox.ItemHeight = 20;
+            this.connected_users_listbox.Location = new System.Drawing.Point(3, 3);
+            this.connected_users_listbox.Name = "connected_users_listbox";
+            this.connected_users_listbox.Size = new System.Drawing.Size(205, 200);
+            this.connected_users_listbox.TabIndex = 0;
+            // 
+            // add_user_button
+            // 
+            this.add_user_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.add_user_button.BackgroundImage = global::G5EmailClient.Properties.Resources.AddUserIcon;
+            this.add_user_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.add_user_button.FlatAppearance.BorderSize = 0;
+            this.add_user_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.add_user_button.Location = new System.Drawing.Point(165, 212);
+            this.add_user_button.Name = "add_user_button";
+            this.add_user_button.Size = new System.Drawing.Size(40, 40);
+            this.add_user_button.TabIndex = 1;
+            this.add_user_button.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.add_user_button.UseVisualStyleBackColor = true;
+            this.add_user_button.Click += new System.EventHandler(this.add_user_button_Click);
+            // 
+            // delete_user_button
+            // 
+            this.delete_user_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.delete_user_button.BackgroundImage = global::G5EmailClient.Properties.Resources.DeleteUserIcon;
+            this.delete_user_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.delete_user_button.FlatAppearance.BorderSize = 0;
+            this.delete_user_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.delete_user_button.Location = new System.Drawing.Point(6, 212);
+            this.delete_user_button.Name = "delete_user_button";
+            this.delete_user_button.Size = new System.Drawing.Size(40, 40);
+            this.delete_user_button.TabIndex = 2;
+            this.delete_user_button.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.delete_user_button.UseVisualStyleBackColor = true;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pictureBox1.Image = global::G5EmailClient.Properties.Resources.Group5Logo;
+            this.pictureBox1.Location = new System.Drawing.Point(3, 272);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(488, 322);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 5;
+            this.pictureBox1.TabStop = false;
+            // 
             // template_flow_panel
             // 
             this.template_flow_panel.AutoScroll = true;
+            this.template_flow_panel.AutoSize = true;
+            this.template_flow_panel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.template_flow_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.template_flow_panel.Location = new System.Drawing.Point(0, 30);
+            this.template_flow_panel.Location = new System.Drawing.Point(0, 66);
+            this.template_flow_panel.MinimumSize = new System.Drawing.Size(350, 0);
             this.template_flow_panel.Name = "template_flow_panel";
-            this.template_flow_panel.Size = new System.Drawing.Size(350, 600);
+            this.template_flow_panel.Size = new System.Drawing.Size(350, 564);
             this.template_flow_panel.TabIndex = 2;
             // 
             // search_textbox
@@ -973,6 +1157,7 @@
             this.inbox_panel.AutoScroll = true;
             this.inbox_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.inbox_panel.Controls.Add(this.template_flow_panel);
+            this.inbox_panel.Controls.Add(this.search_settings_panel);
             this.inbox_panel.Controls.Add(this.search_bar_panel);
             this.inbox_panel.Dock = System.Windows.Forms.DockStyle.Left;
             this.inbox_panel.Location = new System.Drawing.Point(230, 30);
@@ -980,8 +1165,72 @@
             this.inbox_panel.Size = new System.Drawing.Size(352, 632);
             this.inbox_panel.TabIndex = 2;
             // 
+            // search_settings_panel
+            // 
+            this.search_settings_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.search_settings_panel.Controls.Add(this.search_cc_checkbox);
+            this.search_settings_panel.Controls.Add(this.search_body_checkbox);
+            this.search_settings_panel.Controls.Add(this.search_subject_checkbox);
+            this.search_settings_panel.Controls.Add(this.search_sender_checkbox);
+            this.search_settings_panel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.search_settings_panel.Location = new System.Drawing.Point(0, 30);
+            this.search_settings_panel.Name = "search_settings_panel";
+            this.search_settings_panel.Size = new System.Drawing.Size(350, 36);
+            this.search_settings_panel.TabIndex = 6;
+            this.search_settings_panel.Visible = false;
+            // 
+            // search_cc_checkbox
+            // 
+            this.search_cc_checkbox.AutoSize = true;
+            this.search_cc_checkbox.Checked = true;
+            this.search_cc_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.search_cc_checkbox.Location = new System.Drawing.Point(243, 7);
+            this.search_cc_checkbox.Name = "search_cc_checkbox";
+            this.search_cc_checkbox.Size = new System.Drawing.Size(47, 24);
+            this.search_cc_checkbox.TabIndex = 3;
+            this.search_cc_checkbox.Text = "Cc";
+            this.search_cc_checkbox.UseVisualStyleBackColor = true;
+            // 
+            // search_body_checkbox
+            // 
+            this.search_body_checkbox.AutoSize = true;
+            this.search_body_checkbox.Checked = true;
+            this.search_body_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.search_body_checkbox.Location = new System.Drawing.Point(172, 6);
+            this.search_body_checkbox.Name = "search_body_checkbox";
+            this.search_body_checkbox.Size = new System.Drawing.Size(65, 24);
+            this.search_body_checkbox.TabIndex = 2;
+            this.search_body_checkbox.Text = "Body";
+            this.search_body_checkbox.UseVisualStyleBackColor = true;
+            // 
+            // search_subject_checkbox
+            // 
+            this.search_subject_checkbox.AutoSize = true;
+            this.search_subject_checkbox.Checked = true;
+            this.search_subject_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.search_subject_checkbox.Location = new System.Drawing.Point(86, 6);
+            this.search_subject_checkbox.Name = "search_subject_checkbox";
+            this.search_subject_checkbox.Size = new System.Drawing.Size(80, 24);
+            this.search_subject_checkbox.TabIndex = 1;
+            this.search_subject_checkbox.Text = "Subject";
+            this.search_subject_checkbox.UseVisualStyleBackColor = true;
+            this.search_subject_checkbox.CheckedChanged += new System.EventHandler(this.search_subject_checkbox_CheckedChanged);
+            // 
+            // search_sender_checkbox
+            // 
+            this.search_sender_checkbox.AutoSize = true;
+            this.search_sender_checkbox.Checked = true;
+            this.search_sender_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.search_sender_checkbox.Location = new System.Drawing.Point(3, 6);
+            this.search_sender_checkbox.Name = "search_sender_checkbox";
+            this.search_sender_checkbox.Size = new System.Drawing.Size(77, 24);
+            this.search_sender_checkbox.TabIndex = 0;
+            this.search_sender_checkbox.Text = "Sender";
+            this.search_sender_checkbox.UseVisualStyleBackColor = true;
+            // 
             // search_bar_panel
             // 
+            this.search_bar_panel.Controls.Add(this.search_settings_button);
             this.search_bar_panel.Controls.Add(this.search_textbox);
             this.search_bar_panel.Controls.Add(this.search_button);
             this.search_bar_panel.Dock = System.Windows.Forms.DockStyle.Top;
@@ -990,6 +1239,20 @@
             this.search_bar_panel.Padding = new System.Windows.Forms.Padding(3);
             this.search_bar_panel.Size = new System.Drawing.Size(350, 30);
             this.search_bar_panel.TabIndex = 5;
+            // 
+            // search_settings_button
+            // 
+            this.search_settings_button.BackgroundImage = global::G5EmailClient.Properties.Resources.Settings_Icon;
+            this.search_settings_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.search_settings_button.Dock = System.Windows.Forms.DockStyle.Right;
+            this.search_settings_button.FlatAppearance.BorderSize = 0;
+            this.search_settings_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.search_settings_button.Location = new System.Drawing.Point(299, 3);
+            this.search_settings_button.Name = "search_settings_button";
+            this.search_settings_button.Size = new System.Drawing.Size(24, 24);
+            this.search_settings_button.TabIndex = 6;
+            this.search_settings_button.UseVisualStyleBackColor = true;
+            this.search_settings_button.Click += new System.EventHandler(this.search_settings_button_Click);
             // 
             // search_button
             // 
@@ -1022,15 +1285,15 @@
             this.add_cc_menuitem,
             this.add_bcc_menuitem});
             this.cmp_add_contextstrip.Name = "cmp_add_contextstrip";
-            this.cmp_add_contextstrip.Size = new System.Drawing.Size(142, 60);
+            this.cmp_add_contextstrip.Size = new System.Drawing.Size(161, 60);
             // 
             // add_cc_menuitem
             // 
             this.add_cc_menuitem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.add_cc_menuitem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.add_cc_menuitem.Name = "add_cc_menuitem";
-            this.add_cc_menuitem.Size = new System.Drawing.Size(141, 28);
-            this.add_cc_menuitem.Text = "Add cc";
+            this.add_cc_menuitem.Size = new System.Drawing.Size(160, 28);
+            this.add_cc_menuitem.Text = "Toggle Cc";
             this.add_cc_menuitem.Click += new System.EventHandler(this.add_cc_menuitem_Click);
             // 
             // add_bcc_menuitem
@@ -1038,8 +1301,8 @@
             this.add_bcc_menuitem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.add_bcc_menuitem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.add_bcc_menuitem.Name = "add_bcc_menuitem";
-            this.add_bcc_menuitem.Size = new System.Drawing.Size(141, 28);
-            this.add_bcc_menuitem.Text = "Add Bcc";
+            this.add_bcc_menuitem.Size = new System.Drawing.Size(160, 28);
+            this.add_bcc_menuitem.Text = "Toggle Bcc";
             this.add_bcc_menuitem.Click += new System.EventHandler(this.add_bcc_menuitem_Click);
             // 
             // MainWindow
@@ -1055,7 +1318,6 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(1018, 647);
             this.Name = "MainWindow";
-            this.Text = "Email Client";
             this.top_panel.ResumeLayout(false);
             this.top_panel.PerformLayout();
             this.top_toolstrip.ResumeLayout(false);
@@ -1098,7 +1360,17 @@
             this.cmp_to_panel.PerformLayout();
             this.cmp_to_left_panel.ResumeLayout(false);
             this.cmp_to_left_panel.PerformLayout();
+            this.user_settings_tab.ResumeLayout(false);
+            this.user_settings_panel.ResumeLayout(false);
+            this.user_settings_panel.PerformLayout();
+            this.send_as_email_underline_panel.ResumeLayout(false);
+            this.send_as_name_padding_panel.ResumeLayout(false);
+            this.connected_users_panel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.inbox_panel.ResumeLayout(false);
+            this.inbox_panel.PerformLayout();
+            this.search_settings_panel.ResumeLayout(false);
+            this.search_settings_panel.PerformLayout();
             this.search_bar_panel.ResumeLayout(false);
             this.search_bar_panel.PerformLayout();
             this.cmp_add_contextstrip.ResumeLayout(false);
@@ -1118,13 +1390,10 @@
         private Panel folders_panel;
         private Panel main_panel;
         private ToolStripButton open_inbox_button;
-        private ToolStripButton contacts_button;
         private TabControl main_tab;
         private TabPage open_message_tab;
         private ToolStripMenuItem user_settings_button;
         private ToolStripMenuItem logout_button;
-        private ToolStripMenuItem select_user_button;
-        private ToolStripMenuItem add_user_button;
         private ToolStripButton refresh_button;
         private ListBox folders_lisbox;
         private Panel account_info_panel;
@@ -1190,5 +1459,26 @@
         private Label msg_cc_label;
         private Panel search_bar_panel;
         private Button search_button;
+        private TabPage user_settings_tab;
+        private Panel search_settings_panel;
+        private CheckBox search_cc_checkbox;
+        private CheckBox search_body_checkbox;
+        private CheckBox search_subject_checkbox;
+        private CheckBox search_sender_checkbox;
+        private Button search_settings_button;
+        private ListBox connected_users_listbox;
+        private Button add_user_button;
+        private Panel connected_users_panel;
+        private Button delete_user_button;
+        private Panel user_settings_panel;
+        private Panel send_as_name_padding_panel;
+        private Panel send_as_name_underline_panel;
+        private TextBox send_as_name_textbox;
+        private Label send_as_name_label;
+        private Label send_as_email_label;
+        private Panel send_as_email_underline_panel;
+        private Panel panel2;
+        private TextBox send_as_email_textbox;
+        private PictureBox pictureBox1;
     }
 }

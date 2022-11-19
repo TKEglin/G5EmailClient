@@ -23,7 +23,9 @@ namespace G5EmailClient.GUI
         // Used to remove messages after a duration
         System.Timers.Timer timer = new System.Timers.Timer(1000) { Enabled = false };
 
-        public ConnectionForm(IEmail ParamEmailClient)
+        bool isInitialForm = false;
+
+        public ConnectionForm(IEmail ParamEmailClient, bool isInitialFormParam)
         {
             InitializeComponent();
 
@@ -35,6 +37,7 @@ namespace G5EmailClient.GUI
 
             // Saving email client to local variable
             EmailClient = ParamEmailClient;
+            isInitialForm = isInitialFormParam;
 
             // Populating saved users list
             foreach(var username in EmailClient.GetUsernames())
@@ -53,14 +56,6 @@ namespace G5EmailClient.GUI
                 "To overwrite a user, simply save a user with the same username.\n" +
                 "To save a user as default, so it is loaded when the client launches, " +
                 "select a user and load it.");
-        }
-
-        public IEmail IEmail
-        {
-            get => default;
-            set
-            {
-            }
         }
 
         /// <summary>
@@ -203,6 +198,7 @@ namespace G5EmailClient.GUI
             Exception? attempt = EmailClient.Authenticate(activeUser.username, activeUser.password);
             if(attempt == null) // Success
             {
+                if(!isInitialForm) connectionSuccesful(EmailClient, e);
                 this.Close();
             }
             else // Error
@@ -215,6 +211,7 @@ namespace G5EmailClient.GUI
             }
             this.Cursor = Cursors.Default;
         }
+        public event EventHandler connectionSuccesful;
 
         private void message_label_Click(object sender, EventArgs e)
         {

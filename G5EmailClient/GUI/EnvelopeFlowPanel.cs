@@ -18,6 +18,8 @@ namespace G5EmailClient.GUI
 
         public bool needsUpdate = false;
 
+        public bool envelopesHidden = false;
+
         /// <summary>
         /// Set to true if the Envelopes in this panel are copies
         /// </summary>
@@ -205,6 +207,7 @@ namespace G5EmailClient.GUI
         public void ShowAll()
         {
             foreach (var panel in panelList) panel.Value.Visible = true;
+            envelopesHidden = false;
         }
 
         /// <summary>
@@ -216,6 +219,8 @@ namespace G5EmailClient.GUI
             foreach (var panel in panelList) panel.Value.Visible = false;
             //Showing selected
             foreach (var UID in UIDs) panelList[UID].Visible = true;
+
+            envelopesHidden = true;
         }
 
         //

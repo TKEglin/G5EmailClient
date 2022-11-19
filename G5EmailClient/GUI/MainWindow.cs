@@ -11,6 +11,7 @@ namespace G5EmailClient.GUI
     public partial class MainWindow : FormDragBase
     {
         IEmail EmailClient;
+        List<IEmail> EmailClientsList = new();
 
         int NotificationsCount = 0;
 
@@ -23,16 +24,13 @@ namespace G5EmailClient.GUI
         {
             InitializeComponent();
 
-            // Enabling window dragging for controls
-            AddDraggingControl(this);
-            AddDraggingControl(top_toolstrip);
-
             // Saving email client to local variable
             EmailClient = ParamEmailClient;
+            EmailClientsList.Add(EmailClient);
 
             // Opening connection form
             this.Visible = false;
-            Application.Run(new ConnectionForm(EmailClient));
+            Application.Run(new ConnectionForm(EmailClient, true));
             this.Visible = true;
 
             // Setting up GUI
@@ -55,9 +53,6 @@ namespace G5EmailClient.GUI
                 searchPanel.AutoScroll = template_flow_panel.AutoScroll;
                 searchPanel.Parent = template_flow_panel.Parent;
                 searchPanel.BringToFront();
-            // Clear search panel
-
-
             // Message open tab
             msg_from_label.MaximumSize    = new Size(msg_senderinfo_panel.Width - 10, 0);
             msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
@@ -81,6 +76,7 @@ namespace G5EmailClient.GUI
                 updateFolderView(0, true, true);
                 searchPanel.sourcePanel = EnvelopeFlowPanels[0];
                 active_email_label.Text = EmailClient.GetActiveUser().username;
+                connected_users_listbox.Items.Add(EmailClient.GetActiveUser().username);
                 // Events
                 EmailClient.SentMessage += SentMessageHandler;
                 EmailClient.FolderUpdateFinished += FolderUpdateFinishedHandler;
@@ -212,14 +208,15 @@ namespace G5EmailClient.GUI
         /// </summary>
         void updateFolderView(int folderIndex, bool update, bool switchView)
         {
+            this.Cursor = Cursors.WaitCursor;
             // If set active fails, the folder cannot be updated.
-            if (EmailClient.SetActiveFolder(folderIndex) < 0)
+            if (EmailClient.LoadSetActiveFolder(folderIndex) < 0)
                 return;
 
             // Getting panel
             var panel = EnvelopeFlowPanels[folderIndex];
 
-            // If list is empty or update is true, repopulate list.
+            // If update is true, repopulate list.
             if(update == true)
             {
                 panel.Clear();
@@ -240,12 +237,13 @@ namespace G5EmailClient.GUI
                 }
             }
 
-            if(activePanel != panel & switchView)
+            if(switchView)
             {
                 panel.Visible = true;
                 panel.BringToFront();
                 activePanel = panel;
             }
+            this.Cursor = Cursors.Default;
         }
 
         /// <summary>
@@ -266,11 +264,14 @@ namespace G5EmailClient.GUI
                 // Adding flow panel to list
                 var flowPanel = new EnvelopeFlowPanel();
                     flowPanel.Visible = false;
-                    flowPanel.Size       = template_flow_panel.Size;
-                    flowPanel.Dock       = template_flow_panel.Dock;
-                    flowPanel.Location   = template_flow_panel.Location;
-                    flowPanel.AutoScroll = template_flow_panel.AutoScroll;
-                    flowPanel.Parent     = template_flow_panel.Parent;
+                    flowPanel.Dock         =         template_flow_panel.Dock;
+                    flowPanel.Dock         =         template_flow_panel.Dock;
+                    flowPanel.Parent       =       template_flow_panel.Parent;
+                    flowPanel.Location     =     template_flow_panel.Location;
+                    flowPanel.AutoSize     =     template_flow_panel.AutoSize;
+                    flowPanel.AutoScroll   =   template_flow_panel.AutoScroll;
+                    flowPanel.MinimumSize  =  template_flow_panel.MinimumSize;
+                    flowPanel.AutoSizeMode = template_flow_panel.AutoSizeMode;
                     flowPanel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
                     flowPanel.BringToFront();
                 EnvelopeFlowPanels.Add(flowPanel);
@@ -293,7 +294,7 @@ namespace G5EmailClient.GUI
 
             var message = EmailClient.OpenMessage(envelope.UID);
             msg_from_label.Text = message.from;
-            if(message.cc != null & message.cc!.Length > 0)
+            if(message.cc != null & message.cc.Length > 0)
             {
                 msg_cc_label.Visible = true;
                 msg_padding_panel2.Visible = true;
@@ -303,6 +304,7 @@ namespace G5EmailClient.GUI
             {
                 msg_cc_label.Visible = false;
                 msg_padding_panel2.Visible = false;
+                msg_cc_label.Text = "cc: ";
             }
             msg_subject_label.Text = message.subject;
             msg_body_rtextbox.Text = message.body;
@@ -391,19 +393,11 @@ namespace G5EmailClient.GUI
         private void add_bcc_menuitem_Click(object sender, EventArgs e)
         {
             cmp_bcc_panel.Visible = !cmp_bcc_panel.Visible;
-            if (!cmp_bcc_panel.Visible)
-                add_bcc_menuitem.Text = "Add Bcc";
-            else
-                add_bcc_menuitem.Text = "Remove Bcc";
         }
 
         private void add_cc_menuitem_Click(object sender, EventArgs e)
         {
             cmp_cc_panel.Visible = !cmp_cc_panel.Visible;
-            if (!cmp_cc_panel.Visible)
-                add_cc_menuitem.Text = "Add cc";
-            else
-                add_cc_menuitem.Text = "Remove cc";
         }
 
         private void delete_button_MouseEnter(object sender, EventArgs e)
@@ -421,8 +415,10 @@ namespace G5EmailClient.GUI
             this.Cursor = Cursors.WaitCursor;
             IEmail.Message message = new();
                 message.to      = cmp_to_textbox.Text;
-                message.cc      = cmp_cc_textbox.Text;
-                message.bcc     = cmp_bcc_textbox.Text;
+                if(cmp_cc_panel.Visible)
+                    message.cc  = cmp_cc_textbox.Text;
+                if (cmp_bcc_panel.Visible)
+                    message.bcc = cmp_bcc_textbox.Text;
                 message.subject = cmp_subject_textbox.Text;
                 message.body    = cmp_mailbody_rtextbox.Text;
 
@@ -454,7 +450,7 @@ namespace G5EmailClient.GUI
                                             ex.Data["Multi receiver email failed"].ToString() + "\n"
                                             + "Message sent to <" + message.to + "> with "
                                             + " subject \"" + message.subject + "\" failed\n"
-                                            + "\nClick to retry. Error:\n" + ex.Message);;
+                                            + "\nClick to retry. Error:\n" + ex.Message);
                     }
                     else
                     {
@@ -553,8 +549,7 @@ namespace G5EmailClient.GUI
                 folders_lisbox.ClearSelected();
                 folders_lisbox.SetSelected(index, true);
 
-                                           // Switches only if it's the inbox being updated
-                updateFolderView(index, true, index == 0);
+                updateFolderView(index, true, true);
 
                 this.Cursor = Cursors.Default;
             }
@@ -576,14 +571,21 @@ namespace G5EmailClient.GUI
 
             activePanel!.ClearSelection();
             main_tab.SelectedTab = compose_message_tab;
-
         }
 
         private void msg_replyall_button_Click(object sender, EventArgs e)
         {
             cmp_to_textbox.Text = trimFromToEmail(msg_from_label.Text);
+            if (msg_cc_label.Text.Length > 4)
+            {
+                cmp_cc_textbox.Text = msg_cc_label.Text.Remove(0, 4);
+                cmp_cc_panel.Visible = true;
+            }
+            else 
+                cmp_cc_panel.Visible = false;
+
             if(!cmp_cc_panel.Visible)
-                add_cc_menuitem_Click(null, EventArgs.Empty);
+                add_cc_menuitem_Click(sender, EventArgs.Empty);
             cmp_subject_textbox.Text = "RE: " + msg_subject_label.Text;
             cmp_mailbody_rtextbox.Text = "\n\n\n________________\n"
                                              + "Previous Message:"
@@ -596,7 +598,6 @@ namespace G5EmailClient.GUI
                                         + "\n\n" + msg_body_rtextbox.Text;
             activePanel!.ClearSelection();
             main_tab.SelectedTab = compose_message_tab;
-
         }
 
         private void folder_move_button_Click(object sender, EventArgs e)
@@ -618,7 +619,6 @@ namespace G5EmailClient.GUI
         private void MoveMessageFinishedHandler(string UID, int folderIndex, IEmail.Message Envelope, 
                                                 bool seen, bool succes, Exception? ex)
         {
-
             var panel = EnvelopeFlowPanels[folderIndex];
 
             if (panel.InvokeRequired)
@@ -633,12 +633,11 @@ namespace G5EmailClient.GUI
                 {
                     MoveMessageFailed(UID, folderIndex, ex);
                 }
-
                 // Panel will be origin folder if operation is failed. Otherwise, destination index
                 panel.Add(UID, Envelope.from,
-                                Envelope.date,
-                                Envelope.subject,
-                                seen);
+                               Envelope.date,
+                               Envelope.subject,
+                               seen);
             }
         }
         private void MoveMessageFailed(string UID, int folderIndex, Exception ex)
@@ -654,7 +653,7 @@ namespace G5EmailClient.GUI
                                        Properties.Resources.ErrorAnimatedIcon,
                                        "Move message failed. Message moved back to origin folder.\n\n"
                                      + "Error message: \n" + ex!.Message);
-                notifications_flowpanel.Controls.Add(notification);
+                AddNotification(notification);
             }
         }
 
@@ -665,7 +664,8 @@ namespace G5EmailClient.GUI
             int folderIndex = folders_lisbox.SelectedIndex;
 
             search_textbox.Text = string.Empty;
-            activePanel!.ShowAll();
+            if(activePanel!.envelopesHidden)
+                activePanel!.ShowAll();
 
             // Clearing selection
             var FlowPanel = EnvelopeFlowPanels[folderIndex];
@@ -680,14 +680,21 @@ namespace G5EmailClient.GUI
         // Used to return to the previous panel when search is cleared
         private void search_button_Click(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.WaitCursor;
-
             if (search_textbox.Text.Length == 0) return;
 
             if(activePanel != null)
                 activePanel!.ClearSelection();
 
-            var envelopes = EmailClient.SearchFolder(search_textbox.Text);
+            IEmail.SearchFlags flags = IEmail.SearchFlags.Empty;
+            if (search_sender_checkbox.Checked)  flags |= IEmail.SearchFlags.From;
+            if (search_subject_checkbox.Checked) flags |= IEmail.SearchFlags.Subject;
+            if (search_body_checkbox.Checked)    flags |= IEmail.SearchFlags.Body;
+            if (search_cc_checkbox.Checked)      flags |= IEmail.SearchFlags.Cc;
+            if (flags == IEmail.SearchFlags.Empty) return;
+
+            this.Cursor = Cursors.WaitCursor;
+
+            var envelopes = EmailClient.SearchFolder(search_textbox.Text, flags);
 
             activePanel!.HideRest(envelopes.UIDs);
 
@@ -701,13 +708,96 @@ namespace G5EmailClient.GUI
             var textBox = (TextBox)sender;
             textBox.Text = string.Empty;
 
-            activePanel!.ShowAll();
-            
+            if(activePanel!.envelopesHidden)
+                activePanel!.ShowAll();   
         }
 
         private void search_textbox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter) search_button_Click(sender, e);
+        }
+
+        private void search_settings_button_Click(object sender, EventArgs e)
+        {
+            var button = (Button)sender;
+
+            if (!search_settings_panel.Visible)
+            {
+                button.BackgroundImage = Properties.Resources.UpArrowIcon;
+                search_settings_panel.Visible = true;
+            }
+            else
+            {
+                button.BackgroundImage = Properties.Resources.Settings_Icon;
+                search_settings_panel.Visible = false;
+            }
+        }
+
+        private void search_subject_checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            // Searching body also searches subject, so body
+            // search is disabled when subject is disabled
+            if(search_subject_checkbox.Checked)
+            {
+                search_body_checkbox.Enabled = true;
+            }
+            else
+            {
+                search_body_checkbox.Checked = false;
+                search_body_checkbox.Enabled = false;
+            }
+        }
+
+        ConnectionForm connectionForm;
+        bool connectionFormOpen = false;
+        private void add_user_button_Click(object sender, EventArgs e)
+        {
+            if (connectionFormOpen) return;
+
+            IEmail newClient = new MailKitEmail();
+            newClient.SetDatabase(EmailClient.GetDatabase());
+
+            connectionForm = new ConnectionForm(newClient, false);
+            connectionForm.Show();
+            connectionForm.connectionSuccesful += connectionFormSuccesHandler;
+            connectionForm.FormClosed += connectionFormClosed;
+            connectionFormOpen = true;
+
+
+        }
+        private void connectionFormSuccesHandler(object sender, EventArgs e)
+        {
+            var newClient = (IEmail)sender;
+
+            if (newClient.isConnected())
+            {
+                EmailClientsList.Add(newClient);
+                var username = newClient.GetActiveUser().username;
+                active_email_label.Text = username;
+                connected_users_listbox.Items.Add(username);
+
+                //EmailClient = newClient;
+            }
+        }
+        private void connectionFormClosed(object sender, EventArgs e)
+        {
+            connectionFormOpen = false;
+        }
+
+        private void user_settings_button_Click(object sender, EventArgs e)
+        {
+            main_tab.SelectedTab = user_settings_tab;
+        }
+
+        private void logout_button_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            foreach(var client in EmailClientsList)
+            {
+                client.Disconnect();
+            }
+            this.Cursor = Cursors.Default;
+            Application.Exit();
         }
     }
 }

@@ -47,14 +47,6 @@ namespace G5EmailClient.Database
             email_data = JsonNode.Parse(email_data_string)!;
         }
 
-        public IDatabase IDatabase
-        {
-            get => default;
-            set
-            {
-            }
-        }
-
         /// <summary>
         /// Saves the data stored in email_data to disk. If this is not called 
         /// when changes are made, data will be lost when the program closes.
