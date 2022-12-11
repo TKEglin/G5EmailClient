@@ -62,6 +62,8 @@
             this.msg_replyall_button = new System.Windows.Forms.Button();
             this.msg_reply_button = new System.Windows.Forms.Button();
             this.msg_senderinfo_panel = new System.Windows.Forms.Panel();
+            this.msg_attachments_flow_panel = new System.Windows.Forms.FlowLayoutPanel();
+            this.message_sender_infor_paddingpanel3 = new System.Windows.Forms.Panel();
             this.msg_subject_label = new System.Windows.Forms.Label();
             this.msg_senderinfo_padding_panel2 = new System.Windows.Forms.Panel();
             this.msg_cc_label = new System.Windows.Forms.Label();
@@ -73,9 +75,12 @@
             this.cmp_padding_panel2 = new System.Windows.Forms.Panel();
             this.cmp_padding_panel1 = new System.Windows.Forms.Panel();
             this.cmp_bottom_panel = new System.Windows.Forms.Panel();
+            this.cmp_attach_button = new System.Windows.Forms.Button();
             this.cmp_add_button = new System.Windows.Forms.Button();
             this.cmp_send_button = new System.Windows.Forms.Button();
             this.cmp_info_panel = new System.Windows.Forms.Panel();
+            this.cmp_attachments_flowpanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.cmp_info_padding_panel4 = new System.Windows.Forms.Panel();
             this.cmp_subject_panel = new System.Windows.Forms.Panel();
             this.cmp_subject_underscore_panel = new System.Windows.Forms.Panel();
             this.cmp_subject_textbox = new System.Windows.Forms.TextBox();
@@ -129,6 +134,8 @@
             this.cmp_add_contextstrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.add_cc_menuitem = new System.Windows.Forms.ToolStripMenuItem();
             this.add_bcc_menuitem = new System.Windows.Forms.ToolStripMenuItem();
+            this.save_attachment_dialog = new System.Windows.Forms.SaveFileDialog();
+            this.load_attachment_dialog = new System.Windows.Forms.OpenFileDialog();
             this.top_panel.SuspendLayout();
             this.top_toolstrip.SuspendLayout();
             this.folders_panel.SuspendLayout();
@@ -172,7 +179,7 @@
             this.top_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.top_panel.Location = new System.Drawing.Point(0, 0);
             this.top_panel.Name = "top_panel";
-            this.top_panel.Size = new System.Drawing.Size(1086, 30);
+            this.top_panel.Size = new System.Drawing.Size(1082, 30);
             this.top_panel.TabIndex = 0;
             // 
             // top_toolstrip
@@ -192,7 +199,7 @@
             this.top_toolstrip.Name = "top_toolstrip";
             this.top_toolstrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.top_toolstrip.ShowItemToolTips = false;
-            this.top_toolstrip.Size = new System.Drawing.Size(1086, 32);
+            this.top_toolstrip.Size = new System.Drawing.Size(1082, 32);
             this.top_toolstrip.TabIndex = 0;
             this.top_toolstrip.Text = "toolStrip1";
             // 
@@ -281,14 +288,14 @@
             this.folders_panel.Dock = System.Windows.Forms.DockStyle.Left;
             this.folders_panel.Location = new System.Drawing.Point(0, 30);
             this.folders_panel.Name = "folders_panel";
-            this.folders_panel.Size = new System.Drawing.Size(230, 632);
+            this.folders_panel.Size = new System.Drawing.Size(230, 623);
             this.folders_panel.TabIndex = 1;
             // 
             // notifications_separator_panel
             // 
             this.notifications_separator_panel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.notifications_separator_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.notifications_separator_panel.Location = new System.Drawing.Point(0, 600);
+            this.notifications_separator_panel.Location = new System.Drawing.Point(0, 591);
             this.notifications_separator_panel.Name = "notifications_separator_panel";
             this.notifications_separator_panel.Size = new System.Drawing.Size(228, 1);
             this.notifications_separator_panel.TabIndex = 4;
@@ -303,7 +310,7 @@
             this.folders_lisbox.ItemHeight = 23;
             this.folders_lisbox.Location = new System.Drawing.Point(0, 30);
             this.folders_lisbox.Name = "folders_lisbox";
-            this.folders_lisbox.Size = new System.Drawing.Size(228, 571);
+            this.folders_lisbox.Size = new System.Drawing.Size(228, 562);
             this.folders_lisbox.TabIndex = 2;
             this.folders_lisbox.TabStop = false;
             this.folders_lisbox.Click += new System.EventHandler(this.folders_lisbox_Click);
@@ -317,7 +324,7 @@
             this.notification_panel.Controls.Add(this.notifications_flowpanel);
             this.notification_panel.Controls.Add(this.notifications_label);
             this.notification_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.notification_panel.Location = new System.Drawing.Point(0, 601);
+            this.notification_panel.Location = new System.Drawing.Point(0, 592);
             this.notification_panel.Name = "notification_panel";
             this.notification_panel.Size = new System.Drawing.Size(228, 29);
             this.notification_panel.TabIndex = 3;
@@ -376,7 +383,7 @@
             this.main_panel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.main_panel.Location = new System.Drawing.Point(582, 30);
             this.main_panel.Name = "main_panel";
-            this.main_panel.Size = new System.Drawing.Size(504, 632);
+            this.main_panel.Size = new System.Drawing.Size(500, 623);
             this.main_panel.TabIndex = 3;
             // 
             // main_tab
@@ -389,7 +396,7 @@
             this.main_tab.Location = new System.Drawing.Point(0, 0);
             this.main_tab.Name = "main_tab";
             this.main_tab.SelectedIndex = 0;
-            this.main_tab.Size = new System.Drawing.Size(502, 630);
+            this.main_tab.Size = new System.Drawing.Size(498, 621);
             this.main_tab.TabIndex = 0;
             // 
             // intro_tab
@@ -398,7 +405,7 @@
             this.intro_tab.Controls.Add(this.welcome_picture_box);
             this.intro_tab.Location = new System.Drawing.Point(4, 29);
             this.intro_tab.Name = "intro_tab";
-            this.intro_tab.Size = new System.Drawing.Size(494, 597);
+            this.intro_tab.Size = new System.Drawing.Size(490, 588);
             this.intro_tab.TabIndex = 2;
             this.intro_tab.Text = "Welcome";
             // 
@@ -409,7 +416,7 @@
             this.welcome_picture_box.Image = global::G5EmailClient.Properties.Resources.Group5Logo;
             this.welcome_picture_box.Location = new System.Drawing.Point(0, 0);
             this.welcome_picture_box.Name = "welcome_picture_box";
-            this.welcome_picture_box.Size = new System.Drawing.Size(494, 597);
+            this.welcome_picture_box.Size = new System.Drawing.Size(490, 588);
             this.welcome_picture_box.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.welcome_picture_box.TabIndex = 0;
             this.welcome_picture_box.TabStop = false;
@@ -425,7 +432,7 @@
             this.open_message_tab.Location = new System.Drawing.Point(4, 29);
             this.open_message_tab.Name = "open_message_tab";
             this.open_message_tab.Padding = new System.Windows.Forms.Padding(10);
-            this.open_message_tab.Size = new System.Drawing.Size(494, 597);
+            this.open_message_tab.Size = new System.Drawing.Size(490, 588);
             this.open_message_tab.TabIndex = 0;
             this.open_message_tab.Text = "Message";
             // 
@@ -434,10 +441,10 @@
             this.msg_mailbody_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.msg_mailbody_panel.Controls.Add(this.msg_body_rtextbox);
             this.msg_mailbody_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.msg_mailbody_panel.Location = new System.Drawing.Point(10, 100);
+            this.msg_mailbody_panel.Location = new System.Drawing.Point(10, 105);
             this.msg_mailbody_panel.Name = "msg_mailbody_panel";
             this.msg_mailbody_panel.Padding = new System.Windows.Forms.Padding(3);
-            this.msg_mailbody_panel.Size = new System.Drawing.Size(474, 429);
+            this.msg_mailbody_panel.Size = new System.Drawing.Size(470, 415);
             this.msg_mailbody_panel.TabIndex = 4;
             this.msg_mailbody_panel.Tag = "";
             // 
@@ -450,24 +457,24 @@
             this.msg_body_rtextbox.Location = new System.Drawing.Point(3, 3);
             this.msg_body_rtextbox.Name = "msg_body_rtextbox";
             this.msg_body_rtextbox.ReadOnly = true;
-            this.msg_body_rtextbox.Size = new System.Drawing.Size(466, 421);
+            this.msg_body_rtextbox.Size = new System.Drawing.Size(462, 407);
             this.msg_body_rtextbox.TabIndex = 0;
             this.msg_body_rtextbox.Text = "<Message body goes here>";
             // 
             // msg_padding_panel2
             // 
             this.msg_padding_panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.msg_padding_panel2.Location = new System.Drawing.Point(10, 529);
+            this.msg_padding_panel2.Location = new System.Drawing.Point(10, 520);
             this.msg_padding_panel2.Name = "msg_padding_panel2";
-            this.msg_padding_panel2.Size = new System.Drawing.Size(474, 10);
+            this.msg_padding_panel2.Size = new System.Drawing.Size(470, 10);
             this.msg_padding_panel2.TabIndex = 3;
             // 
             // msg_padding_panel1
             // 
             this.msg_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.msg_padding_panel1.Location = new System.Drawing.Point(10, 90);
+            this.msg_padding_panel1.Location = new System.Drawing.Point(10, 95);
             this.msg_padding_panel1.Name = "msg_padding_panel1";
-            this.msg_padding_panel1.Size = new System.Drawing.Size(474, 10);
+            this.msg_padding_panel1.Size = new System.Drawing.Size(470, 10);
             this.msg_padding_panel1.TabIndex = 2;
             // 
             // msg_buttons_panel
@@ -476,10 +483,11 @@
             this.msg_buttons_panel.Controls.Add(this.msg_replyall_button);
             this.msg_buttons_panel.Controls.Add(this.msg_reply_button);
             this.msg_buttons_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.msg_buttons_panel.Location = new System.Drawing.Point(10, 539);
+            this.msg_buttons_panel.Location = new System.Drawing.Point(10, 530);
             this.msg_buttons_panel.Name = "msg_buttons_panel";
-            this.msg_buttons_panel.Size = new System.Drawing.Size(474, 48);
+            this.msg_buttons_panel.Size = new System.Drawing.Size(470, 48);
             this.msg_buttons_panel.TabIndex = 1;
+            this.brief_control_explain_tooltop.SetToolTip(this.msg_buttons_panel, "Attach");
             // 
             // msg_forward_button
             // 
@@ -487,7 +495,7 @@
             this.msg_forward_button.BackgroundImage = global::G5EmailClient.Properties.Resources.ForwardIcon;
             this.msg_forward_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.msg_forward_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.msg_forward_button.Location = new System.Drawing.Point(426, 0);
+            this.msg_forward_button.Location = new System.Drawing.Point(422, 0);
             this.msg_forward_button.Margin = new System.Windows.Forms.Padding(0);
             this.msg_forward_button.Name = "msg_forward_button";
             this.msg_forward_button.Size = new System.Drawing.Size(48, 48);
@@ -523,6 +531,8 @@
             // 
             this.msg_senderinfo_panel.AutoSize = true;
             this.msg_senderinfo_panel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.msg_senderinfo_panel.Controls.Add(this.msg_attachments_flow_panel);
+            this.msg_senderinfo_panel.Controls.Add(this.message_sender_infor_paddingpanel3);
             this.msg_senderinfo_panel.Controls.Add(this.msg_subject_label);
             this.msg_senderinfo_panel.Controls.Add(this.msg_senderinfo_padding_panel2);
             this.msg_senderinfo_panel.Controls.Add(this.msg_cc_label);
@@ -532,9 +542,32 @@
             this.msg_senderinfo_panel.Location = new System.Drawing.Point(10, 10);
             this.msg_senderinfo_panel.Margin = new System.Windows.Forms.Padding(10);
             this.msg_senderinfo_panel.Name = "msg_senderinfo_panel";
-            this.msg_senderinfo_panel.Size = new System.Drawing.Size(474, 80);
+            this.msg_senderinfo_panel.Size = new System.Drawing.Size(470, 85);
             this.msg_senderinfo_panel.TabIndex = 0;
             this.msg_senderinfo_panel.Resize += new System.EventHandler(this.msg_senderinfo_panel_Resize);
+            // 
+            // msg_attachments_flow_panel
+            // 
+            this.msg_attachments_flow_panel.AutoScroll = true;
+            this.msg_attachments_flow_panel.AutoSize = true;
+            this.msg_attachments_flow_panel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.msg_attachments_flow_panel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.msg_attachments_flow_panel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.msg_attachments_flow_panel.Location = new System.Drawing.Point(0, 85);
+            this.msg_attachments_flow_panel.MaximumSize = new System.Drawing.Size(0, 150);
+            this.msg_attachments_flow_panel.Name = "msg_attachments_flow_panel";
+            this.msg_attachments_flow_panel.Size = new System.Drawing.Size(470, 0);
+            this.msg_attachments_flow_panel.TabIndex = 6;
+            this.msg_attachments_flow_panel.WrapContents = false;
+            // 
+            // message_sender_infor_paddingpanel3
+            // 
+            this.message_sender_infor_paddingpanel3.Dock = System.Windows.Forms.DockStyle.Top;
+            this.message_sender_infor_paddingpanel3.Location = new System.Drawing.Point(0, 80);
+            this.message_sender_infor_paddingpanel3.Name = "message_sender_infor_paddingpanel3";
+            this.message_sender_infor_paddingpanel3.Size = new System.Drawing.Size(470, 5);
+            this.message_sender_infor_paddingpanel3.TabIndex = 5;
+            this.message_sender_infor_paddingpanel3.Visible = false;
             // 
             // msg_subject_label
             // 
@@ -553,7 +586,7 @@
             this.msg_senderinfo_padding_panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.msg_senderinfo_padding_panel2.Location = new System.Drawing.Point(0, 52);
             this.msg_senderinfo_padding_panel2.Name = "msg_senderinfo_padding_panel2";
-            this.msg_senderinfo_padding_panel2.Size = new System.Drawing.Size(474, 5);
+            this.msg_senderinfo_padding_panel2.Size = new System.Drawing.Size(470, 5);
             this.msg_senderinfo_padding_panel2.TabIndex = 3;
             this.msg_senderinfo_padding_panel2.Visible = false;
             // 
@@ -575,7 +608,7 @@
             this.msg_senderinfo_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.msg_senderinfo_padding_panel1.Location = new System.Drawing.Point(0, 28);
             this.msg_senderinfo_padding_panel1.Name = "msg_senderinfo_padding_panel1";
-            this.msg_senderinfo_padding_panel1.Size = new System.Drawing.Size(474, 5);
+            this.msg_senderinfo_padding_panel1.Size = new System.Drawing.Size(470, 5);
             this.msg_senderinfo_padding_panel1.TabIndex = 2;
             // 
             // msg_from_label
@@ -601,7 +634,7 @@
             this.compose_message_tab.Location = new System.Drawing.Point(4, 29);
             this.compose_message_tab.Name = "compose_message_tab";
             this.compose_message_tab.Padding = new System.Windows.Forms.Padding(10);
-            this.compose_message_tab.Size = new System.Drawing.Size(494, 597);
+            this.compose_message_tab.Size = new System.Drawing.Size(490, 588);
             this.compose_message_tab.TabIndex = 3;
             this.compose_message_tab.Text = "Compose";
             // 
@@ -610,10 +643,10 @@
             this.cmp_body_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.cmp_body_panel.Controls.Add(this.cmp_mailbody_rtextbox);
             this.cmp_body_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cmp_body_panel.Location = new System.Drawing.Point(10, 159);
+            this.cmp_body_panel.Location = new System.Drawing.Point(10, 164);
             this.cmp_body_panel.Name = "cmp_body_panel";
             this.cmp_body_panel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.cmp_body_panel.Size = new System.Drawing.Size(474, 370);
+            this.cmp_body_panel.Size = new System.Drawing.Size(470, 356);
             this.cmp_body_panel.TabIndex = 4;
             this.cmp_body_panel.Tag = "";
             // 
@@ -624,35 +657,51 @@
             this.cmp_mailbody_rtextbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.cmp_mailbody_rtextbox.Location = new System.Drawing.Point(3, 0);
             this.cmp_mailbody_rtextbox.Name = "cmp_mailbody_rtextbox";
-            this.cmp_mailbody_rtextbox.Size = new System.Drawing.Size(466, 368);
+            this.cmp_mailbody_rtextbox.Size = new System.Drawing.Size(462, 354);
             this.cmp_mailbody_rtextbox.TabIndex = 4;
             this.cmp_mailbody_rtextbox.Text = "";
             // 
             // cmp_padding_panel2
             // 
             this.cmp_padding_panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.cmp_padding_panel2.Location = new System.Drawing.Point(10, 529);
+            this.cmp_padding_panel2.Location = new System.Drawing.Point(10, 520);
             this.cmp_padding_panel2.Name = "cmp_padding_panel2";
-            this.cmp_padding_panel2.Size = new System.Drawing.Size(474, 10);
+            this.cmp_padding_panel2.Size = new System.Drawing.Size(470, 10);
             this.cmp_padding_panel2.TabIndex = 3;
             // 
             // cmp_padding_panel1
             // 
             this.cmp_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.cmp_padding_panel1.Location = new System.Drawing.Point(10, 149);
+            this.cmp_padding_panel1.Location = new System.Drawing.Point(10, 154);
             this.cmp_padding_panel1.Name = "cmp_padding_panel1";
-            this.cmp_padding_panel1.Size = new System.Drawing.Size(474, 10);
+            this.cmp_padding_panel1.Size = new System.Drawing.Size(470, 10);
             this.cmp_padding_panel1.TabIndex = 2;
             // 
             // cmp_bottom_panel
             // 
+            this.cmp_bottom_panel.Controls.Add(this.cmp_attach_button);
             this.cmp_bottom_panel.Controls.Add(this.cmp_add_button);
             this.cmp_bottom_panel.Controls.Add(this.cmp_send_button);
             this.cmp_bottom_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.cmp_bottom_panel.Location = new System.Drawing.Point(10, 539);
+            this.cmp_bottom_panel.Location = new System.Drawing.Point(10, 530);
             this.cmp_bottom_panel.Name = "cmp_bottom_panel";
-            this.cmp_bottom_panel.Size = new System.Drawing.Size(474, 48);
+            this.cmp_bottom_panel.Size = new System.Drawing.Size(470, 48);
             this.cmp_bottom_panel.TabIndex = 1;
+            // 
+            // cmp_attach_button
+            // 
+            this.cmp_attach_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmp_attach_button.BackgroundImage = global::G5EmailClient.Properties.Resources.AttachIcon;
+            this.cmp_attach_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.cmp_attach_button.FlatAppearance.BorderSize = 0;
+            this.cmp_attach_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmp_attach_button.Location = new System.Drawing.Point(58, 0);
+            this.cmp_attach_button.Margin = new System.Windows.Forms.Padding(0);
+            this.cmp_attach_button.Name = "cmp_attach_button";
+            this.cmp_attach_button.Size = new System.Drawing.Size(48, 48);
+            this.cmp_attach_button.TabIndex = 6;
+            this.cmp_attach_button.UseVisualStyleBackColor = true;
+            this.cmp_attach_button.Click += new System.EventHandler(this.cmp_attach_button_Click);
             // 
             // cmp_add_button
             // 
@@ -672,7 +721,7 @@
             this.cmp_send_button.BackgroundImage = global::G5EmailClient.Properties.Resources.SendIcon;
             this.cmp_send_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.cmp_send_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cmp_send_button.Location = new System.Drawing.Point(426, 0);
+            this.cmp_send_button.Location = new System.Drawing.Point(422, 0);
             this.cmp_send_button.Name = "cmp_send_button";
             this.cmp_send_button.Size = new System.Drawing.Size(48, 48);
             this.cmp_send_button.TabIndex = 5;
@@ -683,6 +732,8 @@
             // 
             this.cmp_info_panel.AutoSize = true;
             this.cmp_info_panel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.cmp_info_panel.Controls.Add(this.cmp_attachments_flowpanel);
+            this.cmp_info_panel.Controls.Add(this.cmp_info_padding_panel4);
             this.cmp_info_panel.Controls.Add(this.cmp_subject_panel);
             this.cmp_info_panel.Controls.Add(this.cmp_info_padding_panel3);
             this.cmp_info_panel.Controls.Add(this.cmp_bcc_panel);
@@ -694,8 +745,30 @@
             this.cmp_info_panel.Location = new System.Drawing.Point(10, 10);
             this.cmp_info_panel.Margin = new System.Windows.Forms.Padding(10);
             this.cmp_info_panel.Name = "cmp_info_panel";
-            this.cmp_info_panel.Size = new System.Drawing.Size(474, 139);
+            this.cmp_info_panel.Size = new System.Drawing.Size(470, 144);
             this.cmp_info_panel.TabIndex = 0;
+            // 
+            // cmp_attachments_flowpanel
+            // 
+            this.cmp_attachments_flowpanel.AutoScroll = true;
+            this.cmp_attachments_flowpanel.AutoSize = true;
+            this.cmp_attachments_flowpanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.cmp_attachments_flowpanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.cmp_attachments_flowpanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.cmp_attachments_flowpanel.Location = new System.Drawing.Point(0, 144);
+            this.cmp_attachments_flowpanel.MaximumSize = new System.Drawing.Size(0, 150);
+            this.cmp_attachments_flowpanel.Name = "cmp_attachments_flowpanel";
+            this.cmp_attachments_flowpanel.Size = new System.Drawing.Size(470, 0);
+            this.cmp_attachments_flowpanel.TabIndex = 8;
+            this.cmp_attachments_flowpanel.WrapContents = false;
+            // 
+            // cmp_info_padding_panel4
+            // 
+            this.cmp_info_padding_panel4.Dock = System.Windows.Forms.DockStyle.Top;
+            this.cmp_info_padding_panel4.Location = new System.Drawing.Point(0, 139);
+            this.cmp_info_padding_panel4.Name = "cmp_info_padding_panel4";
+            this.cmp_info_padding_panel4.Size = new System.Drawing.Size(470, 5);
+            this.cmp_info_padding_panel4.TabIndex = 9;
             // 
             // cmp_subject_panel
             // 
@@ -707,7 +780,7 @@
             this.cmp_subject_panel.Location = new System.Drawing.Point(0, 108);
             this.cmp_subject_panel.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_subject_panel.Name = "cmp_subject_panel";
-            this.cmp_subject_panel.Size = new System.Drawing.Size(474, 31);
+            this.cmp_subject_panel.Size = new System.Drawing.Size(470, 31);
             this.cmp_subject_panel.TabIndex = 7;
             // 
             // cmp_subject_underscore_panel
@@ -716,7 +789,7 @@
             this.cmp_subject_underscore_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.cmp_subject_underscore_panel.Location = new System.Drawing.Point(75, 30);
             this.cmp_subject_underscore_panel.Name = "cmp_subject_underscore_panel";
-            this.cmp_subject_underscore_panel.Size = new System.Drawing.Size(399, 1);
+            this.cmp_subject_underscore_panel.Size = new System.Drawing.Size(395, 1);
             this.cmp_subject_underscore_panel.TabIndex = 3;
             // 
             // cmp_subject_textbox
@@ -727,7 +800,7 @@
             this.cmp_subject_textbox.Location = new System.Drawing.Point(75, 0);
             this.cmp_subject_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_subject_textbox.Name = "cmp_subject_textbox";
-            this.cmp_subject_textbox.Size = new System.Drawing.Size(399, 30);
+            this.cmp_subject_textbox.Size = new System.Drawing.Size(395, 30);
             this.cmp_subject_textbox.TabIndex = 3;
             // 
             // cmp_subject_left_panel
@@ -758,7 +831,7 @@
             this.cmp_info_padding_panel3.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_info_padding_panel3.Location = new System.Drawing.Point(0, 103);
             this.cmp_info_padding_panel3.Name = "cmp_info_padding_panel3";
-            this.cmp_info_padding_panel3.Size = new System.Drawing.Size(474, 5);
+            this.cmp_info_padding_panel3.Size = new System.Drawing.Size(470, 5);
             this.cmp_info_padding_panel3.TabIndex = 6;
             // 
             // cmp_bcc_panel
@@ -770,7 +843,7 @@
             this.cmp_bcc_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_bcc_panel.Location = new System.Drawing.Point(0, 72);
             this.cmp_bcc_panel.Name = "cmp_bcc_panel";
-            this.cmp_bcc_panel.Size = new System.Drawing.Size(474, 31);
+            this.cmp_bcc_panel.Size = new System.Drawing.Size(470, 31);
             this.cmp_bcc_panel.TabIndex = 5;
             this.cmp_bcc_panel.Visible = false;
             // 
@@ -780,7 +853,7 @@
             this.cmp_bcc_underscore_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_bcc_underscore_panel.Location = new System.Drawing.Point(45, 30);
             this.cmp_bcc_underscore_panel.Name = "cmp_bcc_underscore_panel";
-            this.cmp_bcc_underscore_panel.Size = new System.Drawing.Size(429, 1);
+            this.cmp_bcc_underscore_panel.Size = new System.Drawing.Size(425, 1);
             this.cmp_bcc_underscore_panel.TabIndex = 3;
             // 
             // cmp_bcc_textbox
@@ -791,7 +864,7 @@
             this.cmp_bcc_textbox.Location = new System.Drawing.Point(45, 0);
             this.cmp_bcc_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_bcc_textbox.Name = "cmp_bcc_textbox";
-            this.cmp_bcc_textbox.Size = new System.Drawing.Size(429, 30);
+            this.cmp_bcc_textbox.Size = new System.Drawing.Size(425, 30);
             this.cmp_bcc_textbox.TabIndex = 2;
             // 
             // cmp_bcc_left_panel
@@ -822,7 +895,7 @@
             this.cmp_info_padding_panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_info_padding_panel2.Location = new System.Drawing.Point(0, 67);
             this.cmp_info_padding_panel2.Name = "cmp_info_padding_panel2";
-            this.cmp_info_padding_panel2.Size = new System.Drawing.Size(474, 5);
+            this.cmp_info_padding_panel2.Size = new System.Drawing.Size(470, 5);
             this.cmp_info_padding_panel2.TabIndex = 4;
             // 
             // cmp_cc_panel
@@ -834,7 +907,7 @@
             this.cmp_cc_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_cc_panel.Location = new System.Drawing.Point(0, 36);
             this.cmp_cc_panel.Name = "cmp_cc_panel";
-            this.cmp_cc_panel.Size = new System.Drawing.Size(474, 31);
+            this.cmp_cc_panel.Size = new System.Drawing.Size(470, 31);
             this.cmp_cc_panel.TabIndex = 2;
             this.cmp_cc_panel.Visible = false;
             // 
@@ -844,7 +917,7 @@
             this.cmp_cc_underscore_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_cc_underscore_panel.Location = new System.Drawing.Point(45, 30);
             this.cmp_cc_underscore_panel.Name = "cmp_cc_underscore_panel";
-            this.cmp_cc_underscore_panel.Size = new System.Drawing.Size(429, 1);
+            this.cmp_cc_underscore_panel.Size = new System.Drawing.Size(425, 1);
             this.cmp_cc_underscore_panel.TabIndex = 3;
             // 
             // cmp_cc_textbox
@@ -855,7 +928,7 @@
             this.cmp_cc_textbox.Location = new System.Drawing.Point(45, 0);
             this.cmp_cc_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_cc_textbox.Name = "cmp_cc_textbox";
-            this.cmp_cc_textbox.Size = new System.Drawing.Size(429, 30);
+            this.cmp_cc_textbox.Size = new System.Drawing.Size(425, 30);
             this.cmp_cc_textbox.TabIndex = 1;
             // 
             // cmp_cc_left_panel
@@ -887,7 +960,7 @@
             this.cmp_info_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_info_padding_panel1.Location = new System.Drawing.Point(0, 31);
             this.cmp_info_padding_panel1.Name = "cmp_info_padding_panel1";
-            this.cmp_info_padding_panel1.Size = new System.Drawing.Size(474, 5);
+            this.cmp_info_padding_panel1.Size = new System.Drawing.Size(470, 5);
             this.cmp_info_padding_panel1.TabIndex = 3;
             // 
             // cmp_to_panel
@@ -899,7 +972,7 @@
             this.cmp_to_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_to_panel.Location = new System.Drawing.Point(0, 0);
             this.cmp_to_panel.Name = "cmp_to_panel";
-            this.cmp_to_panel.Size = new System.Drawing.Size(474, 31);
+            this.cmp_to_panel.Size = new System.Drawing.Size(470, 31);
             this.cmp_to_panel.TabIndex = 1;
             // 
             // cmp_to_underline_panel
@@ -908,7 +981,7 @@
             this.cmp_to_underline_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_to_underline_panel.Location = new System.Drawing.Point(45, 30);
             this.cmp_to_underline_panel.Name = "cmp_to_underline_panel";
-            this.cmp_to_underline_panel.Size = new System.Drawing.Size(429, 1);
+            this.cmp_to_underline_panel.Size = new System.Drawing.Size(425, 1);
             this.cmp_to_underline_panel.TabIndex = 3;
             // 
             // cmp_to_textbox
@@ -919,7 +992,7 @@
             this.cmp_to_textbox.Location = new System.Drawing.Point(45, 0);
             this.cmp_to_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.cmp_to_textbox.Name = "cmp_to_textbox";
-            this.cmp_to_textbox.Size = new System.Drawing.Size(429, 30);
+            this.cmp_to_textbox.Size = new System.Drawing.Size(425, 30);
             this.cmp_to_textbox.TabIndex = 0;
             // 
             // cmp_to_left_panel
@@ -955,7 +1028,7 @@
             this.user_settings_tab.Location = new System.Drawing.Point(4, 29);
             this.user_settings_tab.Name = "user_settings_tab";
             this.user_settings_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.user_settings_tab.Size = new System.Drawing.Size(494, 597);
+            this.user_settings_tab.Size = new System.Drawing.Size(490, 588);
             this.user_settings_tab.TabIndex = 4;
             this.user_settings_tab.Text = "User Settings";
             // 
@@ -1067,7 +1140,7 @@
             this.connected_users_panel.Controls.Add(this.connected_users_listbox);
             this.connected_users_panel.Controls.Add(this.add_user_button);
             this.connected_users_panel.Controls.Add(this.delete_user_button);
-            this.connected_users_panel.Location = new System.Drawing.Point(275, 6);
+            this.connected_users_panel.Location = new System.Drawing.Point(271, 6);
             this.connected_users_panel.Name = "connected_users_panel";
             this.connected_users_panel.Padding = new System.Windows.Forms.Padding(3);
             this.connected_users_panel.Size = new System.Drawing.Size(213, 260);
@@ -1083,6 +1156,7 @@
             this.connected_users_listbox.Name = "connected_users_listbox";
             this.connected_users_listbox.Size = new System.Drawing.Size(205, 200);
             this.connected_users_listbox.TabIndex = 0;
+            this.connected_users_listbox.Click += new System.EventHandler(this.connected_users_listbox_Click);
             // 
             // add_user_button
             // 
@@ -1118,9 +1192,9 @@
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pictureBox1.Image = global::G5EmailClient.Properties.Resources.Group5Logo;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 272);
+            this.pictureBox1.Location = new System.Drawing.Point(3, 263);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(488, 322);
+            this.pictureBox1.Size = new System.Drawing.Size(484, 322);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 5;
             this.pictureBox1.TabStop = false;
@@ -1134,7 +1208,7 @@
             this.template_flow_panel.Location = new System.Drawing.Point(0, 66);
             this.template_flow_panel.MinimumSize = new System.Drawing.Size(350, 0);
             this.template_flow_panel.Name = "template_flow_panel";
-            this.template_flow_panel.Size = new System.Drawing.Size(350, 564);
+            this.template_flow_panel.Size = new System.Drawing.Size(350, 555);
             this.template_flow_panel.TabIndex = 2;
             // 
             // search_textbox
@@ -1162,7 +1236,7 @@
             this.inbox_panel.Dock = System.Windows.Forms.DockStyle.Left;
             this.inbox_panel.Location = new System.Drawing.Point(230, 30);
             this.inbox_panel.Name = "inbox_panel";
-            this.inbox_panel.Size = new System.Drawing.Size(352, 632);
+            this.inbox_panel.Size = new System.Drawing.Size(352, 623);
             this.inbox_panel.TabIndex = 2;
             // 
             // search_settings_panel
@@ -1305,18 +1379,26 @@
             this.add_bcc_menuitem.Text = "Toggle Bcc";
             this.add_bcc_menuitem.Click += new System.EventHandler(this.add_bcc_menuitem_Click);
             // 
+            // save_attachment_dialog
+            // 
+            this.save_attachment_dialog.Title = "Save attachment";
+            // 
+            // load_attachment_dialog
+            // 
+            this.load_attachment_dialog.Title = "Load attachment";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.ClientSize = new System.Drawing.Size(1086, 662);
+            this.ClientSize = new System.Drawing.Size(1082, 653);
             this.Controls.Add(this.main_panel);
             this.Controls.Add(this.inbox_panel);
             this.Controls.Add(this.folders_panel);
             this.Controls.Add(this.top_panel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(1018, 647);
+            this.MinimumSize = new System.Drawing.Size(1100, 700);
             this.Name = "MainWindow";
             this.top_panel.ResumeLayout(false);
             this.top_panel.PerformLayout();
@@ -1475,10 +1557,17 @@
         private Panel send_as_name_underline_panel;
         private TextBox send_as_name_textbox;
         private Label send_as_name_label;
-        private Label send_as_email_label;
-        private Panel send_as_email_underline_panel;
-        private Panel panel2;
         private TextBox send_as_email_textbox;
         private PictureBox pictureBox1;
+        private Panel message_sender_infor_paddingpanel3;
+        private FlowLayoutPanel msg_attachments_flow_panel;
+        private SaveFileDialog save_attachment_dialog;
+        private Panel send_as_email_underline_panel;
+        private Panel panel2;
+        private Label send_as_email_label;
+        private Button cmp_attach_button;
+        private FlowLayoutPanel cmp_attachments_flowpanel;
+        private OpenFileDialog load_attachment_dialog;
+        private Panel cmp_info_padding_panel4;
     }
 }

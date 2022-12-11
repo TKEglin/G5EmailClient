@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Security.Cryptography;
 
 namespace G5EmailClient.Database
 {

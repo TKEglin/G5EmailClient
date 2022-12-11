@@ -74,6 +74,7 @@ namespace G5EmailClient.Email
 
         List<EmailFolder> emailFolders = new();
         EmailFolder? activeFolder;
+        EmailFolder? trashFolder = null;
         // This variable is used to throttle preloading speed when multiple folders are loading
         int foldersPreloading = 0;
 
@@ -143,16 +144,27 @@ namespace G5EmailClient.Email
             var preloadFolders = loadImapClient.GetFolders(mainImapClient.PersonalNamespaces[0], false);
             for (int i = 0; i < mainFolders.Count; i++)
             {
-                var mainFolder = mainFolders[i];
+                var mainFolder    = mainFolders[i];
+                var preloadFolder = preloadFolders[i];
 
                 // If statement to avoid adding the inbox twice
                 if (mainFolder.Name != inbox_name & mainFolder.Exists)
                 {
-                    emailFolders.Add(new EmailFolder(mainFolder, preloadFolders[i], mainFolder.Name));
+                    var newFolder = new EmailFolder(mainFolder, preloadFolder, mainFolder.Name);
+
+                    emailFolders.Add(newFolder);
 
                     // Weird way to find the index. Is probably a better way.
-                    int index = emailFolders.IndexOf(emailFolders.Last());
-                    emailFolders.Last().FolderIndex = index;
+                    int index = emailFolders.IndexOf(newFolder);
+                    newFolder.FolderIndex = index;
+
+                    if (mainFolder.Attributes.HasFlag(FolderAttributes.Trash))
+                    {
+                        trashFolder = newFolder;
+                    }
+
+                    // Preloading folders
+                    ThreadPool.QueueUserWorkItem(state => updateFolder(index));
                 }
             }
         }
@@ -197,7 +209,6 @@ namespace G5EmailClient.Email
                 if(items.Envelope.Subject != null)
                     envelope.subject = items.Envelope.Subject.ToString();
                 folder.Envelopes.Add(items.UniqueId, envelope);
-
             }
 
             folder.isLoaded = true;
@@ -215,21 +226,14 @@ namespace G5EmailClient.Email
                 folder.stopPreload = true;
                 Thread.Sleep(50);
             }
-
-            // Proloading messages
-            ThreadPool.QueueUserWorkItem(state => PreloadMessages(folder));
         }
 
-        private void PreloadMessages(EmailFolder folder)
+        private void PreloadMessages(EmailFolder folder, List<string> sUIDs)
         {
             foldersPreloading++;
             folder.preloadInProgress = true;
 
-            // The integer defines how many new messages are loaded.
-            int loadLimit = folder.Messages.Count + 25;
-            int maxCount = Math.Min(folder.UIDs.Count, loadLimit);
-
-            for(int i = 0; i < maxCount; i++)
+            foreach(var sUID in sUIDs)
             {
                 if(folder.stopPreload)
                 {
@@ -238,8 +242,8 @@ namespace G5EmailClient.Email
                     folder.stopPreload = false;
                     return;
                 }
-
-                var UID = folder.UIDs[i];
+                
+                var UID = UniqueId.Parse(sUID);
                 PreloadMessage(folder, UID);
             }
 
@@ -247,6 +251,11 @@ namespace G5EmailClient.Email
 
             folder.preloadInProgress = false;
             foldersPreloading--;
+        }
+
+        void IEmail.PreloadMessages(int folder, List<string> sUIDs)
+        {
+            ThreadPool.QueueUserWorkItem(state => PreloadMessages(emailFolders[folder], sUIDs));
         }
 
         private void PreloadMessage(EmailFolder folder, UniqueId UID)
@@ -318,15 +327,18 @@ namespace G5EmailClient.Email
 
             List<IEmail.Message> messages = new();
             List<string>         stringUIDs = new();
-            foreach(var UID in UIDs)
+            foreach (var UID in UIDs)
             {
-                IEmail.Message message = new();
+                if (folder.Envelopes.ContainsKey(UID) & folder.Seen.ContainsKey(UID))
+                {
+                    IEmail.Message message = new();
                     message.subject = folder.Envelopes[UID].subject;
-                    message.date    = folder.Envelopes[UID].date;
-                    message.from    = folder.Envelopes[UID].from;
-                    message.seen    = folder.Seen[UID];
-                messages.Add(message);
-                stringUIDs.Add(UID.ToString());
+                    message.date = folder.Envelopes[UID].date;
+                    message.from = folder.Envelopes[UID].from;
+                    message.seen = folder.Seen[UID];
+                    messages.Add(message);
+                    stringUIDs.Add(UID.ToString());
+                }
             }
             envelopes = (messages, stringUIDs);
 
@@ -340,7 +352,6 @@ namespace G5EmailClient.Email
         #region server connection functions
         void IEmail.Disconnect()
         {
-
             MainImapMutex.WaitOne();
             mainImapClient.Disconnect(true);
 
@@ -549,16 +560,59 @@ namespace G5EmailClient.Email
                 MainImapMutex.ReleaseMutex();
             }
             IEmail.Message message = new();
-                message.date    = ImapMessage.Date.ToString();
-                message.from    = ImapMessage.From.ToString();
-                message.to      = ImapMessage.To.ToString();
-                if (ImapMessage.Cc != null)
-                    message.cc      = ImapMessage.Cc.ToString();
-                if (ImapMessage.Subject != null)
-                    message.subject = ImapMessage.Subject;
-                if (ImapMessage.TextBody != null)
-                    message.body    = ImapMessage.TextBody.ToString();
+            message.date    = ImapMessage.Date.ToString();
+            message.from    = ImapMessage.From.ToString();
+            message.to      = ImapMessage.To.ToString();
+            if (ImapMessage.Cc != null)
+                message.cc      = ImapMessage.Cc.ToString();
+            if (ImapMessage.Subject != null)
+                message.subject = ImapMessage.Subject;
+            if (ImapMessage.TextBody != null)
+                message.body    = ImapMessage.TextBody.ToString();
+            if (ImapMessage.Attachments != null)
+            {
+                foreach(var attachment in ImapMessage.Attachments)
+                {
+                    if(attachment is MessagePart)
+                    {
+                        message.attachments.Add(attachment.ContentDisposition.FileName);
+                    }
+                    else
+                    {
+                        var part = (MimePart)attachment;
+                        message.attachments.Add(part.FileName);
+                    }
+                }
+            }
             return message;
+        }
+
+        void IEmail.WriteAttachmentToFile(ref Stream Stream, string sUID, string fileName)
+        {
+            var UID = UniqueId.Parse(sUID);
+            var ImapMessage = activeFolder!.Messages[UID];
+            if (ImapMessage.Attachments != null)
+            {
+                foreach (var attachment in ImapMessage.Attachments)
+                {
+                    if (attachment is MessagePart)
+                    {
+                        if(attachment.ContentDisposition.FileName == fileName)
+                        {
+                            var rfc = (MessagePart)attachment;
+                            rfc.Message.WriteTo(Stream);
+                        }
+                    }
+                    else
+                    {
+                        var part = (MimePart)attachment;
+                        if(part.FileName == fileName)
+                        {
+                            part.Content.DecodeTo(Stream);
+                        }
+                    }
+                }
+            }
         }
 
         List<string> IEmail.GetFoldernames()
@@ -568,8 +622,13 @@ namespace G5EmailClient.Email
             {
                 folderNames.Add(folder.MainImapFolder!.Name);
             }
+            if(trashFolder == null)
+            {
+                NoTrashFolderDetected(null, EventArgs.Empty);
+            }
             return folderNames;
         }
+        public event EventHandler NoTrashFolderDetected;
         #endregion
 
          //__________________________________________
@@ -665,7 +724,15 @@ namespace G5EmailClient.Email
                 folder.MainImapFolder.Open(FolderAccess.ReadWrite);
             }
 
-            folder.MainImapFolder.AddFlags(ID, MessageFlags.Deleted, true);
+            // If trash folder is detected, move the message
+            if (trashFolder != null & folder != trashFolder)
+                MoveMessage(ID, trashFolder.FolderIndex, false);
+            else
+            {
+                folder.MainImapFolder.AddFlags(ID, MessageFlags.Deleted, true);
+                folder.MainImapFolder.Expunge();
+            }
+
             Debug.WriteLine("Server request to add deleted flag");
 
             MainImapMutex.ReleaseMutex();
@@ -673,9 +740,12 @@ namespace G5EmailClient.Email
 
         void IEmail.MoveMessage(string sUID, int folderIndex)
         {
-            Debug.WriteLine("Running MailKitEmail.MoveMessage() with destination " 
-                           + emailFolders[folderIndex].MainImapFolder!.Name);
-            var UID = UniqueId.Parse(sUID);
+            MoveMessage(UniqueId.Parse(sUID), folderIndex, true);
+        }
+        private void MoveMessage(UniqueId UID, int folderIndex, bool async)
+        {
+            Debug.WriteLine("Running MailKitEmail.MoveMessage() with destination "
+               + emailFolders[folderIndex].MainImapFolder!.Name);
 
             // Saving message data before move
             var Envelope = activeFolder!.Envelopes[UID];
@@ -684,8 +754,11 @@ namespace G5EmailClient.Email
             if (activeFolder.Messages.ContainsKey(UID))
                 message = activeFolder.Messages[UID];
 
-            ThreadPool.QueueUserWorkItem(state => AsyncMoveMessage(UID, folderIndex, activeFolder!,
-                                                                   Envelope, Seen, message));
+            if (async)
+                ThreadPool.QueueUserWorkItem(state => AsyncMoveMessage(UID, folderIndex, activeFolder!,
+                                                                       Envelope, Seen, message));
+            else
+                AsyncMoveMessage(UID, folderIndex, activeFolder!, Envelope, Seen, message);
 
             Debug.WriteLine("MailKitEmail.MoveMessage() complete");
         }
@@ -756,7 +829,7 @@ namespace G5EmailClient.Email
         // Functions that interact with the SMTP server 
         #region SMTP functions
 
-        void IEmail.SendMessage(IEmail.Message message)
+        void IEmail.SendMessage(IEmail.Message message, List<(Stream stream, string filename)> attachments)
         {
             var addresses     = SplitEmails(message.to);
             var cc_addresses  = SplitEmails(message.cc);
@@ -778,7 +851,32 @@ namespace G5EmailClient.Email
                         foreach (var bcc_address in bcc_addresses)
                             MimeMsg.Bcc.Add(new MailboxAddress("", bcc_address));
                     MimeMsg.Subject = message.subject;
-                    MimeMsg.Body = new TextPart("plain") { Text = message.body };
+
+                    // Creating body
+                    var body = new BodyBuilder { 
+                        HtmlBody = message.body,
+                        TextBody = message.body
+                        };
+
+                    // Adding attachments to body
+                    if(attachments != null)
+                    {
+                        foreach (var parAtt in attachments)
+                        {
+                            var attachment = new MimePart()
+                            {
+                                Content = new MimeContent(parAtt.stream, ContentEncoding.Default),
+                                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                                ContentTransferEncoding = ContentEncoding.Base64,
+                                FileName = parAtt.filename
+                            };
+                            body.Attachments.Add(attachment);
+                        }
+                    }
+                    
+                    // Adding body to message
+                    MimeMsg.Body = body.ToMessageBody();
+
                 }
                 catch (Exception ex)
                 {

@@ -16,6 +16,9 @@ namespace G5EmailClient.GUI
         internal bool Selected = false;
         public string UID = string.Empty;
 
+        public int? folderIndex;
+        public int? clientIndex;
+
         // Definition of the color of the edge bar for each status
         static Color ReadColor = Color.LightGray;
         static Color UnreadColor = Color.Black;

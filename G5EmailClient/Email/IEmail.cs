@@ -15,14 +15,17 @@ namespace G5EmailClient.Email
         /// </summary>
         public class Message
         {
-            public string date    { get; set; } = string.Empty;
-            public string from    { get; set; } = string.Empty;
-            public string to      { get; set; } = string.Empty;
-            public string cc      { get; set; } = string.Empty;
-            public string bcc     { get; set; } = string.Empty;
-            public string subject { get; set; } = string.Empty;
-            public string body    { get; set; } = string.Empty;
-            public bool   seen    { get; set; } = false;
+            public string date        { get; set; } = string.Empty;
+            public string from        { get; set; } = string.Empty;
+            public string to          { get; set; } = string.Empty;
+            public string cc          { get; set; } = string.Empty;
+            public string bcc         { get; set; } = string.Empty;
+            public string subject     { get; set; } = string.Empty;
+            public string body        { get; set; } = string.Empty;
+            public bool   seen        { get; set; } = false;
+
+
+            public List<string> attachments { get; set; } = new();
         }
 
         /// <summary>
@@ -158,6 +161,11 @@ namespace G5EmailClient.Email
         void PreloadMessage(int folderIndex, string UID);
 
         /// <summary>
+        /// Preloads the messages corresponding to the UIDs in the given folder.
+        /// </summary>
+        void PreloadMessages(int folder, List<string> UIDs);
+
+        /// <summary>
         /// Retrives and returns a message from the active folder given an index.
         /// </summary>
         /// <param name="messageIndex"></param>
@@ -165,11 +173,17 @@ namespace G5EmailClient.Email
         Message? OpenMessage(string UID);
 
         /// <summary>
+        /// Attempts to write the contents of the given stream. 
+        /// </summary>
+        void WriteAttachmentToFile(ref Stream stream, string UID, string fileName);
+
+        /// <summary>
         /// Gets a list of all foldernames. The index of the list will match the underlying index
         /// of the email folder in the IEmail client.
         /// </summary>
         /// <returns>A list of strings containing the folder names.</returns>
         List<string> GetFoldernames();
+        event EventHandler NoTrashFolderDetected;
 
         /// <summary>
         /// Toggles between read and unread for the given index. 
@@ -206,7 +220,7 @@ namespace G5EmailClient.Email
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        void SendMessage(Message message);
+        void SendMessage(Message message, List<(Stream stream, string filename)> attachments);
 
 
         /// <summary>
