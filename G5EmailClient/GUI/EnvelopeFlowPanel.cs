@@ -16,8 +16,7 @@ namespace G5EmailClient.GUI
         Dictionary<string, EnvelopePanel> panelList = new();
         List<EnvelopePanel> selectedPanels = new();
 
-        public bool needsUpdate = false;
-
+        public bool needsUpdate = true;
         public bool envelopesHidden = false;
 
         /// <summary>
