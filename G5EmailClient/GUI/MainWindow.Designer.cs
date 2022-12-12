@@ -441,10 +441,10 @@
             this.msg_mailbody_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.msg_mailbody_panel.Controls.Add(this.msg_body_rtextbox);
             this.msg_mailbody_panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.msg_mailbody_panel.Location = new System.Drawing.Point(10, 105);
+            this.msg_mailbody_panel.Location = new System.Drawing.Point(10, 110);
             this.msg_mailbody_panel.Name = "msg_mailbody_panel";
             this.msg_mailbody_panel.Padding = new System.Windows.Forms.Padding(3);
-            this.msg_mailbody_panel.Size = new System.Drawing.Size(470, 415);
+            this.msg_mailbody_panel.Size = new System.Drawing.Size(470, 410);
             this.msg_mailbody_panel.TabIndex = 4;
             this.msg_mailbody_panel.Tag = "";
             // 
@@ -457,7 +457,7 @@
             this.msg_body_rtextbox.Location = new System.Drawing.Point(3, 3);
             this.msg_body_rtextbox.Name = "msg_body_rtextbox";
             this.msg_body_rtextbox.ReadOnly = true;
-            this.msg_body_rtextbox.Size = new System.Drawing.Size(462, 407);
+            this.msg_body_rtextbox.Size = new System.Drawing.Size(462, 402);
             this.msg_body_rtextbox.TabIndex = 0;
             this.msg_body_rtextbox.Text = "<Message body goes here>";
             // 
@@ -472,7 +472,7 @@
             // msg_padding_panel1
             // 
             this.msg_padding_panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.msg_padding_panel1.Location = new System.Drawing.Point(10, 95);
+            this.msg_padding_panel1.Location = new System.Drawing.Point(10, 100);
             this.msg_padding_panel1.Name = "msg_padding_panel1";
             this.msg_padding_panel1.Size = new System.Drawing.Size(470, 10);
             this.msg_padding_panel1.TabIndex = 2;
@@ -542,7 +542,7 @@
             this.msg_senderinfo_panel.Location = new System.Drawing.Point(10, 10);
             this.msg_senderinfo_panel.Margin = new System.Windows.Forms.Padding(10);
             this.msg_senderinfo_panel.Name = "msg_senderinfo_panel";
-            this.msg_senderinfo_panel.Size = new System.Drawing.Size(470, 85);
+            this.msg_senderinfo_panel.Size = new System.Drawing.Size(470, 90);
             this.msg_senderinfo_panel.TabIndex = 0;
             this.msg_senderinfo_panel.Resize += new System.EventHandler(this.msg_senderinfo_panel_Resize);
             // 
@@ -553,7 +553,8 @@
             this.msg_attachments_flow_panel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.msg_attachments_flow_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.msg_attachments_flow_panel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.msg_attachments_flow_panel.Location = new System.Drawing.Point(0, 85);
+            this.msg_attachments_flow_panel.Location = new System.Drawing.Point(0, 90);
+            this.msg_attachments_flow_panel.Margin = new System.Windows.Forms.Padding(0);
             this.msg_attachments_flow_panel.MaximumSize = new System.Drawing.Size(0, 150);
             this.msg_attachments_flow_panel.Name = "msg_attachments_flow_panel";
             this.msg_attachments_flow_panel.Size = new System.Drawing.Size(470, 0);
@@ -565,7 +566,7 @@
             this.message_sender_infor_paddingpanel3.Dock = System.Windows.Forms.DockStyle.Top;
             this.message_sender_infor_paddingpanel3.Location = new System.Drawing.Point(0, 80);
             this.message_sender_infor_paddingpanel3.Name = "message_sender_infor_paddingpanel3";
-            this.message_sender_infor_paddingpanel3.Size = new System.Drawing.Size(470, 5);
+            this.message_sender_infor_paddingpanel3.Size = new System.Drawing.Size(470, 10);
             this.message_sender_infor_paddingpanel3.TabIndex = 5;
             this.message_sender_infor_paddingpanel3.Visible = false;
             // 
@@ -690,7 +691,6 @@
             // 
             // cmp_attach_button
             // 
-            this.cmp_attach_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmp_attach_button.BackgroundImage = global::G5EmailClient.Properties.Resources.AttachIcon;
             this.cmp_attach_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.cmp_attach_button.FlatAppearance.BorderSize = 0;
@@ -756,6 +756,7 @@
             this.cmp_attachments_flowpanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.cmp_attachments_flowpanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.cmp_attachments_flowpanel.Location = new System.Drawing.Point(0, 144);
+            this.cmp_attachments_flowpanel.Margin = new System.Windows.Forms.Padding(0);
             this.cmp_attachments_flowpanel.MaximumSize = new System.Drawing.Size(0, 150);
             this.cmp_attachments_flowpanel.Name = "cmp_attachments_flowpanel";
             this.cmp_attachments_flowpanel.Size = new System.Drawing.Size(470, 0);
@@ -1047,6 +1048,7 @@
             this.user_settings_panel.Padding = new System.Windows.Forms.Padding(3);
             this.user_settings_panel.Size = new System.Drawing.Size(263, 260);
             this.user_settings_panel.TabIndex = 4;
+            this.user_settings_panel.Visible = false;
             // 
             // send_as_email_underline_panel
             // 

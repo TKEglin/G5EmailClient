@@ -164,7 +164,7 @@ namespace G5EmailClient.Email
                     }
 
                     // Preloading folders
-                    ThreadPool.QueueUserWorkItem(state => updateFolder(index));
+                    //ThreadPool.QueueUserWorkItem(state => updateFolder(index));
                 }
             }
         }
@@ -221,11 +221,11 @@ namespace G5EmailClient.Email
             MainImapMutex.ReleaseMutex();
 
             // Waiting for in-progress preload to stop.
-            while (folder.preloadInProgress)
-            {
-                folder.stopPreload = true;
-                Thread.Sleep(50);
-            }
+            //while (folder.preloadInProgress)
+            //{
+            //    folder.stopPreload = true;
+            //    Thread.Sleep(50);
+            //}
         }
 
         private void PreloadMessages(EmailFolder folder, List<string> sUIDs)
@@ -525,6 +525,11 @@ namespace G5EmailClient.Email
                                    folder.Seen[UID]));
                 }
             }
+
+            // Inbox is downloaded in reverse for some reason, so it is reversed
+            if (folderIndex == 0)
+                envelopes.Reverse();
+
             return envelopes;
         }
 

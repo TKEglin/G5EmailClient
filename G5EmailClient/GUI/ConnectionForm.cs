@@ -161,7 +161,10 @@ namespace G5EmailClient.GUI
         private void close_button_Click(object sender, EventArgs e)
         {
             EmailClient.Disconnect();
-            Application.Exit();
+            if (isInitialForm)
+                Application.Exit();
+            else
+                this.Close();
         }
 
         private void connect_button_Click(object sender, EventArgs e)

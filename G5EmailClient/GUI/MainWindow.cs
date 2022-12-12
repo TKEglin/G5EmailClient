@@ -649,9 +649,14 @@ namespace G5EmailClient.GUI
             {
                 this.Cursor = Cursors.WaitCursor;
 
-                reenableButton(refresh_button);
-                refresh_button.Text = "Refresh";
-                refresh_button.Image = Properties.Resources.RefreshIcon;
+                if(index == 0)
+                {
+                    reenableButton(refresh_button);
+                    refresh_button.Text = "Refresh";
+                    refresh_button.Image = Properties.Resources.RefreshIcon;
+                }
+
+                Debug.WriteLine("Folder update finished handler running for folder with index " + index);
 
                 // Selecting and updating inbox
                 folders_lisbox.ClearSelected();

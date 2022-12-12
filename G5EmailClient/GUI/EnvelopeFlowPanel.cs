@@ -72,18 +72,18 @@ namespace G5EmailClient.GUI
             var NewPanelDate = DateTimeOffset.Parse(envelopePanel.dateText);
 
             // Finding date sorted location
-            foreach (EnvelopePanel OldPanel in flow_control.Controls)
-            {
-                var OldPanelDate = DateTimeOffset.Parse(OldPanel.dateText);
-                if (OldPanelDate.CompareTo(NewPanelDate) < 0)
-                {
-                    Debug.WriteLine("Reached later message. Setting index");
-                    var index = flow_control.Controls.IndexOf(OldPanel);
-                    flow_control.Controls.SetChildIndex(envelopePanel, index);
-                    flow_control.Controls.SetChildIndex(OldPanel, index + 1);
-                    break;
-                }
-            }
+            //foreach (EnvelopePanel OldPanel in flow_control.Controls)
+            //{
+            //    var OldPanelDate = DateTimeOffset.Parse(OldPanel.dateText);
+            //    if (OldPanelDate.CompareTo(NewPanelDate) < 0)
+            //    {
+            //        Debug.WriteLine("Reached later message. Setting index");
+            //        var index = flow_control.Controls.IndexOf(OldPanel);
+            //        flow_control.Controls.SetChildIndex(envelopePanel, index);
+            //        flow_control.Controls.SetChildIndex(OldPanel, index + 1);
+            //        break;
+            //    }
+            //}
             // Adding to the list
             panelList[UID] = envelopePanel;
         }

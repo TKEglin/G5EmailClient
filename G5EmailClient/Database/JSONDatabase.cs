@@ -160,12 +160,20 @@ namespace G5EmailClient.Database
             return 0;
         }
 
+        /// <summary>
+        /// Decrypts encrypted user password data
+        /// </summary>
+        /// <returns>The decrypted user</returns>
         private IDatabase.User DecryptUser(IDatabase.User user)
         {
             user.password = G5Encryption.Decrypt(user.password);
             return user;
         }
 
+        /// <summary>
+        /// Encrypts user password data
+        /// </summary>
+        /// <returns>The encrypted user</returns>
         private IDatabase.User EncryptUser(IDatabase.User user)
         {
             user.password = G5Encryption.Encrypt(user.password);

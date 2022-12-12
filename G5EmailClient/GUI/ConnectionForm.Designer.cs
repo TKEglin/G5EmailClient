@@ -247,7 +247,7 @@
             // 
             this.password_show_label.AutoSize = true;
             this.password_show_label.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.password_show_label.Location = new System.Drawing.Point(495, 112);
+            this.password_show_label.Location = new System.Drawing.Point(492, 113);
             this.password_show_label.Name = "password_show_label";
             this.password_show_label.Size = new System.Drawing.Size(45, 20);
             this.password_show_label.TabIndex = 8;
