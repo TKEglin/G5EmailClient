@@ -39,13 +39,13 @@ namespace G5EmailClient.Database
                     ["DefaultUser"] = "",
                     ["Users"] = new JsonArray()
                 };
-                var dataJson = email_data_json.ToJsonString();
+                var data_json = email_data_json.ToJsonString();
 
-                File.WriteAllText(email_data_file_path, dataJson);
+                File.WriteAllText(email_data_file_path, data_json);
             }
 
-            var email_data_string = File.ReadAllText(email_data_file_path);
-            email_data = JsonNode.Parse(email_data_string)!;
+            var data_string = File.ReadAllText(email_data_file_path);
+            email_data = JsonNode.Parse(data_string)!;
         }
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace G5EmailClient.Database
         /// </summary>
         internal void SaveData()
         {
-            var email_data_string = email_data.ToJsonString();
-            File.WriteAllText(email_data_file_path, email_data_string);
+            var data_string = email_data.ToJsonString();
+            File.WriteAllText(email_data_file_path, data_string);
         }
 
         List<IDatabase.User> IDatabase.GetUsers()
@@ -65,7 +65,7 @@ namespace G5EmailClient.Database
             foreach (var userJson in usersJson)
             {
                 var user = JsonSerializer.Deserialize<IDatabase.User>(userJson);
-                users.Add(user!);
+                users.Add(DecryptUser(user!));
             }
             return users;
         }
@@ -78,7 +78,7 @@ namespace G5EmailClient.Database
                 var user = JsonSerializer.Deserialize<IDatabase.User>(userJson);
                 if(user!.username == username)
                 {
-                    return user;
+                    return DecryptUser(user);
                 }
             }
             // Else:
@@ -96,7 +96,7 @@ namespace G5EmailClient.Database
                 {
                     if (defaultUser == user!["username"]!.GetValue<string>())
                     {
-                        return JsonSerializer.Deserialize<IDatabase.User>(user)!;
+                        return DecryptUser(JsonSerializer.Deserialize<IDatabase.User>(user)!);
                     }
                 }
             }
@@ -121,6 +121,7 @@ namespace G5EmailClient.Database
 
         int IDatabase.SaveUser(IDatabase.User param_user)
         {
+            param_user = EncryptUser(param_user);
             var userJson = JsonSerializer.Serialize<IDatabase.User>(param_user);
             var user_profiles = email_data!["Users"]!.AsArray();
 
@@ -157,6 +158,18 @@ namespace G5EmailClient.Database
             }
             // Else:
             return 0;
+        }
+
+        private IDatabase.User DecryptUser(IDatabase.User user)
+        {
+            user.password = G5Encryption.Decrypt(user.password);
+            return user;
+        }
+
+        private IDatabase.User EncryptUser(IDatabase.User user)
+        {
+            user.password = G5Encryption.Encrypt(user.password);
+            return user;
         }
     }
 }

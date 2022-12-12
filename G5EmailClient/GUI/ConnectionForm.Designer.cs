@@ -45,6 +45,7 @@
             this.message_label = new System.Windows.Forms.Label();
             this.login_button = new System.Windows.Forms.Button();
             this.login_panel = new System.Windows.Forms.Panel();
+            this.password_show_label = new System.Windows.Forms.Label();
             this.password_label = new System.Windows.Forms.Label();
             this.password_textbox = new System.Windows.Forms.TextBox();
             this.username_textbox = new System.Windows.Forms.TextBox();
@@ -231,15 +232,29 @@
             // 
             // login_panel
             // 
+            this.login_panel.Controls.Add(this.password_show_label);
             this.login_panel.Controls.Add(this.password_label);
             this.login_panel.Controls.Add(this.password_textbox);
             this.login_panel.Controls.Add(this.username_textbox);
             this.login_panel.Controls.Add(this.username_label);
             this.login_panel.Location = new System.Drawing.Point(150, 300);
             this.login_panel.Name = "login_panel";
-            this.login_panel.Size = new System.Drawing.Size(500, 150);
+            this.login_panel.Size = new System.Drawing.Size(540, 150);
             this.login_panel.TabIndex = 8;
             this.login_panel.Visible = false;
+            // 
+            // password_show_label
+            // 
+            this.password_show_label.AutoSize = true;
+            this.password_show_label.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.password_show_label.Location = new System.Drawing.Point(495, 112);
+            this.password_show_label.Name = "password_show_label";
+            this.password_show_label.Size = new System.Drawing.Size(45, 20);
+            this.password_show_label.TabIndex = 8;
+            this.password_show_label.Text = "Show";
+            this.password_show_label.Click += new System.EventHandler(this.password_show_label_Click);
+            this.password_show_label.MouseEnter += new System.EventHandler(this.password_show_label_MouseEnter);
+            this.password_show_label.MouseLeave += new System.EventHandler(this.password_show_label_MouseLeave);
             // 
             // password_label
             // 
@@ -456,5 +471,6 @@
         private Button load_user_button;
         private Button save_user_button;
         private ToolTip save_button_tooltip;
+        private Label password_show_label;
     }
 }
