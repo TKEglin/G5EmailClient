@@ -223,22 +223,25 @@ namespace G5EmailClient.GUI
             // If update is true, repopulate list.
             if(update == true)
             {
-                panel.Clear();
+                int loadAmount = 25;
 
-                var envelopes = MainClient.Client.GetFolderEnvelopes(folderIndex);
+                var envelopes = MainClient.Client.GetFolderEnvelopes(folderIndex, loadAmount);
                 foreach (var envelope in envelopes)
                 {
                     panel.Add(envelope.UID, envelope.from,
                                             envelope.date,
                                             envelope.subject,
                                             envelope.read);
+
+                    // Preloading the loaded message
+                    MainClient.Client.PreloadMessage(folderIndex, envelope.UID);
+                }
+                // If there envelopes list is full, there may be more messages.
+                if(envelopes.Count >= loadAmount)
+                {
+                    panel.AddLoadMorePanel();
                 }
 
-                // Preloading the first 10 messages
-                for(int i = 0; i < 10 & i < envelopes.Count; i++)
-                {
-                    MainClient.Client.PreloadMessage(folderIndex, panel[i].UID);
-                }
                 panel.needsUpdate = false;
             }
 
@@ -263,13 +266,15 @@ namespace G5EmailClient.GUI
 
             foreach (var folderName in MainClient.Client.GetFoldernames())
             {
+                index++;
+
                 // Folders list
                 folders_lisbox.Items.Add(folderName);
                 MainClient.FolderNames.Add(folderName);
 
                 // Adding flow panel to list
                 var flowPanel = new EnvelopeFlowPanel();
-                    flowPanel.Visible = false;
+                    flowPanel.Visible = false;  flowPanel.folderIndex = index;
                     flowPanel.Dock         =         template_flow_panel.Dock;
                     flowPanel.Dock         =         template_flow_panel.Dock;
                     flowPanel.Parent       =       template_flow_panel.Parent;
@@ -279,17 +284,23 @@ namespace G5EmailClient.GUI
                     flowPanel.MinimumSize  =  template_flow_panel.MinimumSize;
                     flowPanel.AutoSizeMode = template_flow_panel.AutoSizeMode;
                     flowPanel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
+                flowPanel.LoadMoreClicked += LoadMoreHandler;
                     flowPanel.BringToFront();
                 MainClient.EnvelopeFlowPanels.Add(flowPanel);
 
                 // Move button list
-                index++;
                 ToolStripButton folderButton = new();
                 folderButton.Text = folderName;
                 folderButton.Tag = index;
                 folderButton.Click += folder_move_button_Click;
                 move_message_dropdown.DropDownItems.Add(folderButton);
             }
+        }
+
+        void LoadMoreHandler(object? sender, EventArgs e)
+        {
+            var flowPanel = (EnvelopeFlowPanel)sender!;
+            updateFolderView(flowPanel.folderIndex, true, true);
         }
 
         void NoTrashFolderHandler(object? sender, EventArgs e)
@@ -303,7 +314,7 @@ namespace G5EmailClient.GUI
             AddNotification(notification);
         }
 
-        private void EnvelopePanel_MessageOpen(object sender, EventArgs e)
+        private void EnvelopePanel_MessageOpen(object? sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
 
@@ -632,7 +643,21 @@ namespace G5EmailClient.GUI
                 button.Text = "Refreshing";
                 DisableButton(button, -1);
 
-                MainClient.Client.UpdateInboxAsync();
+                var envelopes = MainClient.Client.GetNewMessageEnvelopes();
+
+                foreach(var envelope in envelopes)
+                {
+                    var panel = MainClient.EnvelopeFlowPanels[0];
+                    panel.Add(envelope.UID, envelope.from,
+                                            envelope.date,
+                                            envelope.subject,
+                                            envelope.read);
+
+                    // Preloading the loaded message
+                    MainClient.Client.PreloadMessage(panel.folderIndex, envelope.UID);
+                }
+
+                reenableButton(button);
             }
             this.Cursor = Cursors.Default;
         }
@@ -662,7 +687,7 @@ namespace G5EmailClient.GUI
                 folders_lisbox.ClearSelected();
                 folders_lisbox.SetSelected(index, true);
 
-                updateFolderView(index, true, true);
+                updateFolderView(index, false, true);
 
                 this.Cursor = Cursors.Default;
             }

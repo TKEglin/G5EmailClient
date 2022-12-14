@@ -34,7 +34,6 @@ namespace G5EmailClient.Email
             public IMailFolder? MainImapFolder    { get; set; }
             public IMailFolder? PreloadImapFolder { get; set; }
             // __Flags__
-
             public bool isLoaded { get; set; } = false;
             // These bools are used to check and stop a preload if it is progress during a new update
             public bool preloadInProgress { get; set; } = false;
@@ -45,6 +44,7 @@ namespace G5EmailClient.Email
             // __Folder Data__
             public string? FolderName;
             public int     FolderIndex; // Contains the folders index in the emailFolders list
+            public int     EnvelopesLoaded = 0; // Keeps track of how many envelopes are loaded in GUI
             public List<UniqueId> UIDs { get; set; } = new();
             public Dictionary<UniqueId, MimeMessage>    Messages  { get; set; } = new();
             public Dictionary<UniqueId, bool>           Seen      { get; set; } = new();
@@ -177,7 +177,6 @@ namespace G5EmailClient.Email
         /// 
         private void updateFolder(int folderIndex)
         {
-
             var folder = emailFolders[folderIndex];
 
             MainImapMutex.WaitOne();
@@ -194,10 +193,14 @@ namespace G5EmailClient.Email
             folder.Envelopes.Clear();
 
             Debug.WriteLine("Fetching summary items from folder " + folder.FolderName);
-            foreach (var items in folder.MainImapFolder.Fetch(0, -1, 
+
+            var envelopes = folder.MainImapFolder.Fetch(0, -1,
                                                        MessageSummaryItems.Envelope |
                                                        MessageSummaryItems.UniqueId |
-                                                       MessageSummaryItems.Flags))
+                                                       MessageSummaryItems.Flags);
+            if (folderIndex == 0) envelopes.Reverse(); // Inbox is downloaded in reverse
+
+            foreach (var items in envelopes)
             {
                 folder.UIDs.Add(items.UniqueId);
                 folder.Seen.Add(items.UniqueId, items.Flags!.Value.HasFlag(MessageFlags.Seen));
@@ -504,7 +507,7 @@ namespace G5EmailClient.Email
             return 0;
         }
 
-        List<(string UID, string from, string date, string subject, bool read)> IEmail.GetFolderEnvelopes(int folderIndex)
+        List<(string UID, string from, string date, string subject, bool read)> IEmail.GetFolderEnvelopes(int folderIndex, int amount)
         {
             List<(string, string, string, string, bool)> envelopes = new();
 
@@ -513,9 +516,14 @@ namespace G5EmailClient.Email
             // This list will contain the flags
             if (folder != null)
             {
+                // The envelopes up to this index are already loaded
+                int StartIndex = folder.EnvelopesLoaded;
+                int EndIndex = Math.Min(StartIndex + amount, folder.Envelopes.Count);
+
                 // This foreach loop merges the messages and UID lists to
                 // add them to the return list in one iteration.
-                for (int i = 0; i < folder.Envelopes.Count; i++)
+                int i;
+                for (i = StartIndex; i < EndIndex; i++)
                 {
                     var UID = folder.UIDs[i];
                     envelopes.Add((UID.ToString(),
@@ -524,14 +532,62 @@ namespace G5EmailClient.Email
                                    folder.Envelopes[UID].subject,
                                    folder.Seen[UID]));
                 }
-            }
 
-            // Inbox is downloaded in reverse for some reason, so it is reversed
-            if (folderIndex == 0)
-                envelopes.Reverse();
+                // Updating loaded count
+                folder.EnvelopesLoaded += i - StartIndex;
+            }
 
             return envelopes;
         }
+
+        List<(string UID, string from, string date, string subject, bool read)> IEmail.GetNewMessageEnvelopes()
+        {
+            List<(string, string, string, string, bool)> envelopes = new();
+
+            MainImapMutex.WaitOne();
+
+            var inbox = emailFolders[0];
+
+            if (!inbox.MainImapFolder!.IsOpen) inbox.MainImapFolder.Open(FolderAccess.ReadWrite);
+
+            var UIDs = inbox.MainImapFolder.Search(SearchQuery.Recent);
+
+            foreach (var items in inbox.MainImapFolder.Fetch(UIDs,
+                                                       MessageSummaryItems.Envelope |
+                                                       MessageSummaryItems.UniqueId |
+                                                       MessageSummaryItems.Flags))
+            {
+                // If message is not already loaded, it is new
+                if(!inbox.UIDs.Contains(items.UniqueId))
+                {
+                    inbox.UIDs.Add(items.UniqueId);
+                    inbox.Seen.Add(items.UniqueId, items.Flags!.Value.HasFlag(MessageFlags.Seen));
+
+                    IEmail.Message envelope = new();
+                    envelope.from = items.Envelope.From.ToString();
+                    if (items.Envelope.Date != null)
+                        envelope.date = items.Envelope.Date.Value.LocalDateTime.ToString();
+                    if (items.Envelope.Subject != null)
+                        envelope.subject = items.Envelope.Subject.ToString();
+                    inbox.Envelopes.Add(items.UniqueId, envelope);
+
+
+                    envelopes.Add((items.UniqueId.ToString(), envelope.from, envelope.date, envelope.subject,
+                                   items.Flags!.Value.HasFlag(MessageFlags.Seen)));
+                }
+            }
+
+            MainImapMutex.ReleaseMutex();
+
+            return envelopes;
+
+        }
+
+        List<(string UID, string from, string date, string subject, bool read)> IEmail.GetAllFolderEnvelopes(int folderIndex)
+        {
+            return ((IEmail)this).GetFolderEnvelopes(folderIndex, int.MaxValue);
+        }
+
 
         IEmail.Message? IEmail.OpenMessage(string sUID)
         {

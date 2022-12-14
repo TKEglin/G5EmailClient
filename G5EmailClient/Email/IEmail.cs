@@ -141,6 +141,11 @@ namespace G5EmailClient.Email
         event EventHandler FolderUpdateFinished;
 
         /// <summary>
+        /// Checks for new messages and returns their envelopes. If the list is empty, no new messages were found.
+        /// </summary>
+        List<(string UID, string from, string date, string subject, bool read)> GetNewMessageEnvelopes();
+
+        /// <summary>
         /// Sets the active folder using a given index. Opens the folder if it is unopened.
         /// Loads the folder if it is unloaded.
         /// </summary>
@@ -149,11 +154,16 @@ namespace G5EmailClient.Email
         int LoadSetActiveFolder(int folderIndex);
 
         /// <summary>
-        /// Gets the from string, subject line and read status of all emails in the active folder.
-        /// Each index in the list corresponds to the index of the folder in the underlying list.
+        /// Gets the from string, subject line and read status of the given amount of emails in the active folder.
         /// </summary>
         /// <returns>A list of tuples.</returns>
-        List<(string UID, string from, string date, string subject, bool read)> GetFolderEnvelopes(int folderIndex);
+        List<(string UID, string from, string date, string subject, bool read)> GetFolderEnvelopes(int folderIndex, int amount);
+
+        /// <summary>
+        /// Gets the from string, subject line and read status of all emails in the active folder.
+        /// </summary>
+        /// <returns>A list of tuples.</returns>
+        List<(string UID, string from, string date, string subject, bool read)> GetAllFolderEnvelopes(int folderIndex);
 
         /// <summary>
         /// Preloads the message corresponding to the UID in the given folder.
