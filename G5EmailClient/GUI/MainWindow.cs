@@ -78,6 +78,7 @@ namespace G5EmailClient.GUI
                 MainClient.Client.FolderUpdateFinished += FolderUpdateFinishedHandler;
                 MainClient.Client.MoveMessageFinished += MoveMessageFinishedHandler;
                 MainClient.Client.NoTrashFolderDetected += NoTrashFolderHandler;
+                refresh_timer.Tick += refresh_button_Click;
                 // Data
                 initializeFoldersView();
                 updateFolderView(0, true, true);
@@ -223,22 +224,25 @@ namespace G5EmailClient.GUI
             // If update is true, repopulate list.
             if(update == true)
             {
-                panel.Clear();
+                int loadAmount = 25;
 
-                var envelopes = MainClient.Client.GetFolderEnvelopes(folderIndex);
+                var envelopes = MainClient.Client.GetFolderEnvelopes(folderIndex, loadAmount);
                 foreach (var envelope in envelopes)
                 {
                     panel.Add(envelope.UID, envelope.from,
                                             envelope.date,
                                             envelope.subject,
                                             envelope.read);
+
+                    // Preloading the loaded message
+                    MainClient.Client.PreloadMessage(folderIndex, envelope.UID);
+                }
+                // If there envelopes list is full, there may be more messages.
+                if(envelopes.Count >= loadAmount)
+                {
+                    panel.AddLoadMorePanel();
                 }
 
-                // Preloading the first 10 messages
-                for(int i = 0; i < 10 & i < envelopes.Count; i++)
-                {
-                    MainClient.Client.PreloadMessage(folderIndex, panel[i].UID);
-                }
                 panel.needsUpdate = false;
             }
 
@@ -263,13 +267,15 @@ namespace G5EmailClient.GUI
 
             foreach (var folderName in MainClient.Client.GetFoldernames())
             {
+                index++;
+
                 // Folders list
                 folders_lisbox.Items.Add(folderName);
                 MainClient.FolderNames.Add(folderName);
 
                 // Adding flow panel to list
                 var flowPanel = new EnvelopeFlowPanel();
-                    flowPanel.Visible = false;
+                    flowPanel.Visible = false;  flowPanel.folderIndex = index;
                     flowPanel.Dock         =         template_flow_panel.Dock;
                     flowPanel.Dock         =         template_flow_panel.Dock;
                     flowPanel.Parent       =       template_flow_panel.Parent;
@@ -279,17 +285,25 @@ namespace G5EmailClient.GUI
                     flowPanel.MinimumSize  =  template_flow_panel.MinimumSize;
                     flowPanel.AutoSizeMode = template_flow_panel.AutoSizeMode;
                     flowPanel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
+                    flowPanel.LoadMoreClicked += LoadMoreHandler;
                     flowPanel.BringToFront();
                 MainClient.EnvelopeFlowPanels.Add(flowPanel);
 
                 // Move button list
-                index++;
                 ToolStripButton folderButton = new();
                 folderButton.Text = folderName;
                 folderButton.Tag = index;
                 folderButton.Click += folder_move_button_Click;
                 move_message_dropdown.DropDownItems.Add(folderButton);
             }
+
+            MainClient.FoldersInitialized = true;
+        }
+
+        void LoadMoreHandler(object? sender, EventArgs e)
+        {
+            var flowPanel = (EnvelopeFlowPanel)sender!;
+            updateFolderView(flowPanel.folderIndex, true, true);
         }
 
         void NoTrashFolderHandler(object? sender, EventArgs e)
@@ -303,7 +317,7 @@ namespace G5EmailClient.GUI
             AddNotification(notification);
         }
 
-        private void EnvelopePanel_MessageOpen(object sender, EventArgs e)
+        private void EnvelopePanel_MessageOpen(object? sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
 
@@ -423,7 +437,7 @@ namespace G5EmailClient.GUI
         {
             this.Cursor = Cursors.WaitCursor;
             ToolStripButton button = (ToolStripButton)sender;
-            DisableButton(button, 0.2);
+            DisableButton(button, 0.3);
 
             var UIDs = MainClient.activePanel!.ToggleReadSelected();
 
@@ -439,11 +453,11 @@ namespace G5EmailClient.GUI
             this.Cursor = Cursors.WaitCursor;
 
             var deleted_UIDs = MainClient.activePanel!.DeleteSelected();
+
             foreach (var UID in deleted_UIDs)
             {
                 MainClient.Client.Delete(UID);
             }
-            
             this.Cursor = Cursors.Default;
         }
 
@@ -620,7 +634,9 @@ namespace G5EmailClient.GUI
         {
             this.Cursor = Cursors.WaitCursor;
 
-            var button = (ToolStripButton)sender;
+            Debug.WriteLine("Refreshing inbox");
+
+            var button = refresh_button;
             if (button.Owner.InvokeRequired)
             {
                 Action safeRefresh = delegate { refresh_button_Click(sender, e); };
@@ -632,8 +648,25 @@ namespace G5EmailClient.GUI
                 button.Text = "Refreshing";
                 DisableButton(button, -1);
 
-                MainClient.Client.UpdateInboxAsync();
+                var envelopes = MainClient.Client.GetNewMessageEnvelopes();
+
+                foreach(var envelope in envelopes)
+                {
+                    var panel = MainClient.EnvelopeFlowPanels[0];
+                    panel.AddToFront(envelope.UID, envelope.from,
+                                                   envelope.date,
+                                                   envelope.subject,
+                                                   envelope.read);
+
+                    // Preloading the loaded message
+                    MainClient.Client.PreloadMessage(panel.folderIndex, envelope.UID);
+                }
+
+                button.Text = "Refresh";
+                button.Image = Properties.Resources.RefreshIcon;
+                reenableButton(button);
             }
+            Debug.WriteLine("Refresh complete");
             this.Cursor = Cursors.Default;
         }
         private void FolderUpdateFinishedHandler(object sender, EventArgs e)
@@ -662,7 +695,7 @@ namespace G5EmailClient.GUI
                 folders_lisbox.ClearSelected();
                 folders_lisbox.SetSelected(index, true);
 
-                updateFolderView(index, true, true);
+                updateFolderView(index, false, true);
 
                 this.Cursor = Cursors.Default;
             }
@@ -793,8 +826,10 @@ namespace G5EmailClient.GUI
         {
             if (search_textbox.Text.Length == 0) return;
 
-            if(MainClient.activePanel != null)
-                MainClient.activePanel!.ClearSelection();
+            var panel = MainClient.activePanel!;
+
+            if (panel != null)
+                panel.ClearSelection();
 
             IEmail.SearchFlags flags = IEmail.SearchFlags.Empty;
             if (search_subject_checkbox.Checked) flags |= IEmail.SearchFlags.Subject;
@@ -807,7 +842,13 @@ namespace G5EmailClient.GUI
 
             var envelopes = MainClient.Client.SearchFolder(search_textbox.Text, flags);
 
-            MainClient.activePanel!.HideRest(envelopes.UIDs);
+            while(panel!.hasLoadMorePanel)
+            {
+                panel!.LoadMorePanel_Click(null, EventArgs.Empty);
+                //LoadMoreHandler(MainClient.activePanel, EventArgs.Empty);
+            }
+
+            panel!.HideRest(envelopes.UIDs);
 
             search_textbox.Text = " " + envelopes.UIDs.Count.ToString() + " messages found. Click here to clear.";
 
@@ -894,6 +935,9 @@ namespace G5EmailClient.GUI
                 // Setting new client as selected
                 connected_users_listbox.SetSelected(connected_users_listbox.Items.Count - 1, true);
                 connected_users_listbox_Click(sender, e);
+
+                // A user can now be deleted without depleting the list so
+                delete_user_button.Visible = true;
             }
         }
         private void connectionFormClosed(object sender, EventArgs e)
@@ -906,18 +950,8 @@ namespace G5EmailClient.GUI
             main_tab.SelectedTab = user_settings_tab;
         }
 
-        private void logout_button_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.WaitCursor;
-            foreach(var client in EmailClientsList)
-            {
-                client.Client.Disconnect();
-            }
-            this.Cursor = Cursors.Default;
-            Application.Exit();
-        }
 
-        private void connected_users_listbox_Click(object sender, EventArgs e)
+        private void connected_users_listbox_Click(object? sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
 
@@ -933,11 +967,57 @@ namespace G5EmailClient.GUI
                     folders_lisbox.Items.Add(name);
                 }
             }
-            
-            updateFolderView(0, true, true);
+
+            var panel = MainClient.EnvelopeFlowPanels[0];
+
+            updateFolderView(0, panel.ListSize == 0, true);
             folders_lisbox.SetSelected(0, true);
 
             this.Cursor = Cursors.Default;
+        }
+
+        private void delete_user_button_Click(object sender, EventArgs e)
+        {
+            // If there are other users, we can show one of these
+            if(connected_users_listbox.Items.Count > 1)
+            {
+                // Disposing deleted client
+                var index = connected_users_listbox.SelectedIndex;
+
+                connected_users_listbox.Items.RemoveAt(index);
+                foreach(var panel in EmailClientsList[index].EnvelopeFlowPanels)
+                {
+                    panel.Dispose();
+                }
+                EmailClientsList[index].Client.Disconnect();
+                EmailClientsList.RemoveAt(index);
+
+                // Updating to show other client
+                connected_users_listbox.SelectedIndex = 0;
+                connected_users_listbox_Click(null, EventArgs.Empty);
+
+                if(connected_users_listbox.Items.Count == 1)
+                {
+                    delete_user_button.Visible = false;
+                }
+            }
+            // Otherwise we need to treat it as a logout
+            else
+            {
+                logout_button_Click(null, EventArgs.Empty);
+            }
+        }
+
+        private void logout_button_Click(object? sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            foreach (var client in EmailClientsList)
+            {
+                client.Client.Disconnect();
+            }
+
+            this.Cursor = Cursors.Default;
+            Application.Exit();
         }
     }
 }

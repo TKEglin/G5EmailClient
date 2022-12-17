@@ -114,11 +114,12 @@
             this.send_as_name_underline_panel = new System.Windows.Forms.Panel();
             this.send_as_name_textbox = new System.Windows.Forms.TextBox();
             this.send_as_name_label = new System.Windows.Forms.Label();
+            this.user_settings_titlelabel = new System.Windows.Forms.Label();
             this.connected_users_panel = new System.Windows.Forms.Panel();
             this.connected_users_listbox = new System.Windows.Forms.ListBox();
             this.add_user_button = new System.Windows.Forms.Button();
             this.delete_user_button = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.connected_users_titlelabel = new System.Windows.Forms.Label();
             this.template_flow_panel = new G5EmailClient.GUI.EnvelopeFlowPanel();
             this.search_textbox = new System.Windows.Forms.TextBox();
             this.inbox_panel = new System.Windows.Forms.Panel();
@@ -136,6 +137,7 @@
             this.add_bcc_menuitem = new System.Windows.Forms.ToolStripMenuItem();
             this.save_attachment_dialog = new System.Windows.Forms.SaveFileDialog();
             this.load_attachment_dialog = new System.Windows.Forms.OpenFileDialog();
+            this.refresh_timer = new System.Windows.Forms.Timer(this.components);
             this.top_panel.SuspendLayout();
             this.top_toolstrip.SuspendLayout();
             this.folders_panel.SuspendLayout();
@@ -166,7 +168,6 @@
             this.send_as_email_underline_panel.SuspendLayout();
             this.send_as_name_padding_panel.SuspendLayout();
             this.connected_users_panel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.inbox_panel.SuspendLayout();
             this.search_settings_panel.SuspendLayout();
             this.search_bar_panel.SuspendLayout();
@@ -187,7 +188,7 @@
             this.top_toolstrip.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.top_toolstrip.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.top_toolstrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.top_toolstrip.ImageScalingSize = new System.Drawing.Size(25, 25);
+            this.top_toolstrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.top_toolstrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.new_message_button,
             this.move_message_dropdown,
@@ -199,16 +200,15 @@
             this.top_toolstrip.Name = "top_toolstrip";
             this.top_toolstrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.top_toolstrip.ShowItemToolTips = false;
-            this.top_toolstrip.Size = new System.Drawing.Size(1082, 32);
+            this.top_toolstrip.Size = new System.Drawing.Size(1082, 30);
             this.top_toolstrip.TabIndex = 0;
-            this.top_toolstrip.Text = "toolStrip1";
             // 
             // new_message_button
             // 
             this.new_message_button.Image = global::G5EmailClient.Properties.Resources.ComposeIcon;
             this.new_message_button.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.new_message_button.Name = "new_message_button";
-            this.new_message_button.Size = new System.Drawing.Size(111, 29);
+            this.new_message_button.Size = new System.Drawing.Size(106, 27);
             this.new_message_button.Text = "Compose";
             this.new_message_button.Click += new System.EventHandler(this.new_message_button_Click);
             // 
@@ -217,7 +217,7 @@
             this.move_message_dropdown.Image = global::G5EmailClient.Properties.Resources.MoveMessageIcon;
             this.move_message_dropdown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.move_message_dropdown.Name = "move_message_dropdown";
-            this.move_message_dropdown.Size = new System.Drawing.Size(91, 29);
+            this.move_message_dropdown.Size = new System.Drawing.Size(86, 27);
             this.move_message_dropdown.Text = "Move";
             // 
             // delete_button
@@ -225,7 +225,7 @@
             this.delete_button.Image = global::G5EmailClient.Properties.Resources.DeleteIcon;
             this.delete_button.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.delete_button.Name = "delete_button";
-            this.delete_button.Size = new System.Drawing.Size(88, 29);
+            this.delete_button.Size = new System.Drawing.Size(83, 27);
             this.delete_button.Text = "Delete";
             this.delete_button.Click += new System.EventHandler(this.delete_button_Click);
             this.delete_button.MouseEnter += new System.EventHandler(this.delete_button_MouseEnter);
@@ -236,7 +236,7 @@
             this.toggle_read_button.Image = global::G5EmailClient.Properties.Resources.ReadUnreadIcon;
             this.toggle_read_button.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toggle_read_button.Name = "toggle_read_button";
-            this.toggle_read_button.Size = new System.Drawing.Size(140, 29);
+            this.toggle_read_button.Size = new System.Drawing.Size(135, 27);
             this.toggle_read_button.Text = "Unread/Read";
             this.toggle_read_button.Click += new System.EventHandler(this.toggle_read_button_Click);
             // 
@@ -249,14 +249,14 @@
             this.settings_dropdown.Image = global::G5EmailClient.Properties.Resources.Settings_Icon;
             this.settings_dropdown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.settings_dropdown.Name = "settings_dropdown";
-            this.settings_dropdown.Size = new System.Drawing.Size(110, 29);
+            this.settings_dropdown.Size = new System.Drawing.Size(105, 27);
             this.settings_dropdown.Text = "Settings";
             // 
             // user_settings_button
             // 
             this.user_settings_button.Image = global::G5EmailClient.Properties.Resources.AccountSettingsIcon;
             this.user_settings_button.Name = "user_settings_button";
-            this.user_settings_button.Size = new System.Drawing.Size(199, 32);
+            this.user_settings_button.Size = new System.Drawing.Size(194, 28);
             this.user_settings_button.Text = "User Settings";
             this.user_settings_button.Click += new System.EventHandler(this.user_settings_button_Click);
             // 
@@ -264,7 +264,7 @@
             // 
             this.logout_button.Image = global::G5EmailClient.Properties.Resources.LogoutIcon;
             this.logout_button.Name = "logout_button";
-            this.logout_button.Size = new System.Drawing.Size(199, 32);
+            this.logout_button.Size = new System.Drawing.Size(194, 28);
             this.logout_button.Text = "Log Out";
             this.logout_button.Click += new System.EventHandler(this.logout_button_Click);
             // 
@@ -274,7 +274,7 @@
             this.refresh_button.Image = global::G5EmailClient.Properties.Resources.RefreshIcon;
             this.refresh_button.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.refresh_button.Name = "refresh_button";
-            this.refresh_button.Size = new System.Drawing.Size(95, 29);
+            this.refresh_button.Size = new System.Drawing.Size(90, 27);
             this.refresh_button.Text = "Refresh";
             this.refresh_button.Click += new System.EventHandler(this.refresh_button_Click);
             // 
@@ -954,7 +954,7 @@
             this.cmp_cc_label.Name = "cmp_cc_label";
             this.cmp_cc_label.Size = new System.Drawing.Size(45, 23);
             this.cmp_cc_label.TabIndex = 0;
-            this.cmp_cc_label.Text = "cc: ";
+            this.cmp_cc_label.Text = "Cc: ";
             // 
             // cmp_info_padding_panel1
             // 
@@ -1025,7 +1025,7 @@
             this.user_settings_tab.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.user_settings_tab.Controls.Add(this.user_settings_panel);
             this.user_settings_tab.Controls.Add(this.connected_users_panel);
-            this.user_settings_tab.Controls.Add(this.pictureBox1);
+            this.user_settings_tab.Controls.Add(this.connected_users_titlelabel);
             this.user_settings_tab.Location = new System.Drawing.Point(4, 29);
             this.user_settings_tab.Name = "user_settings_tab";
             this.user_settings_tab.Padding = new System.Windows.Forms.Padding(3);
@@ -1035,18 +1035,18 @@
             // 
             // user_settings_panel
             // 
-            this.user_settings_panel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.user_settings_panel.Controls.Add(this.send_as_email_underline_panel);
             this.user_settings_panel.Controls.Add(this.send_as_email_textbox);
             this.user_settings_panel.Controls.Add(this.send_as_email_label);
             this.user_settings_panel.Controls.Add(this.send_as_name_padding_panel);
             this.user_settings_panel.Controls.Add(this.send_as_name_textbox);
             this.user_settings_panel.Controls.Add(this.send_as_name_label);
-            this.user_settings_panel.Location = new System.Drawing.Point(6, 6);
+            this.user_settings_panel.Controls.Add(this.user_settings_titlelabel);
+            this.user_settings_panel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.user_settings_panel.Location = new System.Drawing.Point(3, 260);
             this.user_settings_panel.Name = "user_settings_panel";
-            this.user_settings_panel.Padding = new System.Windows.Forms.Padding(3);
-            this.user_settings_panel.Size = new System.Drawing.Size(263, 260);
+            this.user_settings_panel.Padding = new System.Windows.Forms.Padding(3, 6, 3, 3);
+            this.user_settings_panel.Size = new System.Drawing.Size(484, 325);
             this.user_settings_panel.TabIndex = 4;
             this.user_settings_panel.Visible = false;
             // 
@@ -1055,9 +1055,9 @@
             this.send_as_email_underline_panel.BackColor = System.Drawing.Color.Black;
             this.send_as_email_underline_panel.Controls.Add(this.panel2);
             this.send_as_email_underline_panel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.send_as_email_underline_panel.Location = new System.Drawing.Point(3, 119);
+            this.send_as_email_underline_panel.Location = new System.Drawing.Point(3, 145);
             this.send_as_email_underline_panel.Name = "send_as_email_underline_panel";
-            this.send_as_email_underline_panel.Size = new System.Drawing.Size(257, 1);
+            this.send_as_email_underline_panel.Size = new System.Drawing.Size(478, 1);
             this.send_as_email_underline_panel.TabIndex = 7;
             // 
             // panel2
@@ -1066,7 +1066,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(257, 1);
+            this.panel2.Size = new System.Drawing.Size(478, 1);
             this.panel2.TabIndex = 5;
             // 
             // send_as_email_textbox
@@ -1074,10 +1074,10 @@
             this.send_as_email_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.send_as_email_textbox.Dock = System.Windows.Forms.DockStyle.Top;
             this.send_as_email_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.send_as_email_textbox.Location = new System.Drawing.Point(3, 89);
+            this.send_as_email_textbox.Location = new System.Drawing.Point(3, 115);
             this.send_as_email_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.send_as_email_textbox.Name = "send_as_email_textbox";
-            this.send_as_email_textbox.Size = new System.Drawing.Size(257, 30);
+            this.send_as_email_textbox.Size = new System.Drawing.Size(478, 30);
             this.send_as_email_textbox.TabIndex = 6;
             // 
             // send_as_email_label
@@ -1085,7 +1085,7 @@
             this.send_as_email_label.AutoSize = true;
             this.send_as_email_label.Dock = System.Windows.Forms.DockStyle.Top;
             this.send_as_email_label.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.send_as_email_label.Location = new System.Drawing.Point(3, 66);
+            this.send_as_email_label.Location = new System.Drawing.Point(3, 92);
             this.send_as_email_label.Margin = new System.Windows.Forms.Padding(3);
             this.send_as_email_label.MinimumSize = new System.Drawing.Size(45, 0);
             this.send_as_email_label.Name = "send_as_email_label";
@@ -1097,9 +1097,9 @@
             // 
             this.send_as_name_padding_panel.Controls.Add(this.send_as_name_underline_panel);
             this.send_as_name_padding_panel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.send_as_name_padding_panel.Location = new System.Drawing.Point(3, 56);
+            this.send_as_name_padding_panel.Location = new System.Drawing.Point(3, 82);
             this.send_as_name_padding_panel.Name = "send_as_name_padding_panel";
-            this.send_as_name_padding_panel.Size = new System.Drawing.Size(257, 10);
+            this.send_as_name_padding_panel.Size = new System.Drawing.Size(478, 10);
             this.send_as_name_padding_panel.TabIndex = 4;
             // 
             // send_as_name_underline_panel
@@ -1108,7 +1108,7 @@
             this.send_as_name_underline_panel.Dock = System.Windows.Forms.DockStyle.Top;
             this.send_as_name_underline_panel.Location = new System.Drawing.Point(0, 0);
             this.send_as_name_underline_panel.Name = "send_as_name_underline_panel";
-            this.send_as_name_underline_panel.Size = new System.Drawing.Size(257, 1);
+            this.send_as_name_underline_panel.Size = new System.Drawing.Size(478, 1);
             this.send_as_name_underline_panel.TabIndex = 5;
             // 
             // send_as_name_textbox
@@ -1116,10 +1116,10 @@
             this.send_as_name_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.send_as_name_textbox.Dock = System.Windows.Forms.DockStyle.Top;
             this.send_as_name_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.send_as_name_textbox.Location = new System.Drawing.Point(3, 26);
+            this.send_as_name_textbox.Location = new System.Drawing.Point(3, 52);
             this.send_as_name_textbox.MinimumSize = new System.Drawing.Size(0, 30);
             this.send_as_name_textbox.Name = "send_as_name_textbox";
-            this.send_as_name_textbox.Size = new System.Drawing.Size(257, 30);
+            this.send_as_name_textbox.Size = new System.Drawing.Size(478, 30);
             this.send_as_name_textbox.TabIndex = 2;
             // 
             // send_as_name_label
@@ -1127,7 +1127,7 @@
             this.send_as_name_label.AutoSize = true;
             this.send_as_name_label.Dock = System.Windows.Forms.DockStyle.Top;
             this.send_as_name_label.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.send_as_name_label.Location = new System.Drawing.Point(3, 3);
+            this.send_as_name_label.Location = new System.Drawing.Point(3, 29);
             this.send_as_name_label.Margin = new System.Windows.Forms.Padding(3);
             this.send_as_name_label.MinimumSize = new System.Drawing.Size(45, 0);
             this.send_as_name_label.Name = "send_as_name_label";
@@ -1135,17 +1135,29 @@
             this.send_as_name_label.TabIndex = 1;
             this.send_as_name_label.Text = "Name seen by recipient:";
             // 
+            // user_settings_titlelabel
+            // 
+            this.user_settings_titlelabel.AutoSize = true;
+            this.user_settings_titlelabel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.user_settings_titlelabel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.user_settings_titlelabel.Location = new System.Drawing.Point(3, 6);
+            this.user_settings_titlelabel.Margin = new System.Windows.Forms.Padding(3);
+            this.user_settings_titlelabel.Name = "user_settings_titlelabel";
+            this.user_settings_titlelabel.Size = new System.Drawing.Size(116, 23);
+            this.user_settings_titlelabel.TabIndex = 8;
+            this.user_settings_titlelabel.Text = "User Settings";
+            // 
             // connected_users_panel
             // 
-            this.connected_users_panel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.connected_users_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.connected_users_panel.Controls.Add(this.connected_users_listbox);
             this.connected_users_panel.Controls.Add(this.add_user_button);
             this.connected_users_panel.Controls.Add(this.delete_user_button);
-            this.connected_users_panel.Location = new System.Drawing.Point(271, 6);
+            this.connected_users_panel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.connected_users_panel.Location = new System.Drawing.Point(3, 26);
             this.connected_users_panel.Name = "connected_users_panel";
             this.connected_users_panel.Padding = new System.Windows.Forms.Padding(3);
-            this.connected_users_panel.Size = new System.Drawing.Size(213, 260);
+            this.connected_users_panel.Size = new System.Drawing.Size(484, 234);
             this.connected_users_panel.TabIndex = 3;
             // 
             // connected_users_listbox
@@ -1156,7 +1168,7 @@
             this.connected_users_listbox.ItemHeight = 20;
             this.connected_users_listbox.Location = new System.Drawing.Point(3, 3);
             this.connected_users_listbox.Name = "connected_users_listbox";
-            this.connected_users_listbox.Size = new System.Drawing.Size(205, 200);
+            this.connected_users_listbox.Size = new System.Drawing.Size(476, 180);
             this.connected_users_listbox.TabIndex = 0;
             this.connected_users_listbox.Click += new System.EventHandler(this.connected_users_listbox_Click);
             // 
@@ -1167,11 +1179,12 @@
             this.add_user_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.add_user_button.FlatAppearance.BorderSize = 0;
             this.add_user_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.add_user_button.Location = new System.Drawing.Point(165, 212);
+            this.add_user_button.Location = new System.Drawing.Point(436, 186);
             this.add_user_button.Name = "add_user_button";
             this.add_user_button.Size = new System.Drawing.Size(40, 40);
             this.add_user_button.TabIndex = 1;
             this.add_user_button.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.brief_control_explain_tooltop.SetToolTip(this.add_user_button, "Add User");
             this.add_user_button.UseVisualStyleBackColor = true;
             this.add_user_button.Click += new System.EventHandler(this.add_user_button_Click);
             // 
@@ -1180,26 +1193,29 @@
             this.delete_user_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.delete_user_button.BackgroundImage = global::G5EmailClient.Properties.Resources.DeleteUserIcon;
             this.delete_user_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.delete_user_button.Enabled = false;
             this.delete_user_button.FlatAppearance.BorderSize = 0;
             this.delete_user_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.delete_user_button.Location = new System.Drawing.Point(6, 212);
+            this.delete_user_button.Location = new System.Drawing.Point(6, 186);
             this.delete_user_button.Name = "delete_user_button";
             this.delete_user_button.Size = new System.Drawing.Size(40, 40);
             this.delete_user_button.TabIndex = 2;
             this.delete_user_button.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.brief_control_explain_tooltop.SetToolTip(this.delete_user_button, "Remove User");
             this.delete_user_button.UseVisualStyleBackColor = true;
+            this.delete_user_button.Click += new System.EventHandler(this.delete_user_button_Click);
             // 
-            // pictureBox1
+            // connected_users_titlelabel
             // 
-            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pictureBox1.Image = global::G5EmailClient.Properties.Resources.Group5Logo;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 263);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(484, 322);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
+            this.connected_users_titlelabel.AutoSize = true;
+            this.connected_users_titlelabel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.connected_users_titlelabel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.connected_users_titlelabel.Location = new System.Drawing.Point(3, 3);
+            this.connected_users_titlelabel.Margin = new System.Windows.Forms.Padding(3);
+            this.connected_users_titlelabel.Name = "connected_users_titlelabel";
+            this.connected_users_titlelabel.Size = new System.Drawing.Size(142, 23);
+            this.connected_users_titlelabel.TabIndex = 6;
+            this.connected_users_titlelabel.Text = "Connected Users";
             // 
             // template_flow_panel
             // 
@@ -1224,6 +1240,8 @@
             this.search_textbox.Size = new System.Drawing.Size(320, 23);
             this.search_textbox.TabIndex = 4;
             this.search_textbox.TabStop = false;
+            this.brief_control_explain_tooltop.SetToolTip(this.search_textbox, "All messages must be loaded before the search can be done, For a very large folde" +
+        "r, this may take a while.");
             this.search_textbox.Click += new System.EventHandler(this.search_textbox_Enter);
             this.search_textbox.Enter += new System.EventHandler(this.search_textbox_Enter);
             this.search_textbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.search_textbox_KeyUp);
@@ -1389,6 +1407,11 @@
             // 
             this.load_attachment_dialog.Title = "Load attachment";
             // 
+            // refresh_timer
+            // 
+            this.refresh_timer.Enabled = true;
+            this.refresh_timer.Interval = 15000;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -1445,12 +1468,12 @@
             this.cmp_to_left_panel.ResumeLayout(false);
             this.cmp_to_left_panel.PerformLayout();
             this.user_settings_tab.ResumeLayout(false);
+            this.user_settings_tab.PerformLayout();
             this.user_settings_panel.ResumeLayout(false);
             this.user_settings_panel.PerformLayout();
             this.send_as_email_underline_panel.ResumeLayout(false);
             this.send_as_name_padding_panel.ResumeLayout(false);
             this.connected_users_panel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.inbox_panel.ResumeLayout(false);
             this.inbox_panel.PerformLayout();
             this.search_settings_panel.ResumeLayout(false);
@@ -1560,7 +1583,6 @@
         private TextBox send_as_name_textbox;
         private Label send_as_name_label;
         private TextBox send_as_email_textbox;
-        private PictureBox pictureBox1;
         private Panel message_sender_infor_paddingpanel3;
         private FlowLayoutPanel msg_attachments_flow_panel;
         private SaveFileDialog save_attachment_dialog;
@@ -1571,5 +1593,8 @@
         private FlowLayoutPanel cmp_attachments_flowpanel;
         private OpenFileDialog load_attachment_dialog;
         private Panel cmp_info_padding_panel4;
+        private Label connected_users_titlelabel;
+        private Label user_settings_titlelabel;
+        private System.Windows.Forms.Timer refresh_timer;
     }
 }

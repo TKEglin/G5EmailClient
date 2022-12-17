@@ -19,6 +19,11 @@ namespace G5EmailClient.GUI
         public bool needsUpdate = true;
         public bool envelopesHidden = false;
 
+        // Used to store the index of the displayed folder
+        public int folderIndex = -1;
+
+        public bool hasLoadMorePanel = false;
+
         /// <summary>
         /// Set to true if the Envelopes in this panel are copies
         /// </summary>
@@ -71,6 +76,7 @@ namespace G5EmailClient.GUI
             flow_control.Controls.Add(envelopePanel);
             var NewPanelDate = DateTimeOffset.Parse(envelopePanel.dateText);
 
+            // ___ SORT DISABLED FOR OPTIMIZATION. IMPLEMENT IN CLIENT CLASS INSTEAD. ___
             // Finding date sorted location
             //foreach (EnvelopePanel OldPanel in flow_control.Controls)
             //{
@@ -84,6 +90,7 @@ namespace G5EmailClient.GUI
             //        break;
             //    }
             //}
+
             // Adding to the list
             panelList[UID] = envelopePanel;
         }
@@ -98,21 +105,52 @@ namespace G5EmailClient.GUI
             flow_control.Controls.Add(envelopePanel);
             var NewPanelDate = DateTimeOffset.Parse(envelopePanel.dateText);
 
+            // ___ SORT DISABLED FOR OPTIMIZATION. IMPLEMENT IN CLIENT CLASS INSTEAD. ___
             // Finding date sorted location
-            foreach (EnvelopePanel OldPanel in flow_control.Controls)
-            {
-                var OldPanelDate = DateTimeOffset.Parse(OldPanel.dateText);
-                if (OldPanelDate.CompareTo(NewPanelDate) < 0)
-                {
-                    Debug.WriteLine("Reached later message. Setting index");
-                    var index = flow_control.Controls.IndexOf(OldPanel);
-                    flow_control.Controls.SetChildIndex(envelopePanel, index);
-                    flow_control.Controls.SetChildIndex(OldPanel, index + 1);
-                    break;
-                }
-            }
+            //foreach (EnvelopePanel OldPanel in flow_control.Controls)
+            //{
+            //    var OldPanelDate = DateTimeOffset.Parse(OldPanel.dateText);
+            //    if (OldPanelDate.CompareTo(NewPanelDate) < 0)
+            //    {
+            //        Debug.WriteLine("Reached later message. Setting index");
+            //        var index = flow_control.Controls.IndexOf(OldPanel);
+            //        flow_control.Controls.SetChildIndex(envelopePanel, index);
+            //        flow_control.Controls.SetChildIndex(OldPanel, index + 1);
+            //        break;
+            //    }
+            //}
             // Adding to the list
             panelList[envelopePanel.UID] = envelopePanel;
+        }
+
+        public void AddToFront(string UID, string from, string date, string subject, bool seen)
+        {
+            var envelopePanel = new EnvelopePanel();
+            envelopePanel.UID = UID;
+            envelopePanel.fromText = from;
+            envelopePanel.dateText = date;
+            envelopePanel.subjectText = subject;
+            if (!seen)
+                envelopePanel.toggleRead();
+            envelopePanel.Anchor = AnchorStyles.Top;
+            envelopePanel.AutoSize = true;
+            envelopePanel.MinimumSize = new Size(flow_control.Width - 6 - SystemInformation.VerticalScrollBarWidth, 68);
+            envelopePanel.PanelClicked += EnvelopePanel_Click;
+            // Adding the control to the window
+            flow_control.Controls.Add(envelopePanel);
+            flow_control.Controls.SetChildIndex(envelopePanel, 0);
+            var NewPanelDate = DateTimeOffset.Parse(envelopePanel.dateText);
+        }
+
+        public void AddLoadMorePanel()
+        {
+            var LoadMorePanel = new LoadMorePanel();
+                LoadMorePanel.Anchor = AnchorStyles.Top;
+                LoadMorePanel.AutoSize = true;
+                LoadMorePanel.MinimumSize = new Size(flow_control.Width - 6 - SystemInformation.VerticalScrollBarWidth, 68);
+                LoadMorePanel.PanelClicked += LoadMorePanel_Click;
+            flow_control.Controls.Add(LoadMorePanel);
+            hasLoadMorePanel = true;
         }
 
         /// <summary>
@@ -244,10 +282,19 @@ namespace G5EmailClient.GUI
             selectedPanels.Add(panel);
         }
 
+        public void LoadMorePanel_Click(object? sender, EventArgs e)
+        {
+            //var panel = (LoadMorePanel)sender;
+            flow_control.Controls.RemoveAt(flow_control.Controls.Count-1);
+            hasLoadMorePanel = false;
+            this.LoadMoreClicked(this, e);
+        }
 
         //
         // External events
         //
         public event EventHandler EnvelopePanelOpened;
+
+        public event EventHandler LoadMoreClicked;
     }
 }

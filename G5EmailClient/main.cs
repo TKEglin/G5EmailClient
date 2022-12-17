@@ -7,6 +7,7 @@ namespace G5EmailClient
     internal static class main
     {
 
+
         [STAThread]
         static void Main()
         {
