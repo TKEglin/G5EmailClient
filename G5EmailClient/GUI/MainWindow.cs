@@ -55,7 +55,7 @@ namespace G5EmailClient.GUI
             main_tab.SizeMode = TabSizeMode.Fixed;
                 // Message flow panel
             template_flow_panel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
-            // Message open tab
+                // Message open tab
             msg_from_label.MaximumSize    = new Size(msg_senderinfo_panel.Width - 10, 0);
             msg_subject_label.MaximumSize = new Size(msg_senderinfo_panel.Width - 10, 0);
             msg_cc_label.Text = string.Empty;
@@ -69,6 +69,7 @@ namespace G5EmailClient.GUI
             brief_control_explain_tooltop.SetToolTip(cmp_send_button, "Send");
             cmp_send_button.FlatAppearance.BorderSize = 0;
             cmp_add_button. FlatAppearance.BorderSize = 0;
+                // Loading panel
 
             if (MainClient.Client.isConnected())
             {
@@ -158,6 +159,30 @@ namespace G5EmailClient.GUI
             e.DrawBackground();
             // Draw the current item text
             e.Graphics.DrawString(folders_lisbox.Items[e.Index].ToString(), e.Font, Brushes.Black, e.Bounds, StringFormat.GenericDefault);
+            // If the ListBox has focus, draw a focus rectangle around the selected item.
+            // e.DrawFocusRectangle();
+        }
+
+        /// <summary>
+        /// This function modifies the appearance of the folders listbox
+        /// </summary>
+        private void connected_users_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+            //if the item state is selected them change the back color 
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                e = new DrawItemEventArgs(e.Graphics,
+                                          e.Font,
+                                          e.Bounds,
+                                          e.Index,
+                                          e.State ^ DrawItemState.Selected,
+                                          e.ForeColor,
+                                          Color.LightGray);
+
+            // Draw the background of the ListBox control for each item.
+            e.DrawBackground();
+            // Draw the current item text
+            e.Graphics.DrawString(connected_users_listbox.Items[e.Index].ToString(), e.Font, Brushes.Black, e.Bounds, StringFormat.GenericDefault);
             // If the ListBox has focus, draw a focus rectangle around the selected item.
             // e.DrawFocusRectangle();
         }
@@ -824,6 +849,8 @@ namespace G5EmailClient.GUI
         // Used to return to the previous panel when search is cleared
         private void search_button_Click(object sender, EventArgs e)
         {
+            this.Cursor = Cursors.WaitCursor;
+
             if (search_textbox.Text.Length == 0) return;
 
             var panel = MainClient.activePanel!;
@@ -837,8 +864,6 @@ namespace G5EmailClient.GUI
             if (search_body_checkbox.Checked)    flags |= IEmail.SearchFlags.Body;
             if (search_cc_checkbox.Checked)      flags |= IEmail.SearchFlags.Cc;
             if (flags == IEmail.SearchFlags.Empty) return;
-
-            this.Cursor = Cursors.WaitCursor;
 
             var envelopes = MainClient.Client.SearchFolder(search_textbox.Text, flags);
 
@@ -996,7 +1021,7 @@ namespace G5EmailClient.GUI
                 connected_users_listbox.SelectedIndex = 0;
                 connected_users_listbox_Click(null, EventArgs.Empty);
 
-                if(connected_users_listbox.Items.Count == 1)
+                if(connected_users_listbox.Items.Count < 2)
                 {
                     delete_user_button.Visible = false;
                 }
