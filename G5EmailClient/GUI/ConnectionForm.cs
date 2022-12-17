@@ -299,6 +299,14 @@ namespace G5EmailClient.GUI
         private void password_show_label_Click(object sender, EventArgs e)
         {
             password_textbox.UseSystemPasswordChar = !password_textbox.UseSystemPasswordChar;
+            if(password_textbox.UseSystemPasswordChar)
+            {
+                password_show_label.Text = "Show";
+            }
+            else
+            {
+                password_show_label.Text = "Hide";
+            }
         }
 
         private void password_show_label_MouseEnter(object sender, EventArgs e)

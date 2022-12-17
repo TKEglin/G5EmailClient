@@ -22,6 +22,8 @@ namespace G5EmailClient.GUI
         // Used to store the index of the displayed folder
         public int folderIndex = -1;
 
+        public bool hasLoadMorePanel = false;
+
         /// <summary>
         /// Set to true if the Envelopes in this panel are copies
         /// </summary>
@@ -148,6 +150,7 @@ namespace G5EmailClient.GUI
                 LoadMorePanel.MinimumSize = new Size(flow_control.Width - 6 - SystemInformation.VerticalScrollBarWidth, 68);
                 LoadMorePanel.PanelClicked += LoadMorePanel_Click;
             flow_control.Controls.Add(LoadMorePanel);
+            hasLoadMorePanel = true;
         }
 
         /// <summary>
@@ -279,13 +282,13 @@ namespace G5EmailClient.GUI
             selectedPanels.Add(panel);
         }
 
-        private void LoadMorePanel_Click(object sender, EventArgs e)
+        public void LoadMorePanel_Click(object? sender, EventArgs e)
         {
-            var panel = (LoadMorePanel)sender;
-            flow_control.Controls.Remove(panel);
+            //var panel = (LoadMorePanel)sender;
+            flow_control.Controls.RemoveAt(flow_control.Controls.Count-1);
+            hasLoadMorePanel = false;
             this.LoadMoreClicked(this, e);
         }
-
 
         //
         // External events

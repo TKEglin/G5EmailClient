@@ -43,7 +43,7 @@ namespace G5EmailClient.Email
 
             // __Folder Data__
             public string? FolderName;
-            public int     FolderIndex; // Contains the folders index in the emailFolders list
+            public int     FolderIndex;         // Contains the folders index in the emailFolders list
             public int     EnvelopesLoaded = 0; // Keeps track of how many envelopes are loaded in GUI
             public List<UniqueId> UIDs { get; set; } = new();
             public Dictionary<UniqueId, MimeMessage>    Messages  { get; set; } = new();
@@ -78,6 +78,9 @@ namespace G5EmailClient.Email
         // This variable is used to throttle preloading speed when multiple folders are loading
         int foldersPreloading = 0;
 
+        // Used to maintain connection with the server
+        System.Timers.Timer server_ping_timer = new System.Timers.Timer(30000) { Enabled = true };
+
         public MailKitEmail()
         {
             // Initalizing class data variables.
@@ -91,6 +94,8 @@ namespace G5EmailClient.Email
         {
             initializeFolders();
             updateFolder(0); // Updating inbox
+
+            server_ping_timer.Elapsed += MaintainConnection;
         }
 
          //_________________
@@ -141,7 +146,7 @@ namespace G5EmailClient.Email
 
             // Adding folders
             var mainFolders = mainImapClient.GetFolders(mainImapClient.PersonalNamespaces[0], false);
-            var preloadFolders = loadImapClient.GetFolders(mainImapClient.PersonalNamespaces[0], false);
+            var preloadFolders = loadImapClient.GetFolders(loadImapClient.PersonalNamespaces[0], false);
             for (int i = 0; i < mainFolders.Count; i++)
             {
                 var mainFolder    = mainFolders[i];
@@ -164,7 +169,7 @@ namespace G5EmailClient.Email
                     }
 
                     // Preloading folders
-                    //ThreadPool.QueueUserWorkItem(state => updateFolder(index));
+                    // ThreadPool.QueueUserWorkItem(state => updateFolder(index));
                 }
             }
         }
@@ -195,10 +200,11 @@ namespace G5EmailClient.Email
             Debug.WriteLine("Fetching summary items from folder " + folder.FolderName);
 
             var envelopes = folder.MainImapFolder.Fetch(0, -1,
-                                                       MessageSummaryItems.Envelope |
-                                                       MessageSummaryItems.UniqueId |
-                                                       MessageSummaryItems.Flags);
-            if (folderIndex == 0) envelopes.Reverse(); // Inbox is downloaded in reverse
+                                                        MessageSummaryItems.Envelope |
+                                                        MessageSummaryItems.UniqueId |
+                                                        MessageSummaryItems.Flags);
+
+            envelopes = envelopes.Sort(new List<OrderBy>() { OrderBy.ReverseDate });
 
             foreach (var items in envelopes)
             {
@@ -283,8 +289,8 @@ namespace G5EmailClient.Email
                     return;
                 }
 
-                Debug.WriteLine("Folder " + folder.FolderName + " preloading message with subject " + message.Subject
-                              + ". " + foldersPreloading.ToString() + " folders currently preloading.");
+                //Debug.WriteLine("Folder " + folder.FolderName + " preloading message with subject " + message.Subject
+                //              + ". " + foldersPreloading.ToString() + " folders currently preloading.");
 
                 folder.Messages[UID] = message;
 
@@ -408,6 +414,25 @@ namespace G5EmailClient.Email
             initialise();
             return null;
         }
+
+        /// <summary>
+        /// Periodically pings the server to maintain connection
+        /// </summary>
+        void MaintainConnection(object? sender, EventArgs e)
+        {
+            Debug.WriteLine("Pinging server to maintain connection");
+            MainImapMutex.WaitOne();
+            mainImapClient.NoOp();
+            MainImapMutex.ReleaseMutex();
+
+            loadImapMutex.WaitOne();
+            loadImapClient.NoOp();
+            loadImapMutex.ReleaseMutex();
+
+            SmtpMutex.WaitOne();
+            smtpClient.NoOp();
+            SmtpMutex.ReleaseMutex();
+        }
         #endregion
 
          //__________________________________
@@ -513,15 +538,12 @@ namespace G5EmailClient.Email
 
             var folder = emailFolders[folderIndex];
 
-            // This list will contain the flags
             if (folder != null)
             {
                 // The envelopes up to this index are already loaded
                 int StartIndex = folder.EnvelopesLoaded;
                 int EndIndex = Math.Min(StartIndex + amount, folder.Envelopes.Count);
 
-                // This foreach loop merges the messages and UID lists to
-                // add them to the return list in one iteration.
                 int i;
                 for (i = StartIndex; i < EndIndex; i++)
                 {
@@ -548,18 +570,17 @@ namespace G5EmailClient.Email
 
             var inbox = emailFolders[0];
 
-            if (!inbox.MainImapFolder!.IsOpen) inbox.MainImapFolder.Open(FolderAccess.ReadWrite);
+            inbox.MainImapFolder.Open(FolderAccess.ReadWrite);
 
-            var UIDs = inbox.MainImapFolder.Search(SearchQuery.Recent);
-
-            foreach (var items in inbox.MainImapFolder.Fetch(UIDs,
+            foreach (var items in inbox.MainImapFolder.Fetch(0, -1,
                                                        MessageSummaryItems.Envelope |
                                                        MessageSummaryItems.UniqueId |
                                                        MessageSummaryItems.Flags))
             {
                 // If message is not already loaded, it is new
-                if(!inbox.UIDs.Contains(items.UniqueId))
+                if (!inbox.UIDs.Contains(items.UniqueId))
                 {
+                    Debug.WriteLine("Message not currently loaded. Adding to list");
                     inbox.UIDs.Add(items.UniqueId);
                     inbox.Seen.Add(items.UniqueId, items.Flags!.Value.HasFlag(MessageFlags.Seen));
 
@@ -574,6 +595,8 @@ namespace G5EmailClient.Email
 
                     envelopes.Add((items.UniqueId.ToString(), envelope.from, envelope.date, envelope.subject,
                                    items.Flags!.Value.HasFlag(MessageFlags.Seen)));
+
+                    inbox.EnvelopesLoaded++;
                 }
             }
 
