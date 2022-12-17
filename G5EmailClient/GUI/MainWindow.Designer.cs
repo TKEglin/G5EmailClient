@@ -123,6 +123,8 @@
             this.template_flow_panel = new G5EmailClient.GUI.EnvelopeFlowPanel();
             this.search_textbox = new System.Windows.Forms.TextBox();
             this.inbox_panel = new System.Windows.Forms.Panel();
+            this.loading_panel = new System.Windows.Forms.Panel();
+            this.loading_icon_picturebox = new System.Windows.Forms.PictureBox();
             this.search_settings_panel = new System.Windows.Forms.Panel();
             this.search_cc_checkbox = new System.Windows.Forms.CheckBox();
             this.search_body_checkbox = new System.Windows.Forms.CheckBox();
@@ -169,6 +171,8 @@
             this.send_as_name_padding_panel.SuspendLayout();
             this.connected_users_panel.SuspendLayout();
             this.inbox_panel.SuspendLayout();
+            this.loading_panel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.loading_icon_picturebox)).BeginInit();
             this.search_settings_panel.SuspendLayout();
             this.search_bar_panel.SuspendLayout();
             this.cmp_add_contextstrip.SuspendLayout();
@@ -1164,13 +1168,16 @@
             // 
             this.connected_users_listbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.connected_users_listbox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.connected_users_listbox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.connected_users_listbox.FormattingEnabled = true;
             this.connected_users_listbox.ItemHeight = 20;
             this.connected_users_listbox.Location = new System.Drawing.Point(3, 3);
             this.connected_users_listbox.Name = "connected_users_listbox";
             this.connected_users_listbox.Size = new System.Drawing.Size(476, 180);
             this.connected_users_listbox.TabIndex = 0;
+            this.connected_users_listbox.TabStop = false;
             this.connected_users_listbox.Click += new System.EventHandler(this.connected_users_listbox_Click);
+            this.connected_users_listbox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.connected_users_DrawItem);
             // 
             // add_user_button
             // 
@@ -1203,6 +1210,7 @@
             this.delete_user_button.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.brief_control_explain_tooltop.SetToolTip(this.delete_user_button, "Remove User");
             this.delete_user_button.UseVisualStyleBackColor = true;
+            this.delete_user_button.Visible = false;
             this.delete_user_button.Click += new System.EventHandler(this.delete_user_button_Click);
             // 
             // connected_users_titlelabel
@@ -1224,7 +1232,7 @@
             this.template_flow_panel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.template_flow_panel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.template_flow_panel.Location = new System.Drawing.Point(0, 66);
-            this.template_flow_panel.MinimumSize = new System.Drawing.Size(350, 0);
+            this.template_flow_panel.MinimumSize = new System.Drawing.Size(350, 20);
             this.template_flow_panel.Name = "template_flow_panel";
             this.template_flow_panel.Size = new System.Drawing.Size(350, 555);
             this.template_flow_panel.TabIndex = 2;
@@ -1250,6 +1258,7 @@
             // 
             this.inbox_panel.AutoScroll = true;
             this.inbox_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.inbox_panel.Controls.Add(this.loading_panel);
             this.inbox_panel.Controls.Add(this.template_flow_panel);
             this.inbox_panel.Controls.Add(this.search_settings_panel);
             this.inbox_panel.Controls.Add(this.search_bar_panel);
@@ -1258,6 +1267,27 @@
             this.inbox_panel.Name = "inbox_panel";
             this.inbox_panel.Size = new System.Drawing.Size(352, 623);
             this.inbox_panel.TabIndex = 2;
+            // 
+            // loading_panel
+            // 
+            this.loading_panel.Controls.Add(this.loading_icon_picturebox);
+            this.loading_panel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.loading_panel.Location = new System.Drawing.Point(0, 66);
+            this.loading_panel.Name = "loading_panel";
+            this.loading_panel.Padding = new System.Windows.Forms.Padding(40);
+            this.loading_panel.Size = new System.Drawing.Size(350, 555);
+            this.loading_panel.TabIndex = 7;
+            // 
+            // loading_icon_picturebox
+            // 
+            this.loading_icon_picturebox.BackgroundImage = global::G5EmailClient.Properties.Resources.LoadingIconAnimated;
+            this.loading_icon_picturebox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.loading_icon_picturebox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.loading_icon_picturebox.Location = new System.Drawing.Point(40, 40);
+            this.loading_icon_picturebox.Name = "loading_icon_picturebox";
+            this.loading_icon_picturebox.Size = new System.Drawing.Size(270, 475);
+            this.loading_icon_picturebox.TabIndex = 0;
+            this.loading_icon_picturebox.TabStop = false;
             // 
             // search_settings_panel
             // 
@@ -1476,6 +1506,8 @@
             this.connected_users_panel.ResumeLayout(false);
             this.inbox_panel.ResumeLayout(false);
             this.inbox_panel.PerformLayout();
+            this.loading_panel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.loading_icon_picturebox)).EndInit();
             this.search_settings_panel.ResumeLayout(false);
             this.search_settings_panel.PerformLayout();
             this.search_bar_panel.ResumeLayout(false);
@@ -1596,5 +1628,7 @@
         private Label connected_users_titlelabel;
         private Label user_settings_titlelabel;
         private System.Windows.Forms.Timer refresh_timer;
+        private Panel loading_panel;
+        private PictureBox loading_icon_picturebox;
     }
 }

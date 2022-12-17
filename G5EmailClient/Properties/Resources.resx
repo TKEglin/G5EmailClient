@@ -130,17 +130,14 @@
   <data name="DeleteIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\DeleteIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AccountSettingsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Icons\AccountSettingsIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ReadUnreadIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icons\ReadUnreadIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SearchIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\SearchIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Settings_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\Settings_Icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ComposeIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Icons\ComposeIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="RefreshAnimatedIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\RefreshAnimatedIcon.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -169,14 +166,17 @@
   <data name="ErrorAnimatedIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\ErrorAnimatedIcon.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="AddUserIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icons\AddUserIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="SpamIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\SpamIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="CloseIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\CloseIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AddUserIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Icons\AddUserIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="AccountSettingsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icons\AccountSettingsIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="DeleteAnimatedIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\DeleteAnimatedIcon.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -202,8 +202,8 @@
   <data name="AccountIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\AccountIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ReadUnreadIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Icons\ReadUnreadIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ComposeIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icons\ComposeIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SendIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\SendIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -216,5 +216,8 @@
   </data>
   <data name="LargePlusIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\LargePlusIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LoadingIconAnimated" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icons\LoadingIconAnimated.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
