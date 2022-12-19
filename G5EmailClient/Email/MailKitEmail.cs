@@ -43,8 +43,9 @@ namespace G5EmailClient.Email
 
             // __Folder Data__
             public string? FolderName;
-            public int     FolderIndex;         // Contains the folders index in the emailFolders list
-            public int     EnvelopesLoaded = 0; // Keeps track of how many envelopes are loaded in GUI
+            public int     FolderIndex;          // Contains the folders index in the emailFolders list
+            public int     EnvelopesLoaded  = 0; // Keeps track of how many envelopes are loaded in GUI
+            public int     NewMessagesAdded = 0; // New messages added to the end of the UID list need not be loaded
             public List<UniqueId> UIDs { get; set; } = new();
             public Dictionary<UniqueId, MimeMessage>    Messages  { get; set; } = new();
             public Dictionary<UniqueId, bool>           Seen      { get; set; } = new();
@@ -542,7 +543,7 @@ namespace G5EmailClient.Email
             {
                 // The envelopes up to this index are already loaded
                 int StartIndex = folder.EnvelopesLoaded;
-                int EndIndex = Math.Min(StartIndex + amount, folder.Envelopes.Count);
+                int EndIndex = Math.Min(StartIndex + amount, folder.Envelopes.Count - folder.NewMessagesAdded);
 
                 int i;
                 for (i = StartIndex; i < EndIndex; i++)
@@ -596,7 +597,7 @@ namespace G5EmailClient.Email
                     envelopes.Add((items.UniqueId.ToString(), envelope.from, envelope.date, envelope.subject,
                                    items.Flags!.Value.HasFlag(MessageFlags.Seen)));
 
-                    inbox.EnvelopesLoaded++;
+                    inbox.NewMessagesAdded++;
                 }
             }
 

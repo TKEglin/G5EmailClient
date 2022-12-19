@@ -1200,7 +1200,6 @@
             this.delete_user_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.delete_user_button.BackgroundImage = global::G5EmailClient.Properties.Resources.DeleteUserIcon;
             this.delete_user_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.delete_user_button.Enabled = false;
             this.delete_user_button.FlatAppearance.BorderSize = 0;
             this.delete_user_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.delete_user_button.Location = new System.Drawing.Point(6, 186);

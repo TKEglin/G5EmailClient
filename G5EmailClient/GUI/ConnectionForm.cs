@@ -111,6 +111,7 @@ namespace G5EmailClient.GUI
         /// </summary>
         private void unshowMessage(Label label)
         {
+            if (label.IsDisposed) return;
             if (label.InvokeRequired)
             {
                 Action safeUnshow = delegate { unshowMessage(label); };
@@ -170,6 +171,12 @@ namespace G5EmailClient.GUI
         private void connect_button_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
+
+            activeUser.IMAP_hostname = IMAP_hostname_textbox.Text;
+            activeUser.SMTP_hostname = SMTP_hostname_textbox.Text;
+            activeUser.IMAP_port = (int)IMAP_port_box.Value;
+            activeUser.SMTP_port = (int)SMTP_port_box.Value;
+
             Exception? attempt = EmailClient.Connect(activeUser.IMAP_hostname, activeUser.IMAP_port,
                                                      activeUser.SMTP_hostname, activeUser.SMTP_port);
             if (attempt == null) // Success
@@ -198,6 +205,10 @@ namespace G5EmailClient.GUI
         private void login_button_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
+
+            activeUser.username = username_textbox.Text;
+            activeUser.password = password_textbox.Text;
+
             Exception? attempt = EmailClient.Authenticate(activeUser.username, activeUser.password);
             if(attempt == null) // Success
             {
