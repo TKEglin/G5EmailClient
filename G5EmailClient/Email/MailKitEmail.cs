@@ -843,7 +843,7 @@ namespace G5EmailClient.Email
 
             // If trash folder is detected, move the message
             if (trashFolder != null & folder != trashFolder)
-                MoveMessage(ID, trashFolder.FolderIndex, false);
+                MoveMessage(ID, trashFolder.FolderIndex, false, trashFolder);
             else
             {
                 folder.MainImapFolder.AddFlags(ID, MessageFlags.Deleted, true);
@@ -855,11 +855,18 @@ namespace G5EmailClient.Email
             MainImapMutex.ReleaseMutex();
         }
 
-        void IEmail.MoveMessage(string sUID, int folderIndex)
+        void IEmail.MoveMessage(string sUID, int folderIndex, string folderName)
         {
-            MoveMessage(UniqueId.Parse(sUID), folderIndex, true);
+            foreach(var folder in emailFolders)
+            {
+                if(folderName == folder.FolderName)
+                {
+                    MoveMessage(UniqueId.Parse(sUID), folderIndex, true, folder);
+                    break;
+                }
+            }
         }
-        private void MoveMessage(UniqueId UID, int folderIndex, bool async)
+        private void MoveMessage(UniqueId UID, int folderIndex, bool async, EmailFolder folder)
         {
             Debug.WriteLine("Running MailKitEmail.MoveMessage() with destination "
                + emailFolders[folderIndex].MainImapFolder!.Name);
@@ -872,18 +879,18 @@ namespace G5EmailClient.Email
                 message = activeFolder.Messages[UID];
 
             if (async)
-                ThreadPool.QueueUserWorkItem(state => AsyncMoveMessage(UID, folderIndex, activeFolder!,
+                ThreadPool.QueueUserWorkItem(state => AsyncMoveMessage(UID, folderIndex, folder, activeFolder!,
                                                                        Envelope, Seen, message));
             else
-                AsyncMoveMessage(UID, folderIndex, activeFolder!, Envelope, Seen, message);
+                AsyncMoveMessage(UID, folderIndex, folder, activeFolder!, Envelope, Seen, message);
 
             Debug.WriteLine("MailKitEmail.MoveMessage() complete");
         }
-        private void AsyncMoveMessage(UniqueId UID, int destinationIndex, EmailFolder origin, 
+        private void AsyncMoveMessage(UniqueId UID, int destIndex, EmailFolder dest, EmailFolder origin, 
                                       IEmail.Message Envelope, bool Seen, MimeMessage? Message)
         {
             MainImapMutex.WaitOne();
-            var destinationFolder = emailFolders[destinationIndex];
+            var destinationFolder = emailFolders[destIndex];
 
             if (!origin.MainImapFolder!.IsOpen)
             {
@@ -892,7 +899,7 @@ namespace G5EmailClient.Email
 
             Debug.WriteLine("Server request to move message.");
 
-            UniqueId destinationUID = UID;
+            UniqueId? destinationUID = UID;
             bool succes = true;
             Exception? Exception = null;
 
@@ -902,22 +909,27 @@ namespace G5EmailClient.Email
             }
             catch(Exception ex)
             {
-                // If the operation failed, the message will be returned to the original folder.
+                // If the operation failed, the message will disappear into the nether world (for now).
+                if (destinationUID == null) return;
+
+                // Or returned to original folder idk
                 destinationUID = UID;
                 destinationFolder = origin;
-                destinationIndex = origin.FolderIndex;
+                destIndex = origin.FolderIndex;
                 succes = false;
                 Exception = ex;
             }
 
             // Adding message information to new folder
-            destinationFolder.UIDs.Add(destinationUID);
-            if (!destinationFolder.Envelopes.ContainsKey(destinationUID))
-                destinationFolder.Envelopes[destinationUID] = Envelope;
-            if (!destinationFolder.Seen.ContainsKey(destinationUID))
-                destinationFolder.Seen[destinationUID] = Seen;
-            if (!destinationFolder.Messages.ContainsKey(destinationUID) & Message != null)
-                destinationFolder.Messages[destinationUID] = Message!;
+            var destUID = destinationUID.Value;
+
+            destinationFolder.UIDs.Add(destUID);
+            if (!destinationFolder.Envelopes.ContainsKey(destUID))
+                destinationFolder.Envelopes[destUID] = Envelope;
+            if (!destinationFolder.Seen.ContainsKey(destUID))
+                destinationFolder.Seen[destUID] = Seen;
+            if (!destinationFolder.Messages.ContainsKey(destUID) & Message != null)
+                destinationFolder.Messages[destUID] = Message!;
 
             // Removing the message from the origin folder locally:
             if(succes)
@@ -932,7 +944,7 @@ namespace G5EmailClient.Email
 
             Debug.WriteLine("Sending MoveMessageFinished event for message with subject " + Envelope.subject);
             this.MoveMessageFinished(destinationUID.ToString()!,
-                                     destinationIndex,
+                                     destIndex,
                                      Envelope,
                                      Seen,
                                      succes, Exception);

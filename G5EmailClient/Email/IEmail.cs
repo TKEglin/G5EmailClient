@@ -219,7 +219,7 @@ namespace G5EmailClient.Email
         /// The client assumes that the GUI will remove the message from the UI, 
         /// so the message cannot be accessed again.
         /// </summary>
-        void MoveMessage(string UID, int folderIndex);
+        void MoveMessage(string UID, int folderIndex, string folderName);
         event MoveMessageFinishedHandler MoveMessageFinished;
         public delegate void MoveMessageFinishedHandler(string UID, int folderIndex, 
                                                         Message Envelope, bool seen, 

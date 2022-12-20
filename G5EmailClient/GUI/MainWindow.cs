@@ -819,7 +819,7 @@ namespace G5EmailClient.GUI
 
             foreach (var messageUID in messageUIDs)
             {
-                MainClient.Client.MoveMessage(messageUID, folderIndex);
+                MainClient.Client.MoveMessage(messageUID, folderIndex, button.Text);
             }
 
             Debug.WriteLine("Folder with index " + button.Tag + " and name " + button.Text + " selected for move.");
