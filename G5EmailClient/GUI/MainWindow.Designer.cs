@@ -41,8 +41,13 @@
             this.logout_button = new System.Windows.Forms.ToolStripMenuItem();
             this.refresh_button = new System.Windows.Forms.ToolStripButton();
             this.folders_panel = new System.Windows.Forms.Panel();
-            this.notifications_separator_panel = new System.Windows.Forms.Panel();
             this.folders_lisbox = new System.Windows.Forms.ListBox();
+            this.folder_manage_panel = new System.Windows.Forms.Panel();
+            this.new_foldername_textbox = new System.Windows.Forms.TextBox();
+            this.rename_folder_button = new System.Windows.Forms.Button();
+            this.delete_folder_button = new System.Windows.Forms.Button();
+            this.add_folder_button = new System.Windows.Forms.Button();
+            this.notifications_separator_panel = new System.Windows.Forms.Panel();
             this.notification_panel = new System.Windows.Forms.Panel();
             this.notifications_flowpanel = new System.Windows.Forms.FlowLayoutPanel();
             this.notifications_label = new System.Windows.Forms.Label();
@@ -143,6 +148,7 @@
             this.top_panel.SuspendLayout();
             this.top_toolstrip.SuspendLayout();
             this.folders_panel.SuspendLayout();
+            this.folder_manage_panel.SuspendLayout();
             this.notification_panel.SuspendLayout();
             this.account_info_panel.SuspendLayout();
             this.main_panel.SuspendLayout();
@@ -285,8 +291,9 @@
             // folders_panel
             // 
             this.folders_panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.folders_panel.Controls.Add(this.notifications_separator_panel);
             this.folders_panel.Controls.Add(this.folders_lisbox);
+            this.folders_panel.Controls.Add(this.folder_manage_panel);
+            this.folders_panel.Controls.Add(this.notifications_separator_panel);
             this.folders_panel.Controls.Add(this.notification_panel);
             this.folders_panel.Controls.Add(this.account_info_panel);
             this.folders_panel.Dock = System.Windows.Forms.DockStyle.Left;
@@ -294,15 +301,6 @@
             this.folders_panel.Name = "folders_panel";
             this.folders_panel.Size = new System.Drawing.Size(230, 623);
             this.folders_panel.TabIndex = 1;
-            // 
-            // notifications_separator_panel
-            // 
-            this.notifications_separator_panel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.notifications_separator_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.notifications_separator_panel.Location = new System.Drawing.Point(0, 591);
-            this.notifications_separator_panel.Name = "notifications_separator_panel";
-            this.notifications_separator_panel.Size = new System.Drawing.Size(228, 1);
-            this.notifications_separator_panel.TabIndex = 4;
             // 
             // folders_lisbox
             // 
@@ -312,13 +310,95 @@
             this.folders_lisbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.folders_lisbox.FormattingEnabled = true;
             this.folders_lisbox.ItemHeight = 23;
-            this.folders_lisbox.Location = new System.Drawing.Point(0, 30);
+            this.folders_lisbox.Location = new System.Drawing.Point(0, 60);
             this.folders_lisbox.Name = "folders_lisbox";
-            this.folders_lisbox.Size = new System.Drawing.Size(228, 562);
+            this.folders_lisbox.Size = new System.Drawing.Size(228, 531);
             this.folders_lisbox.TabIndex = 2;
             this.folders_lisbox.TabStop = false;
             this.folders_lisbox.Click += new System.EventHandler(this.folders_lisbox_Click);
             this.folders_lisbox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listBox1_DrawItem);
+            // 
+            // folder_manage_panel
+            // 
+            this.folder_manage_panel.Controls.Add(this.new_foldername_textbox);
+            this.folder_manage_panel.Controls.Add(this.rename_folder_button);
+            this.folder_manage_panel.Controls.Add(this.delete_folder_button);
+            this.folder_manage_panel.Controls.Add(this.add_folder_button);
+            this.folder_manage_panel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.folder_manage_panel.Location = new System.Drawing.Point(0, 30);
+            this.folder_manage_panel.Name = "folder_manage_panel";
+            this.folder_manage_panel.Padding = new System.Windows.Forms.Padding(1);
+            this.folder_manage_panel.Size = new System.Drawing.Size(228, 30);
+            this.folder_manage_panel.TabIndex = 5;
+            // 
+            // new_foldername_textbox
+            // 
+            this.new_foldername_textbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.new_foldername_textbox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.new_foldername_textbox.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.new_foldername_textbox.Location = new System.Drawing.Point(57, 1);
+            this.new_foldername_textbox.Name = "new_foldername_textbox";
+            this.new_foldername_textbox.PlaceholderText = "New name...";
+            this.new_foldername_textbox.Size = new System.Drawing.Size(142, 23);
+            this.new_foldername_textbox.TabIndex = 10;
+            this.brief_control_explain_tooltop.SetToolTip(this.new_foldername_textbox, "Type new folder name here");
+            // 
+            // rename_folder_button
+            // 
+            this.rename_folder_button.BackgroundImage = global::G5EmailClient.Properties.Resources.RenameIcon;
+            this.rename_folder_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.rename_folder_button.Dock = System.Windows.Forms.DockStyle.Left;
+            this.rename_folder_button.FlatAppearance.BorderSize = 0;
+            this.rename_folder_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.rename_folder_button.Location = new System.Drawing.Point(29, 1);
+            this.rename_folder_button.Margin = new System.Windows.Forms.Padding(0);
+            this.rename_folder_button.Name = "rename_folder_button";
+            this.rename_folder_button.Size = new System.Drawing.Size(28, 28);
+            this.rename_folder_button.TabIndex = 9;
+            this.brief_control_explain_tooltop.SetToolTip(this.rename_folder_button, "Rename Folder");
+            this.rename_folder_button.UseVisualStyleBackColor = true;
+            this.rename_folder_button.Click += new System.EventHandler(this.rename_folder_button_Click);
+            // 
+            // delete_folder_button
+            // 
+            this.delete_folder_button.BackgroundImage = global::G5EmailClient.Properties.Resources.CloseIcon;
+            this.delete_folder_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.delete_folder_button.Dock = System.Windows.Forms.DockStyle.Right;
+            this.delete_folder_button.FlatAppearance.BorderSize = 0;
+            this.delete_folder_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.delete_folder_button.Location = new System.Drawing.Point(199, 1);
+            this.delete_folder_button.Margin = new System.Windows.Forms.Padding(0);
+            this.delete_folder_button.Name = "delete_folder_button";
+            this.delete_folder_button.Size = new System.Drawing.Size(28, 28);
+            this.delete_folder_button.TabIndex = 8;
+            this.brief_control_explain_tooltop.SetToolTip(this.delete_folder_button, "Delete Folder");
+            this.delete_folder_button.UseVisualStyleBackColor = true;
+            this.delete_folder_button.Click += new System.EventHandler(this.delete_folder_button_Click);
+            // 
+            // add_folder_button
+            // 
+            this.add_folder_button.BackgroundImage = global::G5EmailClient.Properties.Resources.PlusIcon;
+            this.add_folder_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.add_folder_button.Dock = System.Windows.Forms.DockStyle.Left;
+            this.add_folder_button.FlatAppearance.BorderSize = 0;
+            this.add_folder_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.add_folder_button.Location = new System.Drawing.Point(1, 1);
+            this.add_folder_button.Margin = new System.Windows.Forms.Padding(0);
+            this.add_folder_button.Name = "add_folder_button";
+            this.add_folder_button.Size = new System.Drawing.Size(28, 28);
+            this.add_folder_button.TabIndex = 7;
+            this.brief_control_explain_tooltop.SetToolTip(this.add_folder_button, "Add Folder");
+            this.add_folder_button.UseVisualStyleBackColor = true;
+            this.add_folder_button.Click += new System.EventHandler(this.add_folder_button_Click);
+            // 
+            // notifications_separator_panel
+            // 
+            this.notifications_separator_panel.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.notifications_separator_panel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.notifications_separator_panel.Location = new System.Drawing.Point(0, 591);
+            this.notifications_separator_panel.Name = "notifications_separator_panel";
+            this.notifications_separator_panel.Size = new System.Drawing.Size(228, 1);
+            this.notifications_separator_panel.TabIndex = 4;
             // 
             // notification_panel
             // 
@@ -1460,6 +1540,8 @@
             this.top_toolstrip.PerformLayout();
             this.folders_panel.ResumeLayout(false);
             this.folders_panel.PerformLayout();
+            this.folder_manage_panel.ResumeLayout(false);
+            this.folder_manage_panel.PerformLayout();
             this.notification_panel.ResumeLayout(false);
             this.notification_panel.PerformLayout();
             this.account_info_panel.ResumeLayout(false);
@@ -1629,5 +1711,10 @@
         private System.Windows.Forms.Timer refresh_timer;
         private Panel loading_panel;
         private PictureBox loading_icon_picturebox;
+        private Panel folder_manage_panel;
+        private Button rename_folder_button;
+        private Button delete_folder_button;
+        private Button add_folder_button;
+        private TextBox new_foldername_textbox;
     }
 }
