@@ -80,16 +80,13 @@ namespace G5EmailClient.Email
         int foldersPreloading = 0;
 
         // Used to maintain connection with the server
-        System.Timers.Timer server_ping_timer = new System.Timers.Timer(30000) { Enabled = true };
+        System.Timers.Timer server_ping_timer = new System.Timers.Timer(60000) { Enabled = false };
 
         public MailKitEmail()
         {
             // Initalizing class data variables.
             List<IDatabase.User> users = data.GetUsers();
 
-            mainImapClient.Disconnected += MaintainConnection;
-            loadImapClient.Disconnected += MaintainConnection;
-            smtpClient    .Disconnected += MaintainConnection;
         }
 
         /// <summary>
@@ -101,6 +98,11 @@ namespace G5EmailClient.Email
             updateFolder(0); // Updating inbox
 
             server_ping_timer.Elapsed += MaintainConnection;
+            server_ping_timer.Enabled = true;
+
+            mainImapClient.Disconnected += MaintainConnection;
+            loadImapClient.Disconnected += MaintainConnection;
+            smtpClient.Disconnected     += MaintainConnection;
         }
 
          //_________________
@@ -905,13 +907,15 @@ namespace G5EmailClient.Email
 
             try
             {
-                destinationUID = origin!.MainImapFolder!.MoveTo(UID, destinationFolder.MainImapFolder)!.Value;
-            }
-            catch(Exception ex)
-            {
-                // If the operation failed, the message will disappear into the nether world (for now).
-                if (destinationUID == null) return;
+                destinationUID = origin!.MainImapFolder!.MoveTo(UID, destinationFolder.MainImapFolder)!;
 
+                // If the operation failed, the message will disappear into the nether world (for now).
+                if (destinationUID == null) throw new Exception("Move message failed: MoveTo() function returned null.");
+
+                throw new Exception("Test exception");
+            }
+            catch (Exception ex)
+            {
                 // Or returned to original folder idk
                 destinationUID = UID;
                 destinationFolder = origin;

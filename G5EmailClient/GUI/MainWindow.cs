@@ -842,10 +842,10 @@ namespace G5EmailClient.GUI
                     MoveMessageFailed(UID, folderIndex, ex);
                 }
                 // Panel will be origin folder if operation is failed. Otherwise, destination index
-                panel.Add(UID, Envelope.from,
-                               Envelope.date,
-                               Envelope.subject,
-                               seen);
+                panel.AddToFront(UID, Envelope.from,
+                                 Envelope.date,
+                                 Envelope.subject,
+                                 seen);
             }
         }
         private void MoveMessageFailed(string UID, int folderIndex, Exception ex)
@@ -1028,13 +1028,21 @@ namespace G5EmailClient.GUI
 
             if (!MainClient.FoldersInitialized)
                 initializeFoldersView();
-            else
+            
+            // Resetting folder views
+            folders_lisbox.Items.Clear();
+            move_message_dropdown.DropDownItems.Clear();
+            // Index count
+            int i = -1;
+            foreach(var name in MainClient.FolderNames)
             {
-                folders_lisbox.Items.Clear();
-                foreach(var name in MainClient.FolderNames)
-                {
-                    folders_lisbox.Items.Add(name);
-                }
+                i++;
+                folders_lisbox.Items.Add(name);
+                ToolStripButton folderButton = new();
+                folderButton.Text = name;
+                folderButton.Tag = i;
+                folderButton.Click += folder_move_button_Click;
+                move_message_dropdown.DropDownItems.Add(folderButton);
             }
 
             var panel = MainClient.EnvelopeFlowPanels[0];
