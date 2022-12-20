@@ -86,6 +86,10 @@ namespace G5EmailClient.Email
         {
             // Initalizing class data variables.
             List<IDatabase.User> users = data.GetUsers();
+
+            mainImapClient.Disconnected += MaintainConnection;
+            loadImapClient.Disconnected += MaintainConnection;
+            smtpClient    .Disconnected += MaintainConnection;
         }
 
         /// <summary>
@@ -417,21 +421,50 @@ namespace G5EmailClient.Email
         }
 
         /// <summary>
-        /// Periodically pings the server to maintain connection
+        /// Used to maintain connection to the servers
         /// </summary>
         void MaintainConnection(object? sender, EventArgs e)
         {
             Debug.WriteLine("Pinging server to maintain connection");
             MainImapMutex.WaitOne();
-            mainImapClient.NoOp();
+            if(!mainImapClient.IsConnected)
+            {
+                mainImapClient.Connect(activeUser.IMAP_hostname, activeUser.IMAP_port, true);
+            }
+            if (!mainImapClient.IsAuthenticated)
+            {
+                mainImapClient.Authenticate(activeUser.username, activeUser.password);
+            }
+            try { mainImapClient.NoOp(); } catch { /*oh no*/ }
+            
             MainImapMutex.ReleaseMutex();
 
+
             loadImapMutex.WaitOne();
-            loadImapClient.NoOp();
+            if (!loadImapClient.IsConnected)
+            {
+                loadImapClient.Connect(activeUser.IMAP_hostname, activeUser.IMAP_port, true);
+            }
+            if (!loadImapClient.IsAuthenticated)
+            {
+                loadImapClient.Authenticate(activeUser.username, activeUser.password);
+            }
+            try { loadImapClient.NoOp(); } catch { /*oh no*/ }
+
             loadImapMutex.ReleaseMutex();
 
+
             SmtpMutex.WaitOne();
-            smtpClient.NoOp();
+            if (!smtpClient.IsConnected)
+            {
+                smtpClient.Connect(activeUser.SMTP_hostname, activeUser.SMTP_port, true);
+            }
+            if (!smtpClient.IsAuthenticated)
+            {
+                smtpClient.Authenticate(activeUser.username, activeUser.password);
+            }
+            try { smtpClient.NoOp(); } catch { /*oh no*/ }
+
             SmtpMutex.ReleaseMutex();
         }
         #endregion
@@ -908,9 +941,105 @@ namespace G5EmailClient.Email
         public event IEmail.MoveMessageFinishedHandler MoveMessageFinished;
 
 
+        Exception? IEmail.AddFolder(string folderName)
+        {
+            MainImapMutex.WaitOne();
+
+            var topFolder = mainImapClient.GetFolder(mainImapClient.PersonalNamespaces[0]);
+            IMailFolder newMainFolder = topFolder.Create(folderName, false);
+            IMailFolder? newLoadFolder = null;
+
+            //wack solution, but time is short
+            var allFolders = mainImapClient.GetFolders(mainImapClient.PersonalNamespaces[0]);
+            foreach(var folder in allFolders)
+            {
+                if(folder.Name == folderName)
+                {
+                    newLoadFolder = folder;
+                    emailFolders.Add(new EmailFolder(newMainFolder, newLoadFolder, folderName));
+                }
+            }
+
+            MaintainConnection(null, EventArgs.Empty);
+
+            MainImapMutex.ReleaseMutex();
+
+            if (newLoadFolder == null) return new Exception("Folder could not be properly created. Try again.");
+
+            return null; // Success
+        }
+
+        Exception? IEmail.DeleteFolder(string oldName, int folderIndex)
+        {
+            MainImapMutex.WaitOne();
+
+            IMailFolder? deleteFolder = null;
+            foreach (var folder in mainImapClient.GetFolders(mainImapClient.PersonalNamespaces[0]))
+            {
+                if (folder.Name == oldName)
+                {
+                    deleteFolder = folder;
+                    break;
+                }
+            }
+            if (deleteFolder == null) return new Exception("Delete folder failed.");
+
+            try
+            {
+                deleteFolder.Delete();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                return ex;
+            }
+
+            emailFolders.RemoveAt(folderIndex);
+
+            MaintainConnection(null, EventArgs.Empty);
+
+            MainImapMutex.ReleaseMutex();
+
+            return null; // Success
+        }
+
+        Exception? IEmail.RenameFolder(string oldName, string newName, int folderIndex)
+        {
+            MainImapMutex.WaitOne();
+
+            IMailFolder? renamedFolder = null;
+            foreach(var folder in mainImapClient.GetFolders(mainImapClient.PersonalNamespaces[0]))
+            {
+                if (folder.Name == oldName)
+                {
+                    renamedFolder = folder;
+                    break;
+                }
+            }
+            if(renamedFolder == null) return new Exception("Rename folder failed.");
+
+            try
+            {
+                renamedFolder.Rename(renamedFolder.ParentFolder, newName);
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
+                return ex;
+            }
+
+            emailFolders[folderIndex].FolderName = newName;
+
+            MaintainConnection(null, EventArgs.Empty);
+
+            MainImapMutex.ReleaseMutex();
+
+            return null; // Success
+        }
+
         #endregion
 
-         //____________________________________________
+        //____________________________________________
         // Functions that interact with the SMTP server 
         #region SMTP functions
 

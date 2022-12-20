@@ -1044,5 +1044,90 @@ namespace G5EmailClient.GUI
             this.Cursor = Cursors.Default;
             Application.Exit();
         }
+
+        private void add_folder_button_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+
+            var text = new_foldername_textbox.Text;
+
+            new_foldername_textbox.Text = string.Empty;
+
+            if (text.Length <= 0) return;
+
+            if (MainClient.Client.AddFolder(text) == null)
+            {
+                var index = MainClient.FolderNames.Count;
+
+                folders_lisbox.Items.Add(text);
+                MainClient.FolderNames.Add(text);
+
+                // Adding flow panel to list
+                var flowPanel = new EnvelopeFlowPanel();
+                flowPanel.Visible = false; flowPanel.folderIndex = index;
+                flowPanel.Dock = template_flow_panel.Dock;
+                flowPanel.Dock = template_flow_panel.Dock;
+                flowPanel.Parent = template_flow_panel.Parent;
+                flowPanel.Location = template_flow_panel.Location;
+                flowPanel.AutoSize = template_flow_panel.AutoSize;
+                flowPanel.AutoScroll = template_flow_panel.AutoScroll;
+                flowPanel.MinimumSize = template_flow_panel.MinimumSize;
+                flowPanel.AutoSizeMode = template_flow_panel.AutoSizeMode;
+                flowPanel.EnvelopePanelOpened += EnvelopePanel_MessageOpen;
+                flowPanel.LoadMoreClicked += LoadMoreHandler;
+                flowPanel.BringToFront();
+                MainClient.EnvelopeFlowPanels.Add(flowPanel);
+
+                // Move button list
+                ToolStripButton folderButton = new();
+                folderButton.Text = text;
+                folderButton.Tag = index;
+                folderButton.Click += folder_move_button_Click;
+                move_message_dropdown.DropDownItems.Add(folderButton);
+            }
+
+            this.Cursor = Cursors.Default;
+        }
+
+        private void rename_folder_button_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+
+            var index = folders_lisbox.SelectedIndex;
+            var newName = new_foldername_textbox.Text;
+            var oldName = (string)folders_lisbox.Items[index];
+
+            new_foldername_textbox.Text = string.Empty;
+
+            if (newName.Length <= 0) return;
+
+            if (MainClient.Client.RenameFolder(oldName, newName, index) == null)
+            {
+                folders_lisbox.Items[index]   = newName;
+                MainClient.FolderNames[index] = newName;
+
+                // Move button list
+                move_message_dropdown.DropDownItems[index].Text = newName;
+            }
+
+            this.Cursor = Cursors.Default;
+        }
+
+        private void delete_folder_button_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+
+            var index = folders_lisbox.SelectedIndex;
+            var oldName = (string)folders_lisbox.Items[index];
+
+            if (MainClient.Client.DeleteFolder(oldName, index) == null)
+            {
+                folders_lisbox.Items.RemoveAt(index);
+                MainClient.FolderNames.RemoveAt(index);
+                move_message_dropdown.DropDownItems.RemoveAt(index);
+            }
+
+            this.Cursor = Cursors.Default;
+        }
     }
 }

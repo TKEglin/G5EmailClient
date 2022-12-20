@@ -283,6 +283,16 @@ namespace G5EmailClient.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap PlusIcon {
+            get {
+                object obj = ResourceManager.GetObject("PlusIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ReadUnreadIcon {
             get {
                 object obj = ResourceManager.GetObject("ReadUnreadIcon", resourceCulture);
@@ -306,6 +316,16 @@ namespace G5EmailClient.Properties {
         internal static System.Drawing.Bitmap RefreshIcon {
             get {
                 object obj = ResourceManager.GetObject("RefreshIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap RenameIcon {
+            get {
+                object obj = ResourceManager.GetObject("RenameIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

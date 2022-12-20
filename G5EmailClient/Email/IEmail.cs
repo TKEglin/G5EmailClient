@@ -245,5 +245,23 @@ namespace G5EmailClient.Email
         /// </summary>
         /// <returns>Returns a list of folder envelopes</returns>
         (List<IEmail.Message> messages, List<string> UIDs) SearchFolder(string searchString, SearchFlags flags);
+
+        /// <summary>
+        /// Attempts to add a folder with the given name
+        /// </summary>
+        /// <returns>null if successful, the exception if there was an error.</returns>
+        Exception? AddFolder(string folderName);
+
+        /// <summary>
+        /// Attempts to add a folder with the given name
+        /// </summary>
+        /// <returns>null if successful, the exception if there was an error.</returns>
+        Exception? DeleteFolder(string oldName, int folderIndex);
+
+        /// <summary>
+        /// Attempts to add a folder with the given name
+        /// </summary>
+        /// <returns>null if successful, the exception if there was an error.</returns>
+        Exception? RenameFolder(string oldName, string newName, int folderIndex);
     }
 }
