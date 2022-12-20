@@ -249,7 +249,7 @@ namespace G5EmailClient.GUI
             // If update is true, repopulate list.
             if(update == true)
             {
-                int loadAmount = 25;
+                int loadAmount = 50;
 
                 var envelopes = MainClient.Client.GetFolderEnvelopes(folderIndex, loadAmount);
                 foreach (var envelope in envelopes)
