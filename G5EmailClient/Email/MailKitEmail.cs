@@ -911,8 +911,6 @@ namespace G5EmailClient.Email
 
                 // If the operation failed, the message will disappear into the nether world (for now).
                 if (destinationUID == null) throw new Exception("Move message failed: MoveTo() function returned null.");
-
-                throw new Exception("Test exception");
             }
             catch (Exception ex)
             {
