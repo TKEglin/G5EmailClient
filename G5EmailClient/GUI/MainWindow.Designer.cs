@@ -1327,8 +1327,6 @@
             this.search_textbox.Size = new System.Drawing.Size(320, 23);
             this.search_textbox.TabIndex = 4;
             this.search_textbox.TabStop = false;
-            this.brief_control_explain_tooltop.SetToolTip(this.search_textbox, "All messages must be loaded before the search can be done, For a very large folde" +
-        "r, this may take a while.");
             this.search_textbox.Click += new System.EventHandler(this.search_textbox_Enter);
             this.search_textbox.Enter += new System.EventHandler(this.search_textbox_Enter);
             this.search_textbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.search_textbox_KeyUp);

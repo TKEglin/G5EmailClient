@@ -318,8 +318,7 @@ namespace G5EmailClient.Email
 
             var folder = activeFolder!;
 
-            if(!folder.MainImapFolder!.IsOpen)
-                folder.MainImapFolder!.Open(FolderAccess.ReadWrite);
+            folder.MainImapFolder!.Open(FolderAccess.ReadWrite);
 
             SearchQuery Query = SearchQuery.Not(SearchQuery.All);
 
