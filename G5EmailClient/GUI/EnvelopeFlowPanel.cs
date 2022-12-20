@@ -28,12 +28,20 @@ namespace G5EmailClient.GUI
         /// Set to true if the Envelopes in this panel are copies
         /// </summary>
         public bool isCopyPanel = false;
+        // A panel is either copy/search panel or source panel
         public EnvelopeFlowPanel? sourcePanel;
-
+        public EnvelopeFlowPanel? searchPanel;
 
         public EnvelopeFlowPanel()
         {
             InitializeComponent();
+        }
+        public EnvelopeFlowPanel(EnvelopeFlowPanel source)
+        {
+            InitializeComponent();
+
+            isCopyPanel = true;
+            sourcePanel = source;
         }
 
         // Defining indexing operator
@@ -47,7 +55,6 @@ namespace G5EmailClient.GUI
         {
             get { return (EnvelopePanel)flow_control.Controls[index]; }
         }
-
 
         public int ListSize
         {
@@ -76,21 +83,6 @@ namespace G5EmailClient.GUI
             flow_control.Controls.Add(envelopePanel);
             var NewPanelDate = DateTimeOffset.Parse(envelopePanel.dateText);
 
-            // ___ SORT DISABLED FOR OPTIMIZATION. IMPLEMENT IN CLIENT CLASS INSTEAD. ___
-            // Finding date sorted location
-            //foreach (EnvelopePanel OldPanel in flow_control.Controls)
-            //{
-            //    var OldPanelDate = DateTimeOffset.Parse(OldPanel.dateText);
-            //    if (OldPanelDate.CompareTo(NewPanelDate) < 0)
-            //    {
-            //        Debug.WriteLine("Reached later message. Setting index");
-            //        var index = flow_control.Controls.IndexOf(OldPanel);
-            //        flow_control.Controls.SetChildIndex(envelopePanel, index);
-            //        flow_control.Controls.SetChildIndex(OldPanel, index + 1);
-            //        break;
-            //    }
-            //}
-
             // Adding to the list
             panelList[UID] = envelopePanel;
         }
@@ -105,20 +97,6 @@ namespace G5EmailClient.GUI
             flow_control.Controls.Add(envelopePanel);
             var NewPanelDate = DateTimeOffset.Parse(envelopePanel.dateText);
 
-            // ___ SORT DISABLED FOR OPTIMIZATION. IMPLEMENT IN CLIENT CLASS INSTEAD. ___
-            // Finding date sorted location
-            //foreach (EnvelopePanel OldPanel in flow_control.Controls)
-            //{
-            //    var OldPanelDate = DateTimeOffset.Parse(OldPanel.dateText);
-            //    if (OldPanelDate.CompareTo(NewPanelDate) < 0)
-            //    {
-            //        Debug.WriteLine("Reached later message. Setting index");
-            //        var index = flow_control.Controls.IndexOf(OldPanel);
-            //        flow_control.Controls.SetChildIndex(envelopePanel, index);
-            //        flow_control.Controls.SetChildIndex(OldPanel, index + 1);
-            //        break;
-            //    }
-            //}
             // Adding to the list
             panelList[envelopePanel.UID] = envelopePanel;
         }
@@ -170,6 +148,20 @@ namespace G5EmailClient.GUI
         }
 
         /// <summary>
+        /// Toggles read appearance for all envelopes for the given UIDs.
+        /// </summary>
+        public void ToggleReadUIDs(List<string> UIDs)
+        {
+            foreach (var UID in UIDs)
+            {
+                if (panelList.ContainsKey(UID))
+                {
+                    panelList[UID].toggleRead();
+                }
+            }
+        }
+
+        /// <summary>
         /// Remove all selected envelopePanels from the control. Returns a list of the
         /// UIDs of the affected envelopePanels.
         /// </summary>
@@ -186,16 +178,23 @@ namespace G5EmailClient.GUI
         }
 
         /// <summary>
+        /// Remove all envelopePanels with the given UIDs from the control.
+        /// </summary>
+        public void DeleteUIDs(List<string> UIDs)
+        {
+            foreach (var UID in UIDs)
+            {
+                if(panelList.ContainsKey(UID))
+                    panelList[UID].Dispose();
+            }
+        }
+
+        /// <summary>
         /// Disposes all envelope panels in the control.
         /// </summary>
         public void Clear()
         {
-            if (!isCopyPanel)
-                foreach (var panel in panelList) panel.Value.Dispose();
-            else
-                if(sourcePanel != null)
-                    foreach (var panel in panelList)
-                        sourcePanel.Add(panel.Value);
+            foreach (var panel in panelList) panel.Value.Dispose();
 
             panelList.Clear();
             selectedPanels.Clear();
@@ -224,6 +223,18 @@ namespace G5EmailClient.GUI
                 return string.Empty;
             else 
                 return selectedPanels[0].UID;
+        }
+
+        public List<string> SelectedUIDs()
+        {
+            var UIDs = new List<string>();
+
+            foreach(var panel in selectedPanels)
+            {
+                UIDs.Add(panel.UID);
+            }
+
+            return UIDs;
         }
 
         /// <summary>
@@ -271,15 +282,45 @@ namespace G5EmailClient.GUI
                 // When the control button is not held, click opens the message
                 ClearSelection();
                 panel.SetSelected(true);
-
                 panel.setRead();
+
+                if(isCopyPanel)
+                {
+                    sourcePanel!.ClearSelection();
+                    sourcePanel.SetEnvelopeSelected(panel.UID);
+                    sourcePanel.SetEnvelopeRead(panel.UID);
+                }
+
                 this.EnvelopePanelOpened(panel, e);
             }
             else
             {
                 panel.SetSelected(!panel.Selected);
+
+                if (isCopyPanel)
+                {
+                    sourcePanel.SetEnvelopeSelected(panel.UID);
+                }
             }
             selectedPanels.Add(panel);
+        }
+
+        public void SetEnvelopeSelected(string UID)
+        {
+            if(panelList.ContainsKey(UID))
+            {
+                var envelope = panelList[UID];
+                selectedPanels.Add(envelope);
+                envelope.SetSelected(true);
+            }
+        }
+
+        public void SetEnvelopeRead(string UID)
+        {
+            if (panelList.ContainsKey(UID))
+            {
+                panelList[UID].setRead();
+            }
         }
 
         public void LoadMorePanel_Click(object? sender, EventArgs e)
@@ -288,6 +329,37 @@ namespace G5EmailClient.GUI
             flow_control.Controls.RemoveAt(flow_control.Controls.Count-1);
             hasLoadMorePanel = false;
             this.LoadMoreClicked(this, e);
+        }
+
+        /// <summary>
+        /// Creates a copy panel to be used for search.
+        /// Make sure to run
+        /// </summary>
+        /// <returns>The searchPanel</returns>
+        public EnvelopeFlowPanel GetSearchPanel()
+        {
+            if(searchPanel == null)
+            {
+                searchPanel = new EnvelopeFlowPanel(this);
+
+                searchPanel.Visible = true;
+                searchPanel.folderIndex = this.folderIndex;
+                searchPanel.Dock = this.Dock;
+                searchPanel.Parent = this.Parent;
+                searchPanel.Location = this.Location;
+                searchPanel.AutoSize = this.AutoSize;
+                searchPanel.AutoScroll = this.AutoScroll;
+                searchPanel.MinimumSize = this.MinimumSize;
+                searchPanel.AutoSizeMode = this.AutoSizeMode;
+                searchPanel.EnvelopePanelOpened = this.EnvelopePanelOpened;
+                searchPanel.LoadMoreClicked += this.LoadMoreClicked;
+            }
+            else
+            {
+                searchPanel.Clear();
+            }
+
+            return searchPanel;
         }
 
         //

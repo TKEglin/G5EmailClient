@@ -22,6 +22,7 @@ namespace G5EmailClient.GUI
             // This list will be used to store and smoothly switch between envelope panels
             public List<EnvelopeFlowPanel> EnvelopeFlowPanels = new();
             public EnvelopeFlowPanel? activePanel;
+            public bool searchActive; // used to access search version of active panel
 
             // Used to repopulate the folders list when switching
             public List<string> FolderNames = new();
@@ -262,7 +263,7 @@ namespace G5EmailClient.GUI
                     // Preloading the loaded message
                     MainClient.Client.PreloadMessage(folderIndex, envelope.UID);
                 }
-                // If there envelopes list is full, there may be more messages.
+                // If the envelopes list is full, there may be more messages.
                 if(envelopes.Count >= loadAmount)
                 {
                     panel.AddLoadMorePanel();
@@ -464,12 +465,26 @@ namespace G5EmailClient.GUI
             ToolStripButton button = (ToolStripButton)sender;
             DisableButton(button, 0.3);
 
-            var UIDs = MainClient.activePanel!.ToggleReadSelected();
+            var panel = MainClient.activePanel!;
 
-            foreach(var UID in UIDs)
+            var UIDs = new List<string>();
+
+            if(MainClient.searchActive)
+            {
+                UIDs = panel.searchPanel!.ToggleReadSelected();
+                panel.ToggleReadUIDs(UIDs);
+            }
+            else
+            {
+                UIDs = panel.ToggleReadSelected();
+            }
+
+            foreach (var UID in UIDs)
             {
                 MainClient.Client.ToggleRead(UID);
             }
+
+
             this.Cursor = Cursors.Default;
         }
 
@@ -477,7 +492,19 @@ namespace G5EmailClient.GUI
         {
             this.Cursor = Cursors.WaitCursor;
 
-            var deleted_UIDs = MainClient.activePanel!.DeleteSelected();
+            var panel = MainClient.activePanel!;
+
+            var deleted_UIDs = new List<string>();
+
+            if (MainClient.searchActive)
+            {
+                deleted_UIDs = panel.searchPanel!.DeleteSelected();
+                panel.DeleteUIDs(deleted_UIDs);
+            }
+            else
+            {
+                deleted_UIDs = panel.DeleteSelected();
+            }
 
             foreach (var UID in deleted_UIDs)
             {
@@ -775,10 +802,22 @@ namespace G5EmailClient.GUI
 
             var folderIndex = (int)button.Tag;
 
-            // The messages to be moved will be deleted from the active panel
-            var messageUIDs = MainClient.activePanel!.DeleteSelected();
+            var panel = MainClient.activePanel!;
 
-            foreach(var messageUID in messageUIDs)
+            // The messages to be moved will be deleted from the active panel
+            var messageUIDs = new List<string>();
+
+            if (MainClient.searchActive)
+            {
+                messageUIDs = panel.searchPanel!.DeleteSelected();
+                panel.DeleteUIDs(messageUIDs);
+            }
+            else
+            {
+                messageUIDs = panel.DeleteSelected();
+            }
+
+            foreach (var messageUID in messageUIDs)
             {
                 MainClient.Client.MoveMessage(messageUID, folderIndex);
             }
@@ -867,13 +906,17 @@ namespace G5EmailClient.GUI
 
             var envelopes = MainClient.Client.SearchFolder(search_textbox.Text, flags);
 
-            while(panel!.hasLoadMorePanel)
-            {
-                panel!.LoadMorePanel_Click(null, EventArgs.Empty);
-                //LoadMoreHandler(MainClient.activePanel, EventArgs.Empty);
-            }
+            MainClient.searchActive = true;
+            var searchPanel = panel!.GetSearchPanel();
 
-            panel!.HideRest(envelopes.UIDs);
+            for(int i = 0; i < envelopes.UIDs.Count; i++)
+            {
+                searchPanel.Add(envelopes.UIDs[i], envelopes.messages[i].from,
+                                                   envelopes.messages[i].date,
+                                                   envelopes.messages[i].subject,
+                                                   envelopes.messages[i].seen);
+            }
+            searchPanel.BringToFront();
 
             search_textbox.Text = " " + envelopes.UIDs.Count.ToString() + " messages found. Click here to clear.";
 
@@ -885,8 +928,9 @@ namespace G5EmailClient.GUI
             var textBox = (TextBox)sender;
             textBox.Text = string.Empty;
 
-            if(MainClient.activePanel!.envelopesHidden)
-                MainClient.activePanel!.ShowAll();   
+            MainClient.activePanel!.BringToFront();
+            MainClient.searchActive = false;
+
         }
 
         private void search_textbox_KeyUp(object sender, KeyEventArgs e)
